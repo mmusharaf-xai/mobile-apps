@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
@@ -58,7 +58,12 @@ export default function AuthScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.backgroundDark }}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
+    >
+      <View style={{ flex: 1, backgroundColor: colors.backgroundDark }}>
       {/* Status Bar */}
       <View style={{ height: 40, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 32, paddingTop: 16 }}>
         <Text style={{ color: colors.textPrimary, fontSize: 12, fontWeight: '600' }}>9:41</Text>
@@ -97,7 +102,7 @@ export default function AuthScreen() {
       </View>
 
       {/* Form */}
-      <ScrollView style={{ flex: 1, paddingHorizontal: 24, paddingTop: 24, paddingBottom: 24 }}>
+      <ScrollView style={{ flex: 1, paddingHorizontal: 24, paddingTop: 24, paddingBottom: 24 }} keyboardShouldPersistTaps="handled">
         <Text style={{ color: colors.textPrimary, fontSize: 18, fontWeight: 'bold', textAlign: 'center', marginBottom: 24,  }}>
           {isLogin ? 'Welcome Back' : 'New Player Profile'}
         </Text>
@@ -203,5 +208,6 @@ export default function AuthScreen() {
         <View style={{ width: 128, height: 4, backgroundColor: '#ffffff20', borderRadius: 2 }} />
       </View>
     </View>
+    </KeyboardAvoidingView>
   );
 }
