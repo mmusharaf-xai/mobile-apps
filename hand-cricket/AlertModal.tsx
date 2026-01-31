@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { colors } from './constants';
+
 
 interface Button {
   text: string;
@@ -15,9 +15,10 @@ interface AlertModalProps {
   message: string;
   buttons: Button[];
   onClose: () => void;
+  colors: any;
 }
 
-export default function AlertModal({ visible, title, message, buttons, onClose }: AlertModalProps) {
+export default function AlertModal({ visible, title, message, buttons, onClose, colors }: AlertModalProps) {
   const getButtonStyle = (style?: string) => {
     switch (style) {
       case 'destructive':
@@ -32,7 +33,7 @@ export default function AlertModal({ visible, title, message, buttons, onClose }
   const getButtonTextColor = (style?: string) => {
     switch (style) {
       case 'destructive':
-        return colors.textPrimary;
+        return 'white';
       case 'cancel':
         return colors.textPrimary;
       default:

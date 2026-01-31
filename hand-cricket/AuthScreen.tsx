@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingVi
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import { colors } from './constants';
+import { useTheme } from './ThemeContext';
 import AlertModal from './AlertModal';
 
 const avatars = [
@@ -15,6 +15,7 @@ const avatars = [
 ];
 
 export default function AuthScreen() {
+  const { colors } = useTheme();
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -214,7 +215,7 @@ export default function AuthScreen() {
                 >
                   <View style={{ width: 64, height: 64, borderRadius: 32, borderWidth: 2, borderColor: selectedAvatar === index ? colors.primary : 'transparent', padding: 2, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
                     <View style={{ width: '100%', height: '100%', borderRadius: 30, backgroundColor: selectedAvatar === index ? colors.primary + '20' : '#ffffff08', alignItems: 'center', justifyContent: 'center' }}>
-                      <MaterialIcons name={avatar.icon as any} size={36} color={selectedAvatar === index ? colors.primary : '#ffffff40'} />
+                      <MaterialIcons name={avatar.icon as any} size={36} color={selectedAvatar === index ? colors.primary : colors.textMuted} />
                     </View>
                   </View>
                   {selectedAvatar === index && (
@@ -260,6 +261,7 @@ export default function AuthScreen() {
         message={modalMessage}
         buttons={modalButtons}
         onClose={() => setModalVisible(false)}
+        colors={colors}
       />
     </View>
   );

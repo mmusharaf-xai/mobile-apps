@@ -3,10 +3,11 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { colors } from './constants';
+import { useTheme } from './ThemeContext';
 import AlertModal from './AlertModal';
 
 export default function HomeScreen() {
+  const { colors, toggleTheme } = useTheme();
   const [user, setUser] = useState<any>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
@@ -58,7 +59,17 @@ export default function HomeScreen() {
         <Text style={{ color: colors.primary, fontSize: 18, textAlign: 'center', marginTop: 8 }}>HandCricket Game Coming Soon...</Text>
       </View>
 
-      <View style={{ paddingHorizontal: 24, paddingBottom: 40 }}>
+      <View style={{ paddingHorizontal: 24, paddingBottom: 40, gap: 16 }}>
+        <TouchableOpacity
+          style={{ width: '100%', height: 56, backgroundColor: colors.primary, borderRadius: 28, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8 }}
+          onPress={toggleTheme}
+        >
+          <MaterialIcons name="brightness-6" size={20} color="white" />
+          <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 1 }}>
+            Toggle Theme
+          </Text>
+        </TouchableOpacity>
+
         <TouchableOpacity
           style={{ width: '100%', height: 56, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.inputBorder, borderRadius: 28, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8 }}
           onPress={handleLogout}
@@ -76,6 +87,7 @@ export default function HomeScreen() {
         message={modalMessage}
         buttons={modalButtons}
         onClose={() => setModalVisible(false)}
+        colors={colors}
       />
     </View>
   );
