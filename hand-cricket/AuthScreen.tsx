@@ -58,12 +58,7 @@ export default function AuthScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
-    >
-      <View style={{ flex: 1, backgroundColor: colors.backgroundDark }}>
+    <View style={{ flex: 1, backgroundColor: colors.backgroundDark }}>
       {/* Status Bar */}
       <View style={{ height: 40, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 32, paddingTop: 16 }}>
         <Text style={{ color: colors.textPrimary, fontSize: 12, fontWeight: '600' }}>9:41</Text>
@@ -102,7 +97,12 @@ export default function AuthScreen() {
       </View>
 
       {/* Form */}
-      <ScrollView style={{ flex: 1, paddingHorizontal: 24, paddingTop: 24, paddingBottom: 24 }} keyboardShouldPersistTaps="handled">
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
+      >
+        <ScrollView style={{ flex: 1, paddingHorizontal: 24, paddingTop: 24, paddingBottom: 24 }} keyboardShouldPersistTaps="handled">
         <Text style={{ color: colors.textPrimary, fontSize: 18, fontWeight: 'bold', textAlign: 'center', marginBottom: 24,  }}>
           {isLogin ? 'Welcome Back' : 'New Player Profile'}
         </Text>
@@ -164,7 +164,7 @@ export default function AuthScreen() {
               {avatars.map((avatar, index) => (
                 <TouchableOpacity
                   key={index}
-                  style={{ marginRight: index === avatars.length - 1 ? 16 : 0 }}
+                  style={{ marginHorizontal: 8, marginVertical: 4 }}
                   onPress={() => setSelectedAvatar(index)}
                 >
                   <View style={{ width: 64, height: 64, borderRadius: 32, borderWidth: 2, borderColor: selectedAvatar === index ? colors.primary : 'transparent', padding: 2, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
@@ -183,6 +183,7 @@ export default function AuthScreen() {
           </View>
         )}
       </ScrollView>
+      </KeyboardAvoidingView>
 
       {/* Button */}
       <View style={{ paddingHorizontal: 24, paddingBottom: 40, paddingTop: 16 }}>
@@ -208,6 +209,5 @@ export default function AuthScreen() {
         <View style={{ width: 128, height: 4, backgroundColor: '#ffffff20', borderRadius: 2 }} />
       </View>
     </View>
-    </KeyboardAvoidingView>
   );
 }
