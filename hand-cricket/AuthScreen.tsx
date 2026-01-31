@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
 import { useFonts, DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold, DMSans_700Bold } from '@expo-google-fonts/dm-sans';
-import { colors } from '../constants';
+import { colors } from './constants';
 
 const avatars = [
   { name: 'cricket', icon: 'sports-cricket' },
@@ -20,7 +20,7 @@ export default function AuthScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState(0);
-  const router = useRouter();
+  const navigation = useNavigation();
 
   const [fontsLoaded] = useFonts({
     DMSans_400Regular,
@@ -44,7 +44,7 @@ export default function AuthScreen() {
       const user = users.find((u: any) => u.email === email && u.password === password);
       if (user) {
         await AsyncStorage.setItem('currentUser', JSON.stringify(user));
-        router.replace('/home');
+        navigation.navigate('Home' as never);
       } else {
         Alert.alert('Error', 'Invalid credentials');
       }
@@ -63,7 +63,7 @@ export default function AuthScreen() {
       users.push(newUser);
       await AsyncStorage.setItem('users', JSON.stringify(users));
       await AsyncStorage.setItem('currentUser', JSON.stringify(newUser));
-      router.replace('/home');
+      navigation.navigate('Home' as never);
     }
   };
 

@@ -15,9 +15,7 @@
     },
     "web": {
     },
-    "plugins": [
-      "expo-router"
-    ],
+
     "scheme": "handcricket"
   }
 }

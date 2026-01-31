@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter } from 'expo-router';
-import { colors } from '../constants';
+import { useNavigation } from '@react-navigation/native';
+import { colors } from './constants';
 
 export default function HomeScreen() {
   const [user, setUser] = useState<any>(null);
-  const router = useRouter();
+  const navigation = useNavigation();
 
   useEffect(() => {
     const checkUser = async () => {
@@ -14,7 +14,7 @@ export default function HomeScreen() {
       if (currentUser) {
         setUser(JSON.parse(currentUser));
       } else {
-        router.replace('/');
+        navigation.navigate('Auth' as never);
       }
     };
     checkUser();
