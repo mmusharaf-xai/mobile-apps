@@ -65,6 +65,8 @@ export default function AlertModal({ visible, title, message, buttons, onClose }
       flex: 1,
       height: 44,
       borderRadius: 22,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     buttonText: {
       fontSize: 16,
@@ -72,7 +74,6 @@ export default function AlertModal({ visible, title, message, buttons, onClose }
       textTransform: 'uppercase',
       letterSpacing: 0.5,
       textAlign: 'center',
-      alignSelf: 'center',
     },
   });
   const getButtonStyle = (style?: string) => {
