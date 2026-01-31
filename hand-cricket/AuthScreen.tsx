@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity, TextInput, ScrollView, Alert } from 'reac
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import { useFonts, DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold, DMSans_700Bold } from '@expo-google-fonts/dm-sans';
 import { colors } from './constants';
 
 const avatars = [
@@ -22,16 +21,7 @@ export default function AuthScreen() {
   const [selectedAvatar, setSelectedAvatar] = useState(0);
   const navigation = useNavigation();
 
-  const [fontsLoaded] = useFonts({
-    DMSans_400Regular,
-    DMSans_500Medium,
-    DMSans_600SemiBold,
-    DMSans_700Bold,
-  });
 
-  if (!fontsLoaded) {
-    return <View />;
-  }
 
   const handleSubmit = async () => {
     if (isLogin) {
@@ -84,7 +74,7 @@ export default function AuthScreen() {
         <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', shadowColor: colors.primary, shadowOpacity: 0.4, shadowRadius: 20 }}>
           <MaterialIcons name="sports-cricket" size={36} color={colors.backgroundDark} />
         </View>
-        <Text style={{ color: colors.textPrimary, fontSize: 24, fontWeight: 'bold', marginTop: 12, fontFamily: 'DMSans_700Bold' }}>HandCricket</Text>
+        <Text style={{ color: colors.textPrimary, fontSize: 24, fontWeight: 'bold', marginTop: 12 }}>HandCricket</Text>
         <Text style={{ color: colors.textSecondary, fontSize: 10, marginTop: 2 }}>Enter the digital arena</Text>
       </View>
 
@@ -95,30 +85,30 @@ export default function AuthScreen() {
             style={{ flex: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: isLogin ? colors.primary : 'transparent' }}
             onPress={() => setIsLogin(true)}
           >
-            <Text style={{ color: isLogin ? colors.backgroundDark : colors.textSecondary, fontSize: 11, fontWeight: 'bold', fontFamily: 'DMSans_600SemiBold' }}>Login</Text>
+            <Text style={{ color: isLogin ? colors.backgroundDark : colors.textSecondary, fontSize: 11, fontWeight: 'bold',  }}>Login</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={{ flex: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: !isLogin ? colors.primary : 'transparent' }}
             onPress={() => setIsLogin(false)}
           >
-            <Text style={{ color: !isLogin ? colors.backgroundDark : colors.textSecondary, fontSize: 11, fontWeight: 'bold', fontFamily: 'DMSans_600SemiBold' }}>Signup</Text>
+            <Text style={{ color: !isLogin ? colors.backgroundDark : colors.textSecondary, fontSize: 11, fontWeight: 'bold',  }}>Signup</Text>
           </TouchableOpacity>
         </View>
       </View>
 
       {/* Form */}
       <ScrollView style={{ flex: 1, paddingHorizontal: 24, paddingTop: 24, paddingBottom: 24 }}>
-        <Text style={{ color: colors.textPrimary, fontSize: 18, fontWeight: 'bold', textAlign: 'center', marginBottom: 24, fontFamily: 'DMSans_700Bold' }}>
+        <Text style={{ color: colors.textPrimary, fontSize: 18, fontWeight: 'bold', textAlign: 'center', marginBottom: 24,  }}>
           {isLogin ? 'Welcome Back' : 'New Player Profile'}
         </Text>
 
         {!isLogin && (
           <View style={{ marginBottom: 24 }}>
-            <Text style={{ color: colors.textSecondary, fontSize: 9, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 2, marginLeft: 4, marginBottom: 8, fontFamily: 'DMSans_600SemiBold' }}>Username</Text>
+            <Text style={{ color: colors.textSecondary, fontSize: 9, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 2, marginLeft: 4, marginBottom: 8,  }}>Username</Text>
             <View style={{ position: 'relative' }}>
               <MaterialIcons name="account-circle" size={20} color={colors.textSecondary} style={{ position: 'absolute', left: 16, top: 14 }} />
               <TextInput
-                style={{ width: '100%', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.inputBorder, borderRadius: 24, height: 48, paddingLeft: 48, paddingRight: 24, color: colors.textPrimary, fontSize: 14, fontFamily: 'DMSans_400Regular' }}
+                style={{ width: '100%', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.inputBorder, borderRadius: 24, height: 48, paddingLeft: 48, paddingRight: 24, color: colors.textPrimary, fontSize: 14,  }}
                 placeholder="PitchKing"
                 placeholderTextColor={colors.textMuted}
                 value={username}
@@ -129,11 +119,11 @@ export default function AuthScreen() {
         )}
 
         <View style={{ marginBottom: 24 }}>
-          <Text style={{ color: colors.textSecondary, fontSize: 9, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 2, marginLeft: 4, marginBottom: 8, fontFamily: 'DMSans_600SemiBold' }}>Email Address</Text>
+          <Text style={{ color: colors.textSecondary, fontSize: 9, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 2, marginLeft: 4, marginBottom: 8,  }}>Email Address</Text>
           <View style={{ position: 'relative' }}>
             <MaterialIcons name="alternate-email" size={20} color={colors.textSecondary} style={{ position: 'absolute', left: 16, top: 14 }} />
             <TextInput
-              style={{ width: '100%', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.inputBorder, borderRadius: 24, height: 48, paddingLeft: 48, paddingRight: 24, color: colors.textPrimary, fontSize: 14, fontFamily: 'DMSans_400Regular' }}
+              style={{ width: '100%', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.inputBorder, borderRadius: 24, height: 48, paddingLeft: 48, paddingRight: 24, color: colors.textPrimary, fontSize: 14,  }}
               placeholder="player@stadium.com"
               placeholderTextColor={colors.textMuted}
               value={email}
@@ -145,11 +135,11 @@ export default function AuthScreen() {
         </View>
 
         <View style={{ marginBottom: 24 }}>
-          <Text style={{ color: colors.textSecondary, fontSize: 9, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 2, marginLeft: 4, marginBottom: 8, fontFamily: 'DMSans_600SemiBold' }}>Password</Text>
+          <Text style={{ color: colors.textSecondary, fontSize: 9, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 2, marginLeft: 4, marginBottom: 8,  }}>Password</Text>
           <View style={{ position: 'relative' }}>
             <MaterialIcons name="lock" size={20} color={colors.textSecondary} style={{ position: 'absolute', left: 16, top: 14 }} />
             <TextInput
-              style={{ width: '100%', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.inputBorder, borderRadius: 24, height: 48, paddingLeft: 48, paddingRight: 24, color: colors.textPrimary, fontSize: 14, fontFamily: 'DMSans_400Regular' }}
+              style={{ width: '100%', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.inputBorder, borderRadius: 24, height: 48, paddingLeft: 48, paddingRight: 24, color: colors.textPrimary, fontSize: 14,  }}
               placeholder="Your secret code"
               placeholderTextColor={colors.textMuted}
               value={password}
@@ -162,8 +152,8 @@ export default function AuthScreen() {
         {!isLogin && (
           <View style={{ marginBottom: 24 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <Text style={{ color: colors.textSecondary, fontSize: 9, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 2, fontFamily: 'DMSans_600SemiBold' }}>Choose Avatar</Text>
-              <Text style={{ color: colors.primary, fontSize: 7, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 1, fontFamily: 'DMSans_700Bold' }}>Swipe</Text>
+              <Text style={{ color: colors.textSecondary, fontSize: 9, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 2,  }}>Choose Avatar</Text>
+              <Text style={{ color: colors.primary, fontSize: 7, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 1,  }}>Swipe</Text>
             </View>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -8, paddingHorizontal: 8 }}>
               {avatars.map((avatar, index) => (
@@ -195,12 +185,12 @@ export default function AuthScreen() {
           style={{ width: '100%', height: 56, backgroundColor: colors.primary, borderRadius: 28, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8, shadowColor: colors.primary, shadowOpacity: 0.3, shadowRadius: 16, elevation: 8 }}
           onPress={handleSubmit}
         >
-          <Text style={{ color: colors.backgroundDark, fontSize: 18, fontWeight: 'black', textTransform: 'uppercase', letterSpacing: 1, fontFamily: 'DMSans_700Bold' }}>
+          <Text style={{ color: colors.backgroundDark, fontSize: 18, fontWeight: 'black', textTransform: 'uppercase', letterSpacing: 1,  }}>
             {isLogin ? 'Login' : 'Start Playing'}
           </Text>
           <MaterialIcons name="sports-cricket" size={20} color={colors.backgroundDark} />
         </TouchableOpacity>
-        <Text style={{ color: colors.textSecondary, fontSize: 9, textAlign: 'center', marginTop: 24, fontFamily: 'DMSans_400Regular' }}>
+        <Text style={{ color: colors.textSecondary, fontSize: 9, textAlign: 'center', marginTop: 24,  }}>
           {isLogin ? 'New to the game? ' : 'Already on the squad? '}
           <Text style={{ color: colors.primary, fontWeight: 'bold', textDecorationLine: 'underline' }} onPress={() => setIsLogin(!isLogin)}>
             {isLogin ? 'Signup' : 'Login'}
