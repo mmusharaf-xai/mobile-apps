@@ -46,7 +46,11 @@ export default function AuthScreen() {
       const user = users.find((u: any) => u.email === email && u.password === password);
       if (user) {
         await AsyncStorage.setItem('currentUser', JSON.stringify(user));
-        navigation.navigate('Home' as never);
+        setUsername('');
+        setEmail('');
+        setPassword('');
+        setSelectedAvatar(0);
+        navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
       } else {
         showModal('Error', 'Invalid credentials', [{ text: 'OK', onPress: () => {} }]);
       }
@@ -65,7 +69,11 @@ export default function AuthScreen() {
       users.push(newUser);
       await AsyncStorage.setItem('users', JSON.stringify(users));
       await AsyncStorage.setItem('currentUser', JSON.stringify(newUser));
-      navigation.navigate('Home' as never);
+      setUsername('');
+      setEmail('');
+      setPassword('');
+      setSelectedAvatar(0);
+      navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
     }
   };
 
