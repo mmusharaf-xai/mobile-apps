@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useTheme } from './ThemeContext';
 
 
 interface Button {
@@ -15,10 +16,10 @@ interface AlertModalProps {
   message: string;
   buttons: Button[];
   onClose: () => void;
-  colors: any;
 }
 
-export default function AlertModal({ visible, title, message, buttons, onClose, colors }: AlertModalProps) {
+export default function AlertModal({ visible, title, message, buttons, onClose }: AlertModalProps) {
+  const { colors } = useTheme();
   const getButtonStyle = (style?: string) => {
     switch (style) {
       case 'destructive':

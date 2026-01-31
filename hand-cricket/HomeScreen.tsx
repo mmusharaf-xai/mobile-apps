@@ -87,7 +87,6 @@ export default function HomeScreen() {
         message={modalMessage}
         buttons={modalButtons}
         onClose={() => setModalVisible(false)}
-        colors={colors}
       />
     </View>
   );

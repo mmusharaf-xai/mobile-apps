@@ -261,7 +261,6 @@ export default function AuthScreen() {
         message={modalMessage}
         buttons={modalButtons}
         onClose={() => setModalVisible(false)}
-        colors={colors}
       />
     </View>
   );
