@@ -15,7 +15,7 @@ const avatars = [
 ];
 
 export default function AuthScreen() {
-  const [isLogin, setIsLogin] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,6 +33,11 @@ export default function AuthScreen() {
     setModalVisible(true);
   };
 
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
 
 
   const handleSubmit = async () => {
@@ -40,6 +45,14 @@ export default function AuthScreen() {
       // Login
       if (!email || !password) {
         showModal('Error', 'Please fill all fields', [{ text: 'OK', onPress: () => {} }]);
+        return;
+      }
+      if (!isValidEmail(email)) {
+        showModal('Error', 'Please enter a valid email address', [{ text: 'OK', onPress: () => {} }]);
+        return;
+      }
+      if (password.length < 8) {
+        showModal('Error', 'Password must be at least 8 characters', [{ text: 'OK', onPress: () => {} }]);
         return;
       }
       const users = JSON.parse(await AsyncStorage.getItem('users') || '[]');
@@ -58,6 +71,18 @@ export default function AuthScreen() {
       // Signup
       if (!username || !email || !password) {
         showModal('Error', 'Please fill all required fields', [{ text: 'OK', onPress: () => {} }]);
+        return;
+      }
+      if (username.length < 3 || username.length > 50) {
+        showModal('Error', 'Username must be between 3 and 50 characters', [{ text: 'OK', onPress: () => {} }]);
+        return;
+      }
+      if (!isValidEmail(email)) {
+        showModal('Error', 'Please enter a valid email address', [{ text: 'OK', onPress: () => {} }]);
+        return;
+      }
+      if (password.length < 8) {
+        showModal('Error', 'Password must be at least 8 characters', [{ text: 'OK', onPress: () => {} }]);
         return;
       }
       const users = JSON.parse(await AsyncStorage.getItem('users') || '[]');
