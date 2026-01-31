@@ -1,0 +1,217 @@
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
+import { useFonts, DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold, DMSans_700Bold } from '@expo-google-fonts/dm-sans';
+import { colors } from '../constants';
+
+const avatars = [
+  { name: 'cricket', icon: 'sports-cricket' },
+  { name: 'hand', icon: 'front-hand' },
+  { name: 'baseball', icon: 'sports-baseball' },
+  { name: 'medal', icon: 'military-tech' },
+  { name: 'trophy', icon: 'emoji-events' },
+];
+
+export default function AuthScreen() {
+  const [isLogin, setIsLogin] = useState(false);
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [selectedAvatar, setSelectedAvatar] = useState(0);
+  const router = useRouter();
+
+  const [fontsLoaded] = useFonts({
+    DMSans_400Regular,
+    DMSans_500Medium,
+    DMSans_600SemiBold,
+    DMSans_700Bold,
+  });
+
+  if (!fontsLoaded) {
+    return <View />;
+  }
+
+  const handleSubmit = async () => {
+    if (isLogin) {
+      // Login
+      if (!email || !password) {
+        Alert.alert('Error', 'Please fill all fields');
+        return;
+      }
+      const users = JSON.parse(await AsyncStorage.getItem('users') || '[]');
+      const user = users.find((u: any) => u.email === email && u.password === password);
+      if (user) {
+        await AsyncStorage.setItem('currentUser', JSON.stringify(user));
+        router.replace('/home');
+      } else {
+        Alert.alert('Error', 'Invalid credentials');
+      }
+    } else {
+      // Signup
+      if (!username || !email || !password) {
+        Alert.alert('Error', 'Please fill all required fields');
+        return;
+      }
+      const users = JSON.parse(await AsyncStorage.getItem('users') || '[]');
+      if (users.some((u: any) => u.email === email)) {
+        Alert.alert('Error', 'User already exists');
+        return;
+      }
+      const newUser = { username, email, password, avatar: selectedAvatar };
+      users.push(newUser);
+      await AsyncStorage.setItem('users', JSON.stringify(users));
+      await AsyncStorage.setItem('currentUser', JSON.stringify(newUser));
+      router.replace('/home');
+    }
+  };
+
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.backgroundDark }}>
+      {/* Status Bar */}
+      <View style={{ height: 40, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 32, paddingTop: 16 }}>
+        <Text style={{ color: colors.textPrimary, fontSize: 12, fontWeight: '600' }}>9:41</Text>
+        <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
+          <MaterialIcons name="signal-cellular-4-bar" size={14} color={colors.textPrimary} />
+          <MaterialIcons name="wifi" size={14} color={colors.textPrimary} />
+          <MaterialIcons name="battery-full" size={14} color={colors.textPrimary} />
+        </View>
+      </View>
+
+      {/* Header */}
+      <View style={{ alignItems: 'center', marginTop: 24, paddingHorizontal: 24 }}>
+        <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', shadowColor: colors.primary, shadowOpacity: 0.4, shadowRadius: 20 }}>
+          <MaterialIcons name="sports-cricket" size={36} color={colors.backgroundDark} />
+        </View>
+        <Text style={{ color: colors.textPrimary, fontSize: 24, fontWeight: 'bold', marginTop: 12, fontFamily: 'DMSans_700Bold' }}>HandCricket</Text>
+        <Text style={{ color: colors.textSecondary, fontSize: 10, marginTop: 2 }}>Enter the digital arena</Text>
+      </View>
+
+      {/* Toggle */}
+      <View style={{ paddingHorizontal: 24, marginTop: 32 }}>
+        <View style={{ height: 44, width: '100%', backgroundColor: colors.surface, borderRadius: 22, padding: 2, borderWidth: 1, borderColor: colors.surfaceBorder, flexDirection: 'row' }}>
+          <TouchableOpacity
+            style={{ flex: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: isLogin ? colors.primary : 'transparent' }}
+            onPress={() => setIsLogin(true)}
+          >
+            <Text style={{ color: isLogin ? colors.backgroundDark : colors.textSecondary, fontSize: 11, fontWeight: 'bold', fontFamily: 'DMSans_600SemiBold' }}>Login</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ flex: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: !isLogin ? colors.primary : 'transparent' }}
+            onPress={() => setIsLogin(false)}
+          >
+            <Text style={{ color: !isLogin ? colors.backgroundDark : colors.textSecondary, fontSize: 11, fontWeight: 'bold', fontFamily: 'DMSans_600SemiBold' }}>Signup</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Form */}
+      <ScrollView style={{ flex: 1, paddingHorizontal: 24, paddingTop: 24, paddingBottom: 24 }}>
+        <Text style={{ color: colors.textPrimary, fontSize: 18, fontWeight: 'bold', textAlign: 'center', marginBottom: 24, fontFamily: 'DMSans_700Bold' }}>
+          {isLogin ? 'Welcome Back' : 'New Player Profile'}
+        </Text>
+
+        {!isLogin && (
+          <View style={{ marginBottom: 24 }}>
+            <Text style={{ color: colors.textSecondary, fontSize: 9, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 2, marginLeft: 4, marginBottom: 8, fontFamily: 'DMSans_600SemiBold' }}>Username</Text>
+            <View style={{ position: 'relative' }}>
+              <MaterialIcons name="account-circle" size={20} color={colors.textSecondary} style={{ position: 'absolute', left: 16, top: 14 }} />
+              <TextInput
+                style={{ width: '100%', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.inputBorder, borderRadius: 24, height: 48, paddingLeft: 48, paddingRight: 24, color: colors.textPrimary, fontSize: 14, fontFamily: 'DMSans_400Regular' }}
+                placeholder="PitchKing"
+                placeholderTextColor={colors.textMuted}
+                value={username}
+                onChangeText={setUsername}
+              />
+            </View>
+          </View>
+        )}
+
+        <View style={{ marginBottom: 24 }}>
+          <Text style={{ color: colors.textSecondary, fontSize: 9, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 2, marginLeft: 4, marginBottom: 8, fontFamily: 'DMSans_600SemiBold' }}>Email Address</Text>
+          <View style={{ position: 'relative' }}>
+            <MaterialIcons name="alternate-email" size={20} color={colors.textSecondary} style={{ position: 'absolute', left: 16, top: 14 }} />
+            <TextInput
+              style={{ width: '100%', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.inputBorder, borderRadius: 24, height: 48, paddingLeft: 48, paddingRight: 24, color: colors.textPrimary, fontSize: 14, fontFamily: 'DMSans_400Regular' }}
+              placeholder="player@stadium.com"
+              placeholderTextColor={colors.textMuted}
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
+        </View>
+
+        <View style={{ marginBottom: 24 }}>
+          <Text style={{ color: colors.textSecondary, fontSize: 9, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 2, marginLeft: 4, marginBottom: 8, fontFamily: 'DMSans_600SemiBold' }}>Password</Text>
+          <View style={{ position: 'relative' }}>
+            <MaterialIcons name="lock" size={20} color={colors.textSecondary} style={{ position: 'absolute', left: 16, top: 14 }} />
+            <TextInput
+              style={{ width: '100%', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.inputBorder, borderRadius: 24, height: 48, paddingLeft: 48, paddingRight: 24, color: colors.textPrimary, fontSize: 14, fontFamily: 'DMSans_400Regular' }}
+              placeholder="Your secret code"
+              placeholderTextColor={colors.textMuted}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+          </View>
+        </View>
+
+        {!isLogin && (
+          <View style={{ marginBottom: 24 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <Text style={{ color: colors.textSecondary, fontSize: 9, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 2, fontFamily: 'DMSans_600SemiBold' }}>Choose Avatar</Text>
+              <Text style={{ color: colors.primary, fontSize: 7, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 1, fontFamily: 'DMSans_700Bold' }}>Swipe</Text>
+            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -8, paddingHorizontal: 8 }}>
+              {avatars.map((avatar, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={{ marginRight: index === avatars.length - 1 ? 16 : 0 }}
+                  onPress={() => setSelectedAvatar(index)}
+                >
+                  <View style={{ width: 64, height: 64, borderRadius: 32, borderWidth: 2, borderColor: selectedAvatar === index ? colors.primary : 'transparent', padding: 2, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+                    <View style={{ width: '100%', height: '100%', borderRadius: 30, backgroundColor: selectedAvatar === index ? colors.primary + '20' : '#ffffff08', alignItems: 'center', justifyContent: 'center' }}>
+                      <MaterialIcons name={avatar.icon as any} size={36} color={selectedAvatar === index ? colors.primary : '#ffffff40'} />
+                    </View>
+                  </View>
+                  {selectedAvatar === index && (
+                    <View style={{ position: 'absolute', top: -4, right: -4, backgroundColor: colors.primary, borderRadius: 8, padding: 2 }}>
+                      <MaterialIcons name="check" size={12} color={colors.backgroundDark} />
+                    </View>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+      </ScrollView>
+
+      {/* Button */}
+      <View style={{ paddingHorizontal: 24, paddingBottom: 40, paddingTop: 16 }}>
+        <TouchableOpacity
+          style={{ width: '100%', height: 56, backgroundColor: colors.primary, borderRadius: 28, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8, shadowColor: colors.primary, shadowOpacity: 0.3, shadowRadius: 16, elevation: 8 }}
+          onPress={handleSubmit}
+        >
+          <Text style={{ color: colors.backgroundDark, fontSize: 18, fontWeight: 'black', textTransform: 'uppercase', letterSpacing: 1, fontFamily: 'DMSans_700Bold' }}>
+            {isLogin ? 'Login' : 'Start Playing'}
+          </Text>
+          <MaterialIcons name="sports-cricket" size={20} color={colors.backgroundDark} />
+        </TouchableOpacity>
+        <Text style={{ color: colors.textSecondary, fontSize: 9, textAlign: 'center', marginTop: 24, fontFamily: 'DMSans_400Regular' }}>
+          {isLogin ? 'New to the game? ' : 'Already on the squad? '}
+          <Text style={{ color: colors.primary, fontWeight: 'bold', textDecorationLine: 'underline' }} onPress={() => setIsLogin(!isLogin)}>
+            {isLogin ? 'Signup' : 'Login'}
+          </Text>
+        </Text>
+      </View>
+
+      {/* Bottom indicator */}
+      <View style={{ alignItems: 'center', paddingBottom: 8 }}>
+        <View style={{ width: 128, height: 4, backgroundColor: '#ffffff20', borderRadius: 2 }} />
+      </View>
+    </View>
+  );
+}
