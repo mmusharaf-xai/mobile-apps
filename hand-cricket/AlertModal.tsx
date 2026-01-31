@@ -20,6 +20,59 @@ interface AlertModalProps {
 
 export default function AlertModal({ visible, title, message, buttons, onClose }: AlertModalProps) {
   const { colors } = useTheme();
+
+  const styles = StyleSheet.create({
+    overlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 20,
+    },
+    modal: {
+      backgroundColor: colors.surface,
+      borderRadius: 20,
+      padding: 24,
+      width: '100%',
+      maxWidth: 320,
+      borderWidth: 1,
+      borderColor: colors.inputBorder,
+    },
+    header: {
+      alignItems: 'center',
+      marginBottom: 16,
+    },
+    title: {
+      color: colors.textPrimary,
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginTop: 8,
+      textAlign: 'center',
+    },
+    message: {
+      color: colors.textSecondary,
+      fontSize: 14,
+      textAlign: 'center',
+      marginBottom: 24,
+      lineHeight: 20,
+    },
+    buttonContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      gap: 12,
+    },
+    button: {
+      flex: 1,
+      height: 44,
+      borderRadius: 22,
+    },
+    buttonText: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+    },
+  });
   const getButtonStyle = (style?: string) => {
     switch (style) {
       case 'destructive':
@@ -79,58 +132,3 @@ export default function AlertModal({ visible, title, message, buttons, onClose }
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  modal: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    padding: 24,
-    width: '100%',
-    maxWidth: 320,
-    borderWidth: 1,
-    borderColor: colors.inputBorder,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  title: {
-    color: colors.textPrimary,
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  message: {
-    color: colors.textSecondary,
-    fontSize: 14,
-    textAlign: 'center',
-    marginBottom: 24,
-    lineHeight: 20,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
-  button: {
-    flex: 1,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-});
