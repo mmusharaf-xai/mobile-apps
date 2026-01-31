@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { colors } from './constants';
+import AlertModal from './AlertModal';
 
 const avatars = [
   { name: 'cricket', icon: 'sports-cricket' },
@@ -19,7 +20,18 @@ export default function AuthScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState(0);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalButtons, setModalButtons] = useState<any[]>([]);
   const navigation = useNavigation();
+
+  const showModal = (title: string, message: string, buttons: any[]) => {
+    setModalTitle(title);
+    setModalMessage(message);
+    setModalButtons(buttons);
+    setModalVisible(true);
+  };
 
 
 
@@ -27,7 +39,7 @@ export default function AuthScreen() {
     if (isLogin) {
       // Login
       if (!email || !password) {
-        Alert.alert('Error', 'Please fill all fields');
+        showModal('Error', 'Please fill all fields', [{ text: 'OK', onPress: () => {} }]);
         return;
       }
       const users = JSON.parse(await AsyncStorage.getItem('users') || '[]');
@@ -36,17 +48,17 @@ export default function AuthScreen() {
         await AsyncStorage.setItem('currentUser', JSON.stringify(user));
         navigation.navigate('Home' as never);
       } else {
-        Alert.alert('Error', 'Invalid credentials');
+        showModal('Error', 'Invalid credentials', [{ text: 'OK', onPress: () => {} }]);
       }
     } else {
       // Signup
       if (!username || !email || !password) {
-        Alert.alert('Error', 'Please fill all required fields');
+        showModal('Error', 'Please fill all required fields', [{ text: 'OK', onPress: () => {} }]);
         return;
       }
       const users = JSON.parse(await AsyncStorage.getItem('users') || '[]');
       if (users.some((u: any) => u.email === email)) {
-        Alert.alert('Error', 'User already exists');
+        showModal('Error', 'User already exists', [{ text: 'OK', onPress: () => {} }]);
         return;
       }
       const newUser = { username, email, password, avatar: selectedAvatar };
@@ -208,6 +220,14 @@ export default function AuthScreen() {
       <View style={{ alignItems: 'center', paddingBottom: 8 }}>
         <View style={{ width: 128, height: 4, backgroundColor: '#ffffff20', borderRadius: 2 }} />
       </View>
+
+      <AlertModal
+        visible={modalVisible}
+        title={modalTitle}
+        message={modalMessage}
+        buttons={modalButtons}
+        onClose={() => setModalVisible(false)}
+      />
     </View>
   );
 }

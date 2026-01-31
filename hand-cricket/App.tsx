@@ -1,17 +1,31 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, CardStyleInterpolators, TransitionSpecs } from '@react-navigation/stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import AuthScreen from './AuthScreen';
 import HomeScreen from './HomeScreen';
 
 const Stack = createStackNavigator();
 
 export default function App() {
+  const [initialRoute, setInitialRoute] = useState<'Auth' | 'Home'>('Auth');
+
+  useEffect(() => {
+    const checkLogin = async () => {
+      const currentUser = await AsyncStorage.getItem('currentUser');
+      if (currentUser) {
+        setInitialRoute('Home');
+      }
+    };
+    checkLogin();
+  }, []);
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <NavigationContainer>
         <Stack.Navigator
+          initialRouteName={initialRoute}
           screenOptions={{
             headerShown: false,
             gestureEnabled: true,
