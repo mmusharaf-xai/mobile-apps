@@ -52,7 +52,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.backgroundDark }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text style={{ color: colors.textPrimary, fontSize: 24, textAlign: 'center' }}>Welcome to Home, {user.username}!</Text>
         <Text style={{ color: colors.primary, fontSize: 18, textAlign: 'center', marginTop: 8 }}>HandCricket Game Coming Soon...</Text>

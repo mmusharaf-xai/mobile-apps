@@ -36,7 +36,7 @@ export default function AlertModal({ visible, title, message, buttons, onClose }
       case 'cancel':
         return colors.textPrimary;
       default:
-        return colors.backgroundDark;
+        return 'white';
     }
   };
 

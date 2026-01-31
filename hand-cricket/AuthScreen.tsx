@@ -103,7 +103,7 @@ export default function AuthScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.backgroundDark }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       {/* Status Bar */}
       <View style={{ height: 40, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 32, paddingTop: 16 }}>
         <Text style={{ color: colors.textPrimary, fontSize: 12, fontWeight: '600' }}>9:41</Text>
@@ -117,7 +117,7 @@ export default function AuthScreen() {
       {/* Header */}
       <View style={{ alignItems: 'center', marginTop: 24, paddingHorizontal: 24 }}>
         <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', shadowColor: colors.primary, shadowOpacity: 0.4, shadowRadius: 20 }}>
-          <MaterialIcons name="sports-cricket" size={36} color={colors.backgroundDark} />
+          <MaterialIcons name="sports-cricket" size={36} color="white" />
         </View>
         <Text style={{ color: colors.textPrimary, fontSize: 24, fontWeight: 'bold', marginTop: 12 }}>HandCricket</Text>
         <Text style={{ color: colors.textSecondary, fontSize: 10, marginTop: 2 }}>Enter the digital arena</Text>
@@ -130,13 +130,13 @@ export default function AuthScreen() {
             style={{ flex: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: isLogin ? colors.primary : 'transparent' }}
             onPress={() => setIsLogin(true)}
           >
-            <Text style={{ color: isLogin ? colors.backgroundDark : colors.textSecondary, fontSize: 11, fontWeight: 'bold',  }}>Login</Text>
+            <Text style={{ color: isLogin ? 'white' : colors.textSecondary, fontSize: 11, fontWeight: 'bold' }}>Login</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={{ flex: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: !isLogin ? colors.primary : 'transparent' }}
             onPress={() => setIsLogin(false)}
           >
-            <Text style={{ color: !isLogin ? colors.backgroundDark : colors.textSecondary, fontSize: 11, fontWeight: 'bold',  }}>Signup</Text>
+            <Text style={{ color: !isLogin ? 'white' : colors.textSecondary, fontSize: 11, fontWeight: 'bold' }}>Signup</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -219,7 +219,7 @@ export default function AuthScreen() {
                   </View>
                   {selectedAvatar === index && (
                     <View style={{ position: 'absolute', top: -4, right: -4, backgroundColor: colors.primary, borderRadius: 8, padding: 2 }}>
-                      <MaterialIcons name="check" size={12} color={colors.backgroundDark} />
+                      <MaterialIcons name="check" size={12} color="white" />
                     </View>
                   )}
                 </TouchableOpacity>
@@ -236,10 +236,10 @@ export default function AuthScreen() {
           style={{ width: '100%', height: 56, backgroundColor: colors.primary, borderRadius: 28, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8, shadowColor: colors.primary, shadowOpacity: 0.3, shadowRadius: 16, elevation: 8 }}
           onPress={handleSubmit}
         >
-          <Text style={{ color: colors.backgroundDark, fontSize: 18, fontWeight: 'black', textTransform: 'uppercase', letterSpacing: 1,  }}>
+          <Text style={{ color: 'white', fontSize: 18, fontWeight: 'black', textTransform: 'uppercase', letterSpacing: 1 }}>
             {isLogin ? 'Login' : 'Start Playing'}
           </Text>
-          <MaterialIcons name="sports-cricket" size={20} color={colors.backgroundDark} />
+          <MaterialIcons name="sports-cricket" size={20} color="white" />
         </TouchableOpacity>
         <Text style={{ color: colors.textSecondary, fontSize: 9, textAlign: 'center', marginTop: 24,  }}>
           {isLogin ? 'New to the game? ' : 'Already on the squad? '}
