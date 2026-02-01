@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator, CardStyleInterpolators, TransitionSpecs } from '@react-navigation/stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -12,7 +12,7 @@ import HistoryScreen from './HistoryScreen';
 import ProfileScreen from './ProfileScreen';
 import { MaterialIcons } from '@expo/vector-icons';
 
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function TabNavigator() {
@@ -79,12 +79,7 @@ export default function App() {
             initialRouteName={initialRoute}
             screenOptions={{
               headerShown: false,
-              gestureEnabled: true,
-              transitionSpec: {
-                open: TransitionSpecs.TransitionIOSSpec,
-                close: TransitionSpecs.TransitionIOSSpec,
-              },
-              cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+              animation: 'slide_from_right',
             }}
           >
             <Stack.Screen name="Auth" component={AuthScreen} />
