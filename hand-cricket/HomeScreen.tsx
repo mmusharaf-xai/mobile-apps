@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Image, ImageBackground, ScrollView, StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -30,53 +31,55 @@ export default function HomeScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-        {/* Header */}
-        <View style={{ padding: 20, paddingTop: 60 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-              <View style={{ width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: colors.primary, overflow: 'hidden', padding: 1 }}>
-                <Image
-                  source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDJdcvYai3dXGZ1XFOog2z_7GQ8Of8eY25wGZf2osLzSoVkcgmAmAqAUi7QhWb_MXKihG20Vkt0Y_S4YdFz8Nijc4aF5tM3ZOPlrPS7lcaprvFfsKCvR9J_EXC4FBcMbxm39gD9Im--Ns7ndQOBZ0DWHslaoEqaOKYUtaJhDh28Y8nDDmyt2pSP0FvzKcMU6zYO_FDzB8e0P-D3ql4u_Z9ywcib49dhAKi1_NM_KfdXqr0L_38QLSVIhIyrjI_ZQklZN_mMNPnwlSk' }}
-                  style={{ width: '100%', height: '100%', borderRadius: 18 }}
-                />
-              </View>
-              <View>
-                <Text style={{ fontSize: 14, fontWeight: 'bold', color: colors.textPrimary }}>{user.username}</Text>
-                <Text style={{ fontSize: 10, fontWeight: '900', color: colors.primary, textTransform: 'uppercase', letterSpacing: 1 }}>Pro League</Text>
-              </View>
+      {/* Header */}
+      <View style={{ padding: 20, paddingTop: 60, backgroundColor: colors.background }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <View style={{ width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: colors.primary, overflow: 'hidden', padding: 1 }}>
+              <Image
+                source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDJdcvYai3dXGZ1XFOog2z_7GQ8Of8eY25wGZf2osLzSoVkcgmAmAqAUi7QhWb_MXKihG20Vkt0Y_S4YdFz8Nijc4aF5tM3ZOPlrPS7lcaprvFfsKCvR9J_EXC4FBcMbxm39gD9Im--Ns7ndQOBZ0DWHslaoEqaOKYUtaJhDh28Y8nDDmyt2pSP0FvzKcMU6zYO_FDzB8e0P-D3ql4u_Z9ywcib49dhAKi1_NM_KfdXqr0L_38QLSVIhIyrjI_ZQklZN_mMNPnwlSk' }}
+                style={{ width: '100%', height: '100%', borderRadius: 18 }}
+              />
             </View>
-            <TouchableOpacity style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 }}>
-              <MaterialIcons name="notifications" size={20} color={colors.textPrimary} />
-            </TouchableOpacity>
-          </View>
-
-          {/* Stats Grid */}
-          <View style={{ flexDirection: 'row', gap: 12 }}>
-            <View style={{ flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 16, padding: 12, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
-              <Text style={{ fontSize: 10, fontWeight: 'bold', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>User ID</Text>
-              <Text style={{ fontSize: 14, fontWeight: '900', color: colors.textPrimary }}>#88291</Text>
-            </View>
-            <View style={{ flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 16, padding: 12, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
-              <Text style={{ fontSize: 10, fontWeight: 'bold', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>Played</Text>
-              <Text style={{ fontSize: 14, fontWeight: '900', color: colors.textPrimary }}>124</Text>
-            </View>
-            <View style={{ flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 16, padding: 12, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
-              <Text style={{ fontSize: 10, fontWeight: 'bold', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>Wins</Text>
-              <Text style={{ fontSize: 14, fontWeight: '900', color: colors.textPrimary }}>82</Text>
+            <View>
+              <Text style={{ fontSize: 14, fontWeight: 'bold', color: colors.textPrimary }}>{user.username}</Text>
+              <Text style={{ fontSize: 10, fontWeight: '900', color: colors.primary, textTransform: 'uppercase', letterSpacing: 1 }}>Pro League</Text>
             </View>
           </View>
+          <TouchableOpacity style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 }}>
+            <MaterialIcons name="notifications" size={20} color={colors.textPrimary} />
+          </TouchableOpacity>
         </View>
 
-        {/* Main Content */}
-        <View style={{ paddingHorizontal: 20, paddingTop: 8, gap: 24 }}>
+        {/* Stats Grid */}
+        <View style={{ flexDirection: 'row', gap: 12 }}>
+          <View style={{ flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 16, padding: 12, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
+            <Text style={{ fontSize: 10, fontWeight: 'bold', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>User ID</Text>
+            <Text style={{ fontSize: 14, fontWeight: '900', color: colors.textPrimary }}>#88291</Text>
+          </View>
+          <View style={{ flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 16, padding: 12, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
+            <Text style={{ fontSize: 10, fontWeight: 'bold', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>Played</Text>
+            <Text style={{ fontSize: 14, fontWeight: '900', color: colors.textPrimary }}>124</Text>
+          </View>
+          <View style={{ flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 16, padding: 12, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
+            <Text style={{ fontSize: 10, fontWeight: 'bold', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>Wins</Text>
+            <Text style={{ fontSize: 14, fontWeight: '900', color: colors.textPrimary }}>82</Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Main Content */}
+      <ScrollView style={{ flex: 1, paddingHorizontal: 20, paddingTop: 8 }} contentContainerStyle={{ paddingBottom: 100, gap: 24 }}>
           {/* Bot Match Card */}
           <View style={{ backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 32, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, elevation: 4 }}>
             <ImageBackground
               source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDc5MWFyJCFXbdfU9goPJ_WWFFGwuHOn3LY3MnX-CCj5BDcfxwqJ2eVmthpa-MtBtVQ2JKIcPGg3kVZtGexdzTvSznKhUJ064lIuKDGKUfFxHDTzrY0Kd-oNXieskKBiQZ-wThDCWEBpb-VyjNfsw2TIC1RexgjoFJ6D4U9lU0WiNB-mOnDPz9KArNrbM_sEaS9QShRmMCf3XxJKX_8JnCUd35JIcCcaEwFy0CzGRMSqkZFdGjO4nJhwPGyIaBax3ZI2Lp4Btn7DYE' }}
               style={{ height: 176, justifyContent: 'flex-end', padding: 16 }}
-              imageStyle={{ opacity: 0.9 }}
             >
+              <LinearGradient
+                colors={['transparent', 'rgba(255,255,255,0.8)']}
+                style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 100 }}
+              />
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                 <View style={{ backgroundColor: colors.primary, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8 }}>
                   <Text style={{ fontSize: 10, fontWeight: '900', color: colors.textPrimary, textTransform: 'uppercase', letterSpacing: 1 }}>Solo Play</Text>
@@ -130,7 +133,7 @@ export default function HomeScreen() {
           </View>
 
           {/* Friend Match Card */}
-          <View style={{ backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 32, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, elevation: 4, minHeight: 160, position: 'relative' }}>
+          <View style={{ backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 32, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, elevation: 4, height: 382, position: 'relative' }}>
             <Image
               source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB2yu5Qsf0vr3zdYDVK-ASmbtTE6OIUkTm5iWOFwvl1XmgzcQxp6mjPdHBlOS6Zhxi8AeSzOX7XIUX4TFbtVY-MgfMAB3kWTwgpjoOAlU86YU3PN9TkasEivi-ltZX3croXOsvwg5WF4H-o8VhyHbtXZKRQDn6Ee-PO0HK-ZqgrTErc6_2Beg3N8ANuf7SIteep_ApGw3WF4M3T8alEDfMUy1YsbP9o0NOq6DO1vjsW3Cv4LxKYx1U55k2UuPmTVZBIuCOK1LPCLlM' }}
               style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.3, resizeMode: 'cover' }}
@@ -143,7 +146,10 @@ export default function HomeScreen() {
               <Text style={{ fontSize: 24, fontWeight: '900', fontStyle: 'italic', color: colors.textMuted, textTransform: 'uppercase', letterSpacing: 1 }}>Friend Match</Text>
               <Text style={{ fontSize: 12, color: colors.textMuted, marginTop: 4 }}>Play with friends locally or online.</Text>
             </View>
-            <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(255,255,255,0.8)', justifyContent: 'center', alignItems: 'center', zIndex: 2 }}>
+            <LinearGradient
+              colors={['rgba(255,255,255,0.8)', 'rgba(255,255,255,0.95)']}
+              style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center', zIndex: 2 }}
+            >
               <View style={{ alignItems: 'center', gap: 12 }}>
                 <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: colors.primary + '10', alignItems: 'center', justifyContent: 'center' }}>
                   <MaterialIcons name="lock-clock" size={36} color={colors.primary} />
@@ -151,10 +157,9 @@ export default function HomeScreen() {
                 <Text style={{ fontSize: 20, fontWeight: '900', fontStyle: 'italic', color: colors.textPrimary, textTransform: 'uppercase', letterSpacing: 1 }}>Coming Soon</Text>
                 <Text style={{ fontSize: 10, fontWeight: 'bold', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>Multiplayer mode is in development</Text>
               </View>
-            </View>
+            </LinearGradient>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
     </View>
   );
 }
