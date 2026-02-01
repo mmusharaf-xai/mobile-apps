@@ -16,19 +16,19 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function TabNavigator() {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: colors.surface,
+          backgroundColor: isDark ? 'rgba(10,26,17,0.95)' : colors.surface,
           borderTopColor: colors.surfaceBorder,
           height: 80,
           paddingHorizontal: 24,
         },
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textSecondary,
+        tabBarInactiveTintColor: isDark ? '#5a8b6d' : colors.textSecondary,
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: 'bold',

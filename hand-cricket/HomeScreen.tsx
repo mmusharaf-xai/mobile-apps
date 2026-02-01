@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image, ImageBackground, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Image, ImageBackground, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from './ThemeContext';
-import AlertModal from './AlertModal';
 
 export default function HomeScreen() {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const [user, setUser] = useState<any>(null);
   const [selectedOvers, setSelectedOvers] = useState(1);
   const navigation = useNavigation();
@@ -55,7 +54,7 @@ export default function HomeScreen() {
           <View style={{ flexDirection: 'row', gap: 12 }}>
             <View style={{ flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 16, padding: 12, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
               <Text style={{ fontSize: 10, fontWeight: 'bold', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>User ID</Text>
-              <Text style={{ fontSize: 14, fontWeight: '900', color: colors.textPrimary }}>#88291</Text>
+              <Text style={{ fontSize: 14, fontWeight: '900', color: colors.primary }}>#88291</Text>
             </View>
             <View style={{ flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 16, padding: 12, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
               <Text style={{ fontSize: 10, fontWeight: 'bold', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>Played</Text>
@@ -86,7 +85,7 @@ export default function HomeScreen() {
             </ImageBackground>
             <View style={{ padding: 20, gap: 20 }}>
               <View style={{ gap: 12 }}>
-                <Text style={{ fontSize: 10, fontWeight: 'bold', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1, textAlign: 'center' }}>Select Match Duration</Text>
+                <Text style={{ fontSize: 10, fontWeight: 'bold', color: colors.textMuted, textTransform: 'uppercase', letterSpacing: 1, textAlign: 'center' }}>Select Match Duration</Text>
                 <View style={{ flexDirection: 'row', gap: 8 }}>
                   {[1, 3, 5].map((overs) => (
                     <TouchableOpacity
@@ -96,7 +95,7 @@ export default function HomeScreen() {
                         flex: 1,
                         height: 48,
                         borderRadius: 16,
-                        backgroundColor: selectedOvers === overs ? colors.primary : '#f0f0f0',
+                        backgroundColor: selectedOvers === overs ? colors.primary : colors.surfaceBorder,
                         borderWidth: 1,
                         borderColor: selectedOvers === overs ? colors.primary : 'transparent',
                         alignItems: 'center',
@@ -130,7 +129,7 @@ export default function HomeScreen() {
           </View>
 
           {/* Friend Match Card */}
-          <View style={{ backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 32, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, elevation: 4, minHeight: 160, position: 'relative' }}>
+          <View style={{ backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 32, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, elevation: 4, minHeight: 160, position: 'relative', opacity: isDark ? 0.6 : 1 }}>
             <Image
               source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB2yu5Qsf0vr3zdYDVK-ASmbtTE6OIUkTm5iWOFwvl1XmgzcQxp6mjPdHBlOS6Zhxi8AeSzOX7XIUX4TFbtVY-MgfMAB3kWTwgpjoOAlU86YU3PN9TkasEivi-ltZX3croXOsvwg5WF4H-o8VhyHbtXZKRQDn6Ee-PO0HK-ZqgrTErc6_2Beg3N8ANuf7SIteep_ApGw3WF4M3T8alEDfMUy1YsbP9o0NOq6DO1vjsW3Cv4LxKYx1U55k2UuPmTVZBIuCOK1LPCLlM' }}
               style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.3, resizeMode: 'cover' }}
@@ -140,16 +139,16 @@ export default function HomeScreen() {
               <MaterialIcons name="sports-cricket" size={144} color="rgba(0,0,0,0.1)" />
             </View>
             <View style={{ padding: 20, zIndex: 1 }}>
-              <Text style={{ fontSize: 24, fontWeight: '900', fontStyle: 'italic', color: colors.textMuted, textTransform: 'uppercase', letterSpacing: 1 }}>Friend Match</Text>
-              <Text style={{ fontSize: 12, color: colors.textMuted, marginTop: 4 }}>Play with friends locally or online.</Text>
+              <Text style={{ fontSize: 24, fontWeight: '900', fontStyle: 'italic', color: isDark ? colors.textMuted : colors.textMuted, textTransform: 'uppercase', letterSpacing: 1 }}>Friend Match</Text>
+              <Text style={{ fontSize: 12, color: isDark ? colors.textMuted : colors.textMuted, marginTop: 4 }}>Play with friends locally or online.</Text>
             </View>
-            <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(255,255,255,0.8)', justifyContent: 'center', alignItems: 'center', zIndex: 2 }}>
+            <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: isDark ? 'rgba(10,26,17,0.85)' : 'rgba(255,255,255,0.8)', justifyContent: 'center', alignItems: 'center', zIndex: 2 }}>
               <View style={{ alignItems: 'center', gap: 12 }}>
                 <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: colors.primary + '10', alignItems: 'center', justifyContent: 'center' }}>
                   <MaterialIcons name="lock-clock" size={36} color={colors.primary} />
                 </View>
-                <Text style={{ fontSize: 20, fontWeight: '900', fontStyle: 'italic', color: colors.textPrimary, textTransform: 'uppercase', letterSpacing: 1 }}>Coming Soon</Text>
-                <Text style={{ fontSize: 10, fontWeight: 'bold', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>Multiplayer mode is in development</Text>
+                <Text style={{ fontSize: 20, fontWeight: '900', fontStyle: 'italic', color: isDark ? colors.primary : colors.textPrimary, textTransform: 'uppercase', letterSpacing: 1 }}>Coming Soon</Text>
+                <Text style={{ fontSize: 10, fontWeight: isDark ? '500' : 'bold', color: isDark ? 'rgba(255,255,255,0.7)' : colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>Multiplayer mode is in development</Text>
               </View>
             </View>
           </View>

@@ -13,13 +13,13 @@ export const lightColors = {
 export const darkColors = {
   primary: '#19e62b',
   background: '#0a1a11',
-  surface: '#1a3d2a',
-  surfaceBorder: '#2a5a3a',
-  inputBorder: '#3a7a4a',
+  surface: '#142a1d',
+  surfaceBorder: '#234832',
+  inputBorder: '#234832',
   textPrimary: 'white',
   textSecondary: '#92c9a8',
-  textMuted: '#3a7a4a',
-  textPlaceholder: '#3a7a4a',
+  textMuted: '#5a8b6d',
+  textPlaceholder: '#5a8b6d',
 };
 
 export const getColors = (isDark: boolean) => isDark ? darkColors : lightColors;
