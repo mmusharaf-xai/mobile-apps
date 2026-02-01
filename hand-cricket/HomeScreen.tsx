@@ -54,7 +54,7 @@ export default function HomeScreen() {
         <View style={{ flexDirection: 'row', gap: 12 }}>
           <View style={{ flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 16, padding: 12, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
             <Text style={{ fontSize: 10, fontWeight: 'bold', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>User ID</Text>
-            <Text style={{ fontSize: 14, fontWeight: '900', color: colors.textPrimary }}>#88291</Text>
+            <Text style={{ fontSize: 14, fontWeight: '900', color: isDark ? colors.primary : colors.textPrimary }}>#88291</Text>
           </View>
           <View style={{ flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 16, padding: 12, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
             <Text style={{ fontSize: 10, fontWeight: 'bold', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>Played</Text>
@@ -76,7 +76,7 @@ export default function HomeScreen() {
               style={{ height: 176, justifyContent: 'flex-end', padding: 16 }}
             >
               <LinearGradient
-                colors={['transparent', 'rgba(255,255,255,0.8)']}
+                colors={['transparent', isDark ? 'rgba(10,26,17,0.9)' : 'rgba(255,255,255,0.8)']}
                 style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 100 }}
               />
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
@@ -132,7 +132,7 @@ export default function HomeScreen() {
           </View>
 
           {/* Friend Match Card */}
-          <View style={{ backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 32, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, elevation: 4, height: 382, position: 'relative' }}>
+          <View style={{ backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 32, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, elevation: 4, height: 382, position: 'relative', opacity: isDark ? 0.6 : 1 }}>
             <Image
               source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB2yu5Qsf0vr3zdYDVK-ASmbtTE6OIUkTm5iWOFwvl1XmgzcQxp6mjPdHBlOS6Zhxi8AeSzOX7XIUX4TFbtVY-MgfMAB3kWTwgpjoOAlU86YU3PN9TkasEivi-ltZX3croXOsvwg5WF4H-o8VhyHbtXZKRQDn6Ee-PO0HK-ZqgrTErc6_2Beg3N8ANuf7SIteep_ApGw3WF4M3T8alEDfMUy1YsbP9o0NOq6DO1vjsW3Cv4LxKYx1U55k2UuPmTVZBIuCOK1LPCLlM' }}
               style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.3, resizeMode: 'cover' }}
@@ -145,9 +145,8 @@ export default function HomeScreen() {
               <Text style={{ fontSize: 24, fontWeight: '900', fontStyle: 'italic', color: isDark ? colors.textMuted : colors.textMuted, textTransform: 'uppercase', letterSpacing: 1 }}>Friend Match</Text>
               <Text style={{ fontSize: 12, color: isDark ? colors.textMuted : colors.textMuted, marginTop: 4 }}>Play with friends locally or online.</Text>
             </View>
-            <LinearGradient
-              colors={['rgba(255,255,255,0.8)', 'rgba(255,255,255,0.95)']}
-              style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center', zIndex: 2 }}
+            <View
+              style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center', zIndex: 2, backgroundColor: isDark ? 'rgba(10,26,17,0.85)' : 'rgba(255,255,255,0.8)' }}
             >
               <View style={{ alignItems: 'center', gap: 12 }}>
                 <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: colors.primary + '10', alignItems: 'center', justifyContent: 'center' }}>
@@ -156,7 +155,7 @@ export default function HomeScreen() {
                 <Text style={{ fontSize: 20, fontWeight: '900', fontStyle: 'italic', color: isDark ? colors.primary : colors.textPrimary, textTransform: 'uppercase', letterSpacing: 1 }}>Coming Soon</Text>
                 <Text style={{ fontSize: 10, fontWeight: isDark ? '500' : 'bold', color: isDark ? 'rgba(255,255,255,0.7)' : colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>Multiplayer mode is in development</Text>
               </View>
-            </LinearGradient>
+            </View>
           </View>
         </ScrollView>
     </View>
