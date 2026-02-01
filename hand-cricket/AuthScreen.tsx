@@ -104,7 +104,7 @@ export default function AuthScreen() {
       setEmail('');
       setPassword('');
       setSelectedAvatar(0);
-      navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
+      navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
     }
   };
 
