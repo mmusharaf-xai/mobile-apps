@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from './ThemeContext';
+import AlertModal from './AlertModal';
 
 const avatars = [
   { name: 'cricket', icon: 'sports-cricket' },
@@ -20,6 +21,11 @@ export default function ProfileScreen() {
   const [editedEmail, setEditedEmail] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState(0);
   const [hasChanges, setHasChanges] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalButtons, setModalButtons] = useState<any[]>([]);
+  const usernameInputRef = useRef<TextInput>(null);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -62,9 +68,16 @@ export default function ProfileScreen() {
     Alert.alert('Success', 'Profile updated successfully!');
   };
 
+  const showModal = (title: string, message: string, buttons: any[]) => {
+    setModalTitle(title);
+    setModalMessage(message);
+    setModalButtons(buttons);
+    setModalVisible(true);
+  };
+
   const handleLogout = () => {
-    Alert.alert('Logout', 'Are you sure you want to logout?', [
-      { text: 'Cancel', style: 'cancel' },
+    showModal('Logout', 'Are you sure you want to logout?', [
+      { text: 'Cancel', onPress: () => {}, style: 'cancel' },
       {
         text: 'Logout',
         onPress: async () => {
@@ -111,18 +124,22 @@ export default function ProfileScreen() {
           <Text style={{ fontSize: 11, fontWeight: 'bold', color: colors.textMuted, textTransform: 'uppercase', letterSpacing: 1, marginLeft: 4, marginBottom: 8 }}>Username</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 16, paddingHorizontal: 20, paddingVertical: 16 }}>
             <TextInput
+              ref={usernameInputRef}
               value={editedUsername}
               onChangeText={setEditedUsername}
               style={{ flex: 1, fontSize: 16, color: colors.textPrimary }}
               placeholder="Username"
               placeholderTextColor={colors.textMuted}
             />
-            <MaterialIcons name="edit" size={20} color={colors.primary} />
+            <TouchableOpacity onPress={() => usernameInputRef.current?.focus()}>
+              <MaterialIcons name="edit" size={20} color={colors.primary} />
+            </TouchableOpacity>
           </View>
         </View>
 
         {/* Change Password */}
         <TouchableOpacity
+          onPress={() => navigation.navigate('UpdatePassword')}
           style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 16, padding: 20, marginBottom: 20 }}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
@@ -149,7 +166,7 @@ export default function ProfileScreen() {
             </View>
           </View>
           <TouchableOpacity onPress={toggleTheme}>
-            <View style={{ width: 48, height: 24, borderRadius: 12, backgroundColor: isDark ? colors.primary : colors.surfaceBorder, alignItems: 'center', justifyContent: isDark ? 'flex-end' : 'flex-start', padding: 2 }}>
+            <View style={{ width: 48, height: 24, borderRadius: 12, backgroundColor: isDark ? colors.primary : colors.surfaceBorder, justifyContent: isDark ? 'flex-end' : 'flex-start', padding: 2 }}>
               <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: 'white' }} />
             </View>
           </TouchableOpacity>
@@ -226,6 +243,14 @@ export default function ProfileScreen() {
           <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#dc2626', textTransform: 'uppercase', letterSpacing: 1 }}>Logout</Text>
         </TouchableOpacity>
       </View>
+
+      <AlertModal
+        visible={modalVisible}
+        title={modalTitle}
+        message={modalMessage}
+        buttons={modalButtons}
+        onClose={() => setModalVisible(false)}
+      />
     </View>
   );
 }
