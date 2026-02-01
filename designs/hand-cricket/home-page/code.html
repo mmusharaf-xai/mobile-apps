@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HandCricket | Mobile Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#19e62b",
+                        "background-light": "#f4f7f5",
+                        "card-light": "#ffffff",
+                        "text-dark": "#0a1a11",
+                        "text-muted": "#64748b"
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "1.5rem",
+                        "xl": "2rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: "Spline Sans", sans-serif;
+            background-color: #f4f7f5;
+            overscroll-behavior-y: contain;
+        }
+        .coming-soon-overlay {
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.95));
+            backdrop-filter: blur(2px);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .bottom-nav-active {
+            color: #19e62b;
+        }
+        .radio-btn:checked + span {
+            background-color: #19e62b;
+            color: #0a1a11;
+            border-color: #19e62b;
+        }
+    </style>
+</head>
+<body class="light text-text-dark min-h-screen pb-20">
+<div class="layout-container flex flex-col min-h-screen">
+<header class="p-5 sticky top-0 z-50 bg-[#f4f7f5]/90 backdrop-blur-md">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full border-2 border-primary p-0.5 overflow-hidden">
+<img alt="User Avatar" class="w-full h-full object-cover rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJdcvYai3dXGZ1XFOog2z_7GQ8Of8eY25wGZf2osLzSoVkcgmAmAqAUi7QhWb_MXKihG20Vkt0Y_S4YdFz8Nijc4aF5tM3ZOPlrPS7lcaprvFfsKCvR9J_EXC4FBcMbxm39gD9Im--Ns7ndQOBZ0DWHslaoEqaOKYUtaJhDh28Y8nDDmyt2pSP0FvzKcMU6zYO_FDzB8e0P-D3ql4u_Z9ywcib49dhAKi1_NM_KfdXqr0L_38QLSVIhIyrjI_ZQklZN_mMNPnwlSk"/>
+</div>
+<div>
+<h2 class="text-sm font-bold leading-none text-text-dark">Alex Rivera</h2>
+<span class="text-[10px] text-primary font-black tracking-widest uppercase">Pro League</span>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="size-10 flex items-center justify-center rounded-full bg-white shadow-sm border border-gray-200">
+<span class="material-symbols-outlined text-xl text-text-dark">notifications</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-3">
+<div class="bg-white shadow-sm border border-gray-100 p-3 rounded-xl flex flex-col items-center justify-center">
+<span class="text-[10px] text-text-muted font-bold uppercase tracking-tighter">User ID</span>
+<span class="text-text-dark font-black text-sm">#88291</span>
+</div>
+<div class="bg-white shadow-sm border border-gray-100 p-3 rounded-xl flex flex-col items-center justify-center">
+<span class="text-[10px] text-text-muted font-bold uppercase tracking-tighter">Played</span>
+<span class="text-text-dark font-black text-sm">124</span>
+</div>
+<div class="bg-white shadow-sm border border-gray-100 p-3 rounded-xl flex flex-col items-center justify-center">
+<span class="text-[10px] text-text-muted font-bold uppercase tracking-tighter">Wins</span>
+<span class="text-text-dark font-black text-sm">82</span>
+</div>
+</div>
+</header>
+<main class="flex-1 px-5 py-2 space-y-6">
+<div class="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-lg relative">
+<div class="h-44 bg-center bg-cover flex items-end p-4" style='background-image: linear-gradient(to bottom, transparent, rgba(255,255,255,0.8)), url("https://lh3.googleusercontent.com/aida-public/AB6AXuDc5MWFyJCFXbdfU9goPJ_WWFFGwuHOn3LY3MnX-CCj5BDcfxwqJ2eVmthpa-MtBtVQ2JKIcPGg3kVZtGexdzTvSznKhUJ064lIuKDGKUfFxHDTzrY0Kd-oNXieskKBiQZ-wThDCWEBpb-VyjNfsw2TIC1RexgjoFJ6D4U9lU0WiNB-mOnDPz9KArNrbM_sEaS9QShRmMCf3XxJKX_8JnCUd35JIcCcaEwFy0CzGRMSqkZFdGjO4nJhwPGyIaBax3ZI2Lp4Btn7DYE");'>
+<div class="flex flex-col">
+<span class="bg-primary text-text-dark text-[10px] font-black px-2 py-0.5 rounded-full uppercase w-fit mb-1">Solo Play</span>
+<h3 class="text-2xl font-black italic uppercase tracking-tighter text-text-dark">Bot Match</h3>
+</div>
+</div>
+<div class="p-5 flex flex-col gap-5">
+<div class="space-y-3">
+<p class="text-[10px] font-bold text-text-muted uppercase tracking-widest text-center">Select Match Duration</p>
+<div class="flex gap-2">
+<label class="flex-1 cursor-pointer">
+<input checked="" class="hidden radio-btn" name="overs" type="radio"/>
+<span class="flex items-center justify-center h-12 rounded-xl bg-gray-100 border border-transparent text-text-muted font-bold text-sm transition-all">1 OVER</span>
+</label>
+<label class="flex-1 cursor-pointer">
+<input class="hidden radio-btn" name="overs" type="radio"/>
+<span class="flex items-center justify-center h-12 rounded-xl bg-gray-100 border border-transparent text-text-muted font-bold text-sm transition-all">3 OVERS</span>
+</label>
+<label class="flex-1 cursor-pointer">
+<input class="hidden radio-btn" name="overs" type="radio"/>
+<span class="flex items-center justify-center h-12 rounded-xl bg-gray-100 border border-transparent text-text-muted font-bold text-sm transition-all">5 OVERS</span>
+</label>
+</div>
+</div>
+<button class="w-full bg-primary text-text-dark h-14 rounded-full font-black text-lg uppercase tracking-widest shadow-[0_4px_15px_rgba(25,230,43,0.4)] active:scale-[0.97] transition-transform">
+                        Play Now
+                    </button>
+</div>
+</div>
+<div class="bg-white border border-gray-100 rounded-2xl overflow-hidden relative shadow-sm min-h-[160px]">
+<div class="absolute inset-0 bg-center bg-cover opacity-30 grayscale mix-blend-multiply" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB2yu5Qsf0vr3zdYDVK-ASmbtTE6OIUkTm5iWOFwvl1XmgzcQxp6mjPdHBlOS6Zhxi8AeSzOX7XIUX4TFbtVY-MgfMAB3kWTwgpjoOAlU86YU3PN9TkasEivi-ltZX3croXOsvwg5WF4H-o8VhyHbtXZKRQDn6Ee-PO0HK-ZqgrTErc6_2Beg3N8ANuf7SIteep_ApGw3WF4M3T8alEDfMUy1YsbP9o0NOq6DO1vjsW3Cv4LxKYx1U55k2UuPmTVZBIuCOK1LPCLlM");'></div>
+<div class="absolute inset-0 flex justify-between items-end px-8 opacity-10">
+<span class="material-symbols-outlined text-9xl scale-x-[-1] translate-y-4">sports_cricket</span>
+<span class="material-symbols-outlined text-9xl translate-y-4">sports_cricket</span>
+</div>
+<div class="relative p-5 z-10">
+<h3 class="text-2xl font-black italic uppercase tracking-tighter text-gray-400">Friend Match</h3>
+<p class="text-xs text-gray-400 mt-1">Play with friends locally or online.</p>
+</div>
+<div class="absolute inset-0 coming-soon-overlay flex flex-col items-center justify-center text-center p-6 z-20">
+<div class="size-16 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-primary text-4xl">lock_clock</span>
+</div>
+<h4 class="text-text-dark text-xl font-black uppercase italic tracking-tighter">Coming Soon</h4>
+<p class="text-[10px] text-text-muted font-bold uppercase tracking-widest mt-1">Multiplayer mode is in development</p>
+</div>
+</div>
+</main>
+<nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-gray-200 h-20 px-6 flex items-center justify-between z-[60] shadow-[0_-2px_10px_rgba(0,0,0,0.03)]">
+<a class="flex flex-col items-center gap-1 bottom-nav-active" href="#">
+<span class="material-symbols-outlined fill-1">home</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-text-muted" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">History</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-text-muted" href="#">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Ranking</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-text-muted" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Profile</span>
+</a>
+</nav>
+</div>
+
+</body></html>
