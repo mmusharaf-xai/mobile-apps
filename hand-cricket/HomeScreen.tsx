@@ -135,6 +135,7 @@ export default function HomeScreen() {
                   shadowRadius: 8,
                   elevation: 4,
                 }}
+                onPress={() => navigation.navigate('TossArena', { overs: selectedOvers })}
               >
                 <Text style={{ fontSize: 18, fontWeight: '900', color: colors.textPrimary, textTransform: 'uppercase', letterSpacing: 1 }}>Play Now</Text>
               </TouchableOpacity>

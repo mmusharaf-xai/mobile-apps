@@ -10,6 +10,7 @@ import HomeScreen from './HomeScreen';
 import RankingScreen from './RankingScreen';
 import HistoryScreen from './HistoryScreen';
 import ProfileScreen from './ProfileScreen';
+import TossArena from './TossArena';
 import { MaterialIcons } from '@expo/vector-icons';
 
 const Stack = createNativeStackNavigator();
@@ -26,6 +27,7 @@ function TabNavigator() {
           borderTopColor: colors.surfaceBorder,
           height: 80,
           paddingHorizontal: 24,
+          paddingBottom: 10,
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: isDark ? '#5a8b6d' : colors.textSecondary,
@@ -84,6 +86,7 @@ export default function App() {
           >
             <Stack.Screen name="Auth" component={AuthScreen} />
             <Stack.Screen name="Main" component={TabNavigator} />
+            <Stack.Screen name="TossArena" component={TossArena} />
           </Stack.Navigator>
         </NavigationContainer>
       </GestureHandlerRootView>
