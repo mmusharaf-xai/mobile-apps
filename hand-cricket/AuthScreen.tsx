@@ -92,7 +92,11 @@ export default function AuthScreen() {
         showModal('Error', 'User already exists', [{ text: 'OK', onPress: () => {} }]);
         return;
       }
-      const newUser = { username, email, password, avatar: selectedAvatar };
+      let userId;
+      do {
+        userId = Math.floor(Math.random() * 90000) + 10000; // Random 5-digit number
+      } while (users.some((u: any) => u.userId === userId));
+      const newUser = { username, email, password, avatar: selectedAvatar, userId, played: 0, wins: 0 };
       users.push(newUser);
       await AsyncStorage.setItem('users', JSON.stringify(users));
       await AsyncStorage.setItem('currentUser', JSON.stringify(newUser));

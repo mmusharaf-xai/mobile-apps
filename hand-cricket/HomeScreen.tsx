@@ -16,7 +16,11 @@ export default function HomeScreen() {
     const checkUser = async () => {
       const currentUser = await AsyncStorage.getItem('currentUser');
       if (currentUser) {
-        setUser(JSON.parse(currentUser));
+        const parsedUser = JSON.parse(currentUser);
+        // Ensure stats exist for backward compatibility
+        parsedUser.played = parsedUser.played || 0;
+        parsedUser.wins = parsedUser.wins || 0;
+        setUser(parsedUser);
       } else {
         navigation.navigate('Auth' as never);
       }
@@ -35,10 +39,16 @@ export default function HomeScreen() {
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
             <View style={{ width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: colors.primary, overflow: 'hidden', padding: 1 }}>
-              <Image
-                source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDJdcvYai3dXGZ1XFOog2z_7GQ8Of8eY25wGZf2osLzSoVkcgmAmAqAUi7QhWb_MXKihG20Vkt0Y_S4YdFz8Nijc4aF5tM3ZOPlrPS7lcaprvFfsKCvR9J_EXC4FBcMbxm39gD9Im--Ns7ndQOBZ0DWHslaoEqaOKYUtaJhDh28Y8nDDmyt2pSP0FvzKcMU6zYO_FDzB8e0P-D3ql4u_Z9ywcib49dhAKi1_NM_KfdXqr0L_38QLSVIhIyrjI_ZQklZN_mMNPnwlSk' }}
-                style={{ width: '100%', height: '100%', borderRadius: 18 }}
-              />
+              {user.avatar !== undefined && user.avatar >= 0 && user.avatar < 5 ? (
+                <View style={{ width: '100%', height: '100%', borderRadius: 18, backgroundColor: colors.primary + '20', alignItems: 'center', justifyContent: 'center' }}>
+                  <MaterialIcons name={['sports-cricket', 'front-hand', 'sports-baseball', 'military-tech', 'emoji-events'][user.avatar] as any} size={24} color={colors.primary} />
+                </View>
+              ) : (
+                <Image
+                  source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDJdcvYai3dXGZ1XFOog2z_7GQ8Of8eY25wGZf2osLzSoVkcgmAmAqAUi7QhWb_MXKihG20Vkt0Y_S4YdFz8Nijc4aF5tM3ZOPlrPS7lcaprvFfsKCvR9J_EXC4FBcMbxm39gD9Im--Ns7ndQOBZ0DWHslaoEqaOKYUtaJhDh28Y8nDDmyt2pSP0FvzKcMU6zYO_FDzB8e0P-D3ql4u_Z9ywcib49dhAKi1_NM_KfdXqr0L_38QLSVIhIyrjI_ZQklZN_mMNPnwlSk' }}
+                  style={{ width: '100%', height: '100%', borderRadius: 18 }}
+                />
+              )}
             </View>
             <View>
               <Text style={{ fontSize: 14, fontWeight: 'bold', color: colors.textPrimary }}>{user.username}</Text>
@@ -54,15 +64,15 @@ export default function HomeScreen() {
         <View style={{ flexDirection: 'row', gap: 12 }}>
           <View style={{ flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 16, padding: 12, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
             <Text style={{ fontSize: 10, fontWeight: 'bold', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>User ID</Text>
-            <Text style={{ fontSize: 14, fontWeight: '900', color: isDark ? colors.primary : colors.textPrimary }}>#88291</Text>
+            <Text style={{ fontSize: 14, fontWeight: '900', color: isDark ? colors.primary : colors.textPrimary }}>#{user.userId}</Text>
           </View>
           <View style={{ flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 16, padding: 12, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
             <Text style={{ fontSize: 10, fontWeight: 'bold', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>Played</Text>
-            <Text style={{ fontSize: 14, fontWeight: '900', color: colors.textPrimary }}>124</Text>
+            <Text style={{ fontSize: 14, fontWeight: '900', color: colors.textPrimary }}>{user.played}</Text>
           </View>
           <View style={{ flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 16, padding: 12, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
             <Text style={{ fontSize: 10, fontWeight: 'bold', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1 }}>Wins</Text>
-            <Text style={{ fontSize: 14, fontWeight: '900', color: colors.textPrimary }}>82</Text>
+            <Text style={{ fontSize: 14, fontWeight: '900', color: colors.textPrimary }}>{user.wins}</Text>
           </View>
         </View>
       </View>
