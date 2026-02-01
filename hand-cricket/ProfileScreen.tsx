@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { BlurView } from 'expo-blur';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -214,7 +215,7 @@ export default function ProfileScreen() {
       </ScrollView>
 
       {/* Footer */}
-      <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: colors.surface + '95', paddingHorizontal: 24, paddingTop: 16, paddingBottom: 40, borderTopWidth: 1, borderTopColor: colors.surfaceBorder }}>
+      <BlurView intensity={80} tint={isDark ? 'dark' : 'light'} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: 24, paddingTop: 16, paddingBottom: 40, borderTopWidth: 1, borderTopColor: colors.surfaceBorder }}>
         {hasChanges && (
           <TouchableOpacity
             onPress={saveChanges}
@@ -242,7 +243,7 @@ export default function ProfileScreen() {
           <MaterialIcons name="logout" size={20} color="#dc2626" />
           <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#dc2626', textTransform: 'uppercase', letterSpacing: 1 }}>Logout</Text>
         </TouchableOpacity>
-      </View>
+      </BlurView>
 
       <AlertModal
         visible={modalVisible}
