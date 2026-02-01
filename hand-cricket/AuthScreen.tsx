@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
@@ -104,16 +104,7 @@ export default function AuthScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
-      {/* Status Bar */}
-      <View style={{ height: 40, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 32, paddingTop: 16 }}>
-        <Text style={{ color: colors.textPrimary, fontSize: 12, fontWeight: '600' }}>9:41</Text>
-        <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
-          <MaterialIcons name="signal-cellular-4-bar" size={14} color={colors.textPrimary} />
-          <MaterialIcons name="wifi" size={14} color={colors.textPrimary} />
-          <MaterialIcons name="battery-full" size={14} color={colors.textPrimary} />
-        </View>
-      </View>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
 
       {/* Header */}
       <View style={{ alignItems: 'center', marginTop: 24, paddingHorizontal: 24 }}>
@@ -149,9 +140,11 @@ export default function AuthScreen() {
         keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
       >
         <ScrollView style={{ flex: 1, paddingHorizontal: 24, paddingTop: 24, paddingBottom: 24 }} keyboardShouldPersistTaps="handled">
-        <Text style={{ color: colors.textPrimary, fontSize: 18, fontWeight: 'bold', textAlign: 'center', marginBottom: 24,  }}>
-          {isLogin ? 'Welcome Back' : 'New Player Profile'}
-        </Text>
+        {isLogin && (
+          <Text style={{ color: colors.textPrimary, fontSize: 18, fontWeight: 'bold', textAlign: 'center', marginBottom: 24 }}>
+            Welcome back
+          </Text>
+        )}
 
         {!isLogin && (
           <View style={{ marginBottom: 24 }}>
@@ -262,6 +255,6 @@ export default function AuthScreen() {
         buttons={modalButtons}
         onClose={() => setModalVisible(false)}
       />
-    </View>
+    </SafeAreaView>
   );
 }
