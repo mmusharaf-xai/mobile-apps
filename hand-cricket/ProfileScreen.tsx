@@ -77,6 +77,19 @@ export default function ProfileScreen() {
     setModalVisible(true);
   };
 
+  // Prevent back if unsaved changes, show alert (matches design)
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+      if (!hasChanges) return;
+      e.preventDefault();
+      showModal('Unsaved Changes', 'You have unsaved changes. What would you like to do?', [
+        { text: 'Go Back', onPress: () => navigation.goBack(), style: 'cancel' },
+        { text: 'Save and Go Back', onPress: async () => { await saveChanges(); navigation.goBack(); } },
+      ]);
+    });
+    return unsubscribe;
+  }, [hasChanges, navigation]);
+
   const handleLogout = () => {
     showModal('Logout', 'Are you sure you want to logout?', [
       { text: 'Cancel', onPress: () => {}, style: 'cancel' },
