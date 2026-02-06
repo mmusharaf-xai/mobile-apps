@@ -130,11 +130,11 @@ export default function ProfileScreen() {
 
   const handleLogout = () => {
     if (hasChanges) {
-      // Same unsaved alert before logout
+      // Unsaved alert before logout (Cancel, Save And Logout green, Logout red)
       showUnsaved('Unsaved Changes', 'You have unsaved changes. What would you like to do?', [
         { text: 'Cancel', onPress: () => {}, style: 'cancel' },
-        { text: 'Go Back', onPress: handleDiscard, style: 'cancel' },
-        { text: 'Save and Logout', onPress: async () => { await saveChanges(); await logout(); navigation.reset({ index: 0, routes: [{ name: 'Auth' }] }); } },
+        { text: 'Save And Logout', onPress: async () => { await saveChanges(); await logout(); navigation.reset({ index: 0, routes: [{ name: 'Auth' }] }); }, style: 'save' },
+        { text: 'Logout', onPress: async () => { await logout(); navigation.reset({ index: 0, routes: [{ name: 'Auth' }] }); }, style: 'destructive' },
       ]);
       return;
     }
