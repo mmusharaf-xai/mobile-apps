@@ -6,6 +6,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from './ThemeContext';
 import { useUser } from './UserContext';
 import AlertModal from './AlertModal';
+import UnsavedAlert from './UnsavedAlert';
 
 const avatars = [
   { name: 'cricket', icon: 'sports-cricket' },
@@ -26,6 +27,11 @@ export default function ProfileScreen() {
   const [modalTitle, setModalTitle] = useState('');
   const [modalMessage, setModalMessage] = useState('');
   const [modalButtons, setModalButtons] = useState<any[]>([]);
+  // Separate state for unsaved alert (vertical buttons per design)
+  const [unsavedVisible, setUnsavedVisible] = useState(false);
+  const [unsavedTitle, setUnsavedTitle] = useState('');
+  const [unsavedMessage, setUnsavedMessage] = useState('');
+  const [unsavedButtons, setUnsavedButtons] = useState<any[]>([]);
   const usernameInputRef = useRef<TextInput>(null);
   const navigation = useNavigation();
 
@@ -88,12 +94,19 @@ export default function ProfileScreen() {
     setModalVisible(true);
   };
 
+  const showUnsaved = (title: string, message: string, buttons: any[]) => {
+    setUnsavedTitle(title);
+    setUnsavedMessage(message);
+    setUnsavedButtons(buttons);
+    setUnsavedVisible(true);
+  };
+
   // Prevent back if unsaved changes, show alert (matches design with cancel)
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', (e) => {
       if (!hasChanges) return;
       e.preventDefault();
-      showModal('Unsaved Changes', 'You have unsaved changes. What would you like to do?', [
+      showUnsaved('Unsaved Changes', 'You have unsaved changes. What would you like to do?', [
         { text: 'Cancel', onPress: () => {}, style: 'cancel' },
         { text: 'Go Back', onPress: handleDiscard, style: 'cancel' },
         { text: 'Save and Go Back', onPress: async () => { await saveChanges(); navigation.goBack(); } },
@@ -105,7 +118,7 @@ export default function ProfileScreen() {
   // Custom back handler for header button (triggers alert if unsaved)
   const handleBack = () => {
     if (hasChanges) {
-      showModal('Unsaved Changes', 'You have unsaved changes. What would you like to do?', [
+      showUnsaved('Unsaved Changes', 'You have unsaved changes. What would you like to do?', [
         { text: 'Cancel', onPress: () => {}, style: 'cancel' },
         { text: 'Go Back', onPress: handleDiscard, style: 'cancel' },
         { text: 'Save and Go Back', onPress: async () => { await saveChanges(); navigation.goBack(); } },
@@ -118,7 +131,7 @@ export default function ProfileScreen() {
   const handleLogout = () => {
     if (hasChanges) {
       // Same unsaved alert before logout
-      showModal('Unsaved Changes', 'You have unsaved changes. What would you like to do?', [
+      showUnsaved('Unsaved Changes', 'You have unsaved changes. What would you like to do?', [
         { text: 'Cancel', onPress: () => {}, style: 'cancel' },
         { text: 'Go Back', onPress: handleDiscard, style: 'cancel' },
         { text: 'Save and Logout', onPress: async () => { await saveChanges(); await logout(); navigation.reset({ index: 0, routes: [{ name: 'Auth' }] }); } },
@@ -312,6 +325,16 @@ export default function ProfileScreen() {
         buttons={modalButtons}
         onClose={() => setModalVisible(false)}
       />
+
+      {/* Unsaved changes alert with vertical buttons (exact design match) */}
+      <UnsavedAlert
+        visible={unsavedVisible}
+        title={unsavedTitle}
+        message={unsavedMessage}
+        buttons={unsavedButtons}
+        onClose={() => setUnsavedVisible(false)}
+      />
+    
     </View>
   );
 }
