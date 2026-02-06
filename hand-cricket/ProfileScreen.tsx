@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, Animated, Platform } from 'react-native';
 import { BlurView } from 'expo-blur';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
@@ -29,6 +29,12 @@ export default function ProfileScreen() {
   const usernameInputRef = useRef<TextInput>(null);
   const navigation = useNavigation();
 
+  // Animated value for smooth toggle knob movement
+  const switchAnim = useRef(new Animated.Value(2)).current;
+
+  // Use lighter bold weight on iOS for consistent thickness across platforms
+  const boldWeight = Platform.OS === 'ios' ? '600' : 'bold';
+
   useEffect(() => {
     const loadUser = async () => {
       const currentUser = await AsyncStorage.getItem('currentUser');
@@ -42,6 +48,15 @@ export default function ProfileScreen() {
     };
     loadUser();
   }, []);
+
+  // Animate toggle knob on theme change
+  useEffect(() => {
+    Animated.timing(switchAnim, {
+      toValue: isDark ? 26 : 2,
+      duration: 250,
+      useNativeDriver: false,
+    }).start();
+  }, [isDark]);
 
   useEffect(() => {
     if (user) {
@@ -103,7 +118,7 @@ export default function ProfileScreen() {
           >
             <MaterialIcons name="arrow-back-ios" size={24} color={colors.textPrimary} />
           </TouchableOpacity>
-          <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.textPrimary }}>Profile Settings</Text>
+          <Text style={{ fontSize: 18, fontWeight: boldWeight, color: colors.textPrimary }}>Profile Settings</Text>
           <View style={{ width: 40 }} />
         </View>
       </View>
@@ -122,7 +137,7 @@ export default function ProfileScreen() {
 
         {/* Username */}
         <View style={{ marginBottom: 20 }}>
-          <Text style={{ fontSize: 11, fontWeight: 'bold', color: colors.textMuted, textTransform: 'uppercase', letterSpacing: 1, marginLeft: 4, marginBottom: 8 }}>Username</Text>
+          <Text style={{ fontSize: 11, fontWeight: boldWeight, color: colors.textMuted, textTransform: 'uppercase', letterSpacing: 1, marginLeft: 4, marginBottom: 8 }}>Username</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 16, paddingHorizontal: 20, paddingVertical: 16 }}>
             <TextInput
               ref={usernameInputRef}
@@ -148,7 +163,7 @@ export default function ProfileScreen() {
               <MaterialIcons name="key" size={24} color={colors.primary} />
             </View>
             <View>
-              <Text style={{ fontSize: 16, fontWeight: 'bold', color: colors.textPrimary }}>Change Password</Text>
+              <Text style={{ fontSize: 16, fontWeight: boldWeight, color: colors.textPrimary }}>Change Password</Text>
               <Text style={{ fontSize: 10, color: colors.textMuted }}>Last updated recently</Text>
             </View>
           </View>
@@ -162,20 +177,20 @@ export default function ProfileScreen() {
               <MaterialIcons name="dark-mode" size={24} color={colors.textMuted} />
             </View>
             <View>
-              <Text style={{ fontSize: 16, fontWeight: 'bold', color: colors.textPrimary }}>Dark Mode</Text>
+              <Text style={{ fontSize: 16, fontWeight: boldWeight, color: colors.textPrimary }}>Dark Mode</Text>
               <Text style={{ fontSize: 10, color: colors.textMuted }}>Currently {isDark ? 'enabled' : 'disabled'}</Text>
             </View>
           </View>
           <TouchableOpacity onPress={toggleTheme}>
             <View style={{ width: 48, height: 24, borderRadius: 12, backgroundColor: isDark ? colors.primary : colors.surfaceBorder, position: 'relative' }}>
-              <View style={{
+              <Animated.View style={{
                 width: 20,
                 height: 20,
                 borderRadius: 10,
                 backgroundColor: 'white',
                 position: 'absolute',
                 top: 2,
-                left: isDark ? 26 : 2,
+                left: switchAnim,
               }} />
             </View>
           </TouchableOpacity>
@@ -183,7 +198,7 @@ export default function ProfileScreen() {
 
         {/* Avatar Selection */}
         <View style={{ marginBottom: 20 }}>
-          <Text style={{ fontSize: 11, fontWeight: 'bold', color: colors.textMuted, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 16 }}>Your Avatar</Text>
+          <Text style={{ fontSize: 11, fontWeight: boldWeight, color: colors.textMuted, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 16 }}>Your Avatar</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -24, paddingHorizontal: 24 }}>
             {avatars.map((avatar, index) => (
               <TouchableOpacity
@@ -214,7 +229,7 @@ export default function ProfileScreen() {
                   </View>
                 </View>
                 {selectedAvatar === index && (
-                  <Text style={{ fontSize: 9, fontWeight: 'bold', color: colors.primary, textTransform: 'uppercase', marginTop: 4 }}>Active</Text>
+                  <Text style={{ fontSize: 9, fontWeight: boldWeight, color: colors.primary, textTransform: 'uppercase', marginTop: 4 }}>Active</Text>
                 )}
               </TouchableOpacity>
             ))}
@@ -223,7 +238,11 @@ export default function ProfileScreen() {
       </ScrollView>
 
       {/* Footer */}
-      <BlurView intensity={80} tint={isDark ? 'dark' : 'light'} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: 24, paddingTop: 16, paddingBottom: 40, borderTopWidth: 1, borderTopColor: colors.surfaceBorder }}>
+      <BlurView
+        intensity={Platform.OS === 'android' ? 100 : 85}
+        tint={isDark ? 'dark' : 'light'}
+        style={{ position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: 24, paddingTop: 16, paddingBottom: 40, borderTopWidth: 1, borderTopColor: colors.surfaceBorder }}
+      >
         {hasChanges && (
           <TouchableOpacity
             onPress={saveChanges}
@@ -249,7 +268,7 @@ export default function ProfileScreen() {
           style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 12 }}
         >
           <MaterialIcons name="logout" size={20} color="#dc2626" />
-          <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#dc2626', textTransform: 'uppercase', letterSpacing: 1 }}>Logout</Text>
+          <Text style={{ fontSize: 14, fontWeight: boldWeight, color: '#dc2626', textTransform: 'uppercase', letterSpacing: 1 }}>Logout</Text>
         </TouchableOpacity>
       </BlurView>
 
