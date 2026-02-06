@@ -103,7 +103,7 @@ export default function UpdatePassword() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
       >
-        <ScrollView style={{ flex: 1, paddingHorizontal: 24 }} contentContainerStyle={{ paddingBottom: 40 }}>
+        <ScrollView style={{ flex: 1, paddingHorizontal: 24 }} contentContainerStyle={{ paddingBottom: 200 }}>
           {/* Subtitle */}
           <View style={{ marginBottom: 32 }}>
             <Text style={{ fontSize: 20, fontWeight: 'bold', color: colors.primary, marginBottom: 8 }}>Update Credentials</Text>
