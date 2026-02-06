@@ -12,11 +12,12 @@ export default function HomeScreen() {
   const [selectedOvers, setSelectedOvers] = useState(1);
   const navigation = useNavigation();
 
-  // Redirect if no user
-  if (!user) {
-    navigation.navigate('Auth' as never);
-    return <View />;
-  }
+  // Redirect if no user (in effect to avoid render update error)
+  useEffect(() => {
+    if (!user) {
+      navigation.navigate('Auth' as never);
+    }
+  }, [user, navigation]);
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
