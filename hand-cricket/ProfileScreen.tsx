@@ -90,6 +90,18 @@ export default function ProfileScreen() {
     return unsubscribe;
   }, [hasChanges, navigation]);
 
+  // Custom back handler for header button (triggers alert if unsaved)
+  const handleBack = () => {
+    if (hasChanges) {
+      showModal('Unsaved Changes', 'You have unsaved changes. What would you like to do?', [
+        { text: 'Go Back', onPress: () => navigation.goBack(), style: 'cancel' },
+        { text: 'Save and Go Back', onPress: async () => { await saveChanges(); navigation.goBack(); } },
+      ]);
+      return;
+    }
+    navigation.goBack();
+  };
+
   const handleLogout = () => {
     showModal('Logout', 'Are you sure you want to logout?', [
       { text: 'Cancel', onPress: () => {}, style: 'cancel' },
@@ -112,7 +124,7 @@ export default function ProfileScreen() {
       <View style={{ paddingTop: 50, paddingHorizontal: 24, paddingBottom: 20, backgroundColor: colors.background }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
+            onPress={handleBack}
             style={{ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' }}
           >
             <MaterialIcons name="arrow-back-ios" size={24} color={colors.textPrimary} />
