@@ -167,8 +167,16 @@ export default function ProfileScreen() {
             </View>
           </View>
           <TouchableOpacity onPress={toggleTheme}>
-            <View style={{ width: 48, height: 24, borderRadius: 12, backgroundColor: isDark ? colors.primary : colors.surfaceBorder, justifyContent: isDark ? 'flex-end' : 'flex-start', padding: 2 }}>
-              <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: 'white' }} />
+            <View style={{ width: 48, height: 24, borderRadius: 12, backgroundColor: isDark ? colors.primary : colors.surfaceBorder, position: 'relative' }}>
+              <View style={{
+                width: 20,
+                height: 20,
+                borderRadius: 10,
+                backgroundColor: 'white',
+                position: 'absolute',
+                top: 2,
+                left: isDark ? 26 : 2,
+              }} />
             </View>
           </TouchableOpacity>
         </View>
