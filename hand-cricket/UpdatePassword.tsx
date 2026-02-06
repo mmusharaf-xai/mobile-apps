@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -97,12 +97,18 @@ export default function UpdatePassword() {
         </View>
       </View>
 
-      <ScrollView style={{ flex: 1, paddingHorizontal: 24 }} contentContainerStyle={{ paddingBottom: 100 }}>
-        {/* Subtitle */}
-        <View style={{ marginBottom: 32 }}>
-          <Text style={{ fontSize: 20, fontWeight: 'bold', color: colors.primary, marginBottom: 8 }}>Update Credentials</Text>
-          <Text style={{ fontSize: 14, color: colors.textSecondary, lineHeight: 20 }}>Ensure your account is using a strong, unique password to stay secure.</Text>
-        </View>
+      {/* Keyboard avoiding wrapper for form fields (auto-scrolls inputs above keyboard) */}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
+      >
+        <ScrollView style={{ flex: 1, paddingHorizontal: 24 }} contentContainerStyle={{ paddingBottom: 40 }}>
+          {/* Subtitle */}
+          <View style={{ marginBottom: 32 }}>
+            <Text style={{ fontSize: 20, fontWeight: 'bold', color: colors.primary, marginBottom: 8 }}>Update Credentials</Text>
+            <Text style={{ fontSize: 14, color: colors.textSecondary, lineHeight: 20 }}>Ensure your account is using a strong, unique password to stay secure.</Text>
+          </View>
 
         {/* Current Password */}
         <View style={{ marginBottom: 24 }}>
@@ -228,42 +234,47 @@ export default function UpdatePassword() {
           </Text>
         </View>
 
-        {/* Update Button */}
-        <TouchableOpacity
-          onPress={handleUpdate}
-          style={{
-            width: '100%',
-            height: 56,
-            backgroundColor: colors.primary,
-            borderRadius: 28,
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'row',
-            gap: 8,
-            shadowColor: colors.primary,
-            shadowOpacity: 0.3,
-            shadowRadius: 8,
-            elevation: 4,
-            marginBottom: 16,
-          }}
-        >
-          <Text style={{ fontSize: 18, fontWeight: '900', color: colors.textPrimary, textTransform: 'uppercase', letterSpacing: 1 }}>Update Password</Text>
-          <MaterialIcons name="task-alt" size={24} color={colors.textPrimary} />
-        </TouchableOpacity>
-
-        {/* Cancel Button */}
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={{
-            width: '100%',
-            height: 48,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Text style={{ fontSize: 16, fontWeight: 'bold', color: colors.textMuted, textTransform: 'uppercase', letterSpacing: 1 }}>Cancel</Text>
-        </TouchableOpacity>
       </ScrollView>
+    </KeyboardAvoidingView>
+
+    {/* Fixed footer buttons (always at bottom, non-scrollable) */}
+    <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: colors.background, paddingHorizontal: 24, paddingTop: 16, paddingBottom: 40, borderTopWidth: 1, borderTopColor: colors.surfaceBorder, zIndex: 10 }}>
+      {/* Update Button */}
+      <TouchableOpacity
+        onPress={handleUpdate}
+        style={{
+          width: '100%',
+          height: 56,
+          backgroundColor: colors.primary,
+          borderRadius: 28,
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'row',
+          gap: 8,
+          shadowColor: colors.primary,
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 4,
+          marginBottom: 16,
+        }}
+      >
+        <Text style={{ fontSize: 18, fontWeight: '900', color: colors.textPrimary, textTransform: 'uppercase', letterSpacing: 1 }}>Update Password</Text>
+        <MaterialIcons name="task-alt" size={24} color={colors.textPrimary} />
+      </TouchableOpacity>
+
+      {/* Cancel Button */}
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        style={{
+          width: '100%',
+          height: 48,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Text style={{ fontSize: 16, fontWeight: 'bold', color: colors.textMuted, textTransform: 'uppercase', letterSpacing: 1 }}>Cancel</Text>
+      </TouchableOpacity>
+    </View>
 
       <AlertModal
         visible={modalVisible}
