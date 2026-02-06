@@ -70,6 +70,17 @@ export default function ProfileScreen() {
     Alert.alert('Success', 'Profile updated successfully!');
   };
 
+  // Discard changes and revert edited fields to original (from context)
+  const handleDiscard = () => {
+    if (currentUser) {
+      setEditedUsername(currentUser.username);
+      setEditedEmail(currentUser.email);
+      setSelectedAvatar(currentUser.avatar || 0);
+      setHasChanges(false);
+    }
+    navigation.goBack();
+  };
+
   const showModal = (title: string, message: string, buttons: any[]) => {
     setModalTitle(title);
     setModalMessage(message);
@@ -77,13 +88,14 @@ export default function ProfileScreen() {
     setModalVisible(true);
   };
 
-  // Prevent back if unsaved changes, show alert (matches design)
+  // Prevent back if unsaved changes, show alert (matches design with cancel)
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', (e) => {
       if (!hasChanges) return;
       e.preventDefault();
       showModal('Unsaved Changes', 'You have unsaved changes. What would you like to do?', [
-        { text: 'Go Back', onPress: () => navigation.goBack(), style: 'cancel' },
+        { text: 'Cancel', onPress: () => {}, style: 'cancel' },
+        { text: 'Go Back', onPress: handleDiscard, style: 'cancel' },
         { text: 'Save and Go Back', onPress: async () => { await saveChanges(); navigation.goBack(); } },
       ]);
     });
@@ -94,7 +106,8 @@ export default function ProfileScreen() {
   const handleBack = () => {
     if (hasChanges) {
       showModal('Unsaved Changes', 'You have unsaved changes. What would you like to do?', [
-        { text: 'Go Back', onPress: () => navigation.goBack(), style: 'cancel' },
+        { text: 'Cancel', onPress: () => {}, style: 'cancel' },
+        { text: 'Go Back', onPress: handleDiscard, style: 'cancel' },
         { text: 'Save and Go Back', onPress: async () => { await saveChanges(); navigation.goBack(); } },
       ]);
       return;
@@ -103,6 +116,15 @@ export default function ProfileScreen() {
   };
 
   const handleLogout = () => {
+    if (hasChanges) {
+      // Same unsaved alert before logout
+      showModal('Unsaved Changes', 'You have unsaved changes. What would you like to do?', [
+        { text: 'Cancel', onPress: () => {}, style: 'cancel' },
+        { text: 'Go Back', onPress: handleDiscard, style: 'cancel' },
+        { text: 'Save and Logout', onPress: async () => { await saveChanges(); await logout(); navigation.reset({ index: 0, routes: [{ name: 'Auth' }] }); } },
+      ]);
+      return;
+    }
     showModal('Logout', 'Are you sure you want to logout?', [
       { text: 'Cancel', onPress: () => {}, style: 'cancel' },
       {
