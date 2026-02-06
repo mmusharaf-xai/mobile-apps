@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from './ThemeContext';
+import { useUser } from './UserContext';
 import AlertModal from './AlertModal';
 
 export default function UpdatePassword() {
   const { colors, isDark } = useTheme();
+  const { user: currentUser, updateUser } = useUser();
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -62,21 +63,13 @@ export default function UpdatePassword() {
       return;
     }
 
-    const currentUser = JSON.parse(await AsyncStorage.getItem('currentUser') || '{}');
-    if (currentUser.password !== oldPassword) {
+    if (!currentUser || currentUser.password !== oldPassword) {
       showModal('Error', 'Old password is incorrect', [{ text: 'OK', onPress: () => {} }]);
       return;
     }
 
-    currentUser.password = newPassword;
-    await AsyncStorage.setItem('currentUser', JSON.stringify(currentUser));
-
-    const users = JSON.parse(await AsyncStorage.getItem('users') || '[]');
-    const index = users.findIndex((u: any) => u.email === currentUser.email);
-    if (index !== -1) {
-      users[index].password = newPassword;
-      await AsyncStorage.setItem('users', JSON.stringify(users));
-    }
+    // Update via context (syncs globally and to storage)
+    await updateUser({ password: newPassword });
 
     showModal('Success', 'Password updated successfully!', [{ text: 'OK', onPress: () => navigation.goBack() }]);
   };

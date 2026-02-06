@@ -5,6 +5,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from './ThemeContext';
+import { useUser } from './UserContext';
 import AlertModal from './AlertModal';
 
 const avatars = [
@@ -17,6 +18,7 @@ const avatars = [
 
 export default function AuthScreen() {
   const { colors } = useTheme();
+  const { setUser } = useUser();
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -61,6 +63,7 @@ export default function AuthScreen() {
       const user = users.find((u: any) => u.email === email && u.password === password);
       if (user) {
         await AsyncStorage.setItem('currentUser', JSON.stringify(user));
+        setUser(user); // Sync to global context
         setUsername('');
         setEmail('');
         setPassword('');
@@ -100,6 +103,7 @@ export default function AuthScreen() {
       users.push(newUser);
       await AsyncStorage.setItem('users', JSON.stringify(users));
       await AsyncStorage.setItem('currentUser', JSON.stringify(newUser));
+      setUser(newUser); // Sync to global context
       setUsername('');
       setEmail('');
       setPassword('');

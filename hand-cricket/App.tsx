@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemeProvider, useTheme } from './ThemeContext';
+import { UserProvider } from './UserContext';
 import AuthScreen from './AuthScreen';
 import HomeScreen from './HomeScreen';
 import RankingScreen from './RankingScreen';
@@ -76,7 +77,8 @@ export default function App() {
 
   return (
     <ThemeProvider>
-      <GestureHandlerRootView style={{ flex: 1 }}>
+      <UserProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
         <NavigationContainer>
           <Stack.Navigator
             initialRouteName={initialRoute}
@@ -92,6 +94,7 @@ export default function App() {
           </Stack.Navigator>
         </NavigationContainer>
       </GestureHandlerRootView>
+      </UserProvider>
     </ThemeProvider>
   );
 }

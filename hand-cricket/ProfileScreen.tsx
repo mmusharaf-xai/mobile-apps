@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, Animated, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, Animated, Platform, Alert } from 'react-native';
 import { BlurView } from 'expo-blur';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from './ThemeContext';
+import { useUser } from './UserContext';
 import AlertModal from './AlertModal';
 
 const avatars = [
@@ -17,7 +17,7 @@ const avatars = [
 
 export default function ProfileScreen() {
   const { colors, isDark, toggleTheme } = useTheme();
-  const [user, setUser] = useState<any>(null);
+  const { user: currentUser, updateUser, logout } = useUser();
   const [editedUsername, setEditedUsername] = useState('');
   const [editedEmail, setEditedEmail] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState(0);
@@ -35,19 +35,14 @@ export default function ProfileScreen() {
   // Use lighter bold weight on iOS for consistent thickness across platforms
   const boldWeight = Platform.OS === 'ios' ? '600' : 'bold';
 
+  // Sync edited fields from context user
   useEffect(() => {
-    const loadUser = async () => {
-      const currentUser = await AsyncStorage.getItem('currentUser');
-      if (currentUser) {
-        const parsedUser = JSON.parse(currentUser);
-        setUser(parsedUser);
-        setEditedUsername(parsedUser.username);
-        setEditedEmail(parsedUser.email);
-        setSelectedAvatar(parsedUser.avatar || 0);
-      }
-    };
-    loadUser();
-  }, []);
+    if (currentUser) {
+      setEditedUsername(currentUser.username);
+      setEditedEmail(currentUser.email);
+      setSelectedAvatar(currentUser.avatar || 0);
+    }
+  }, [currentUser]);
 
   // Animate toggle knob on theme change
   useEffect(() => {
@@ -59,27 +54,18 @@ export default function ProfileScreen() {
   }, [isDark]);
 
   useEffect(() => {
-    if (user) {
+    if (currentUser) {
       setHasChanges(
-        editedUsername !== user.username ||
-        editedEmail !== user.email ||
-        selectedAvatar !== (user.avatar || 0)
+        editedUsername !== currentUser.username ||
+        editedEmail !== currentUser.email ||
+        selectedAvatar !== (currentUser.avatar || 0)
       );
     }
-  }, [editedUsername, editedEmail, selectedAvatar, user]);
+  }, [editedUsername, editedEmail, selectedAvatar, currentUser]);
 
   const saveChanges = async () => {
-    if (!user) return;
-    const updatedUser = { ...user, username: editedUsername, email: editedEmail, avatar: selectedAvatar };
-    setUser(updatedUser);
-    await AsyncStorage.setItem('currentUser', JSON.stringify(updatedUser));
-    // Update in users array too
-    const users = JSON.parse(await AsyncStorage.getItem('users') || '[]');
-    const index = users.findIndex((u: any) => u.userId === user.userId);
-    if (index !== -1) {
-      users[index] = updatedUser;
-      await AsyncStorage.setItem('users', JSON.stringify(users));
-    }
+    if (!currentUser) return;
+    await updateUser({ username: editedUsername, email: editedEmail, avatar: selectedAvatar });
     setHasChanges(false);
     Alert.alert('Success', 'Profile updated successfully!');
   };
@@ -97,7 +83,7 @@ export default function ProfileScreen() {
       {
         text: 'Logout',
         onPress: async () => {
-          await AsyncStorage.removeItem('currentUser');
+          await logout();
           navigation.reset({ index: 0, routes: [{ name: 'Auth' }] });
         },
         style: 'destructive',
@@ -105,7 +91,7 @@ export default function ProfileScreen() {
     ]);
   };
 
-  if (!user) return <View />;
+  if (!currentUser) return <View />;
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -131,7 +117,7 @@ export default function ProfileScreen() {
           </View>
           <View style={{ marginTop: 16, flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.surface, paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: colors.surfaceBorder }}>
             <MaterialIcons name="lock" size={16} color={colors.primary} />
-            <Text style={{ fontSize: 14, color: colors.textSecondary }}>{user.email}</Text>
+            <Text style={{ fontSize: 14, color: colors.textSecondary }}>{currentUser.email}</Text>
           </View>
         </View>
 
