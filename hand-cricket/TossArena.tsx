@@ -92,30 +92,20 @@ export default function TossArena() {
   const strokeDashoffset = circumference * (1 - timerProgress / 100);
 
   useEffect(() => {
-    if (currentScreen === 'choose') {
+    // Reset timer/progress when entering a timed screen (choose or chooseAction/screen 2)
+    if (currentScreen === 'choose' || currentScreen === 'chooseAction') {
       setTimeLeft(10);
       setTimerProgress(100);
+
       timerRef.current = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
             clearInterval(timerRef.current!);
-            handleTossChoice('heads', true);
-            return 0;
-          }
-          const newTime = prev - 1;
-          setTimerProgress((newTime / 10) * 100);
-          return newTime;
-        });
-      }, 1000);
-    } else if (currentScreen === 'chooseAction') {
-      // Timer for bat/ball choice (screen 2)
-      setTimeLeft(10);
-      setTimerProgress(100);
-      timerRef.current = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(timerRef.current!);
-            handleActionChoice('bat', true); // default bat
+            if (currentScreen === 'choose') {
+              handleTossChoice('heads', true);
+            } else {
+              handleActionChoice('bat', true); // default bat on screen 2 timeout
+            }
             return 0;
           }
           const newTime = prev - 1;
