@@ -272,8 +272,6 @@ export default function TossArena() {
           </View>
         )}
       </View>
-
-      </View>
     </View>
   );
 }
