@@ -20,11 +20,11 @@ export default function TossArena() {
   const route = useRoute();
   const overs = (route.params as any)?.overs || 5;
 
-  // Platform-specific adjustments for consistent UI (iOS/Android font/padding)
-  const titleFontSize = Platform.OS === 'ios' ? 32 : 28;
-  const titleLetterSpacing = Platform.OS === 'ios' ? -1 : -0.5;
-  const headerPaddingBottom = Platform.OS === 'ios' ? 40 : 50;
-  const subtitleMarginTop = Platform.OS === 'ios' ? 16 : 24;
+  // Platform-specific adjustments for consistent UI (iOS/Android font/padding; Android fonts render bolder/larger)
+  const titleFontSize = Platform.OS === 'ios' ? 32 : 24;
+  const titleLetterSpacing = Platform.OS === 'ios' ? -1 : -0.8;
+  const headerPaddingBottom = Platform.OS === 'ios' ? 40 : 55;
+  const subtitleMarginTop = Platform.OS === 'ios' ? 16 : 28;
 
   const [currentScreen, setCurrentScreen] = useState<'choose' | 'flipping' | 'result' | 'chooseAction' | 'startMatch'>('choose');
   const [timeLeft, setTimeLeft] = useState(10);
