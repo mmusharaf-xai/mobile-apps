@@ -19,11 +19,12 @@ export default function TossArena() {
   const route = useRoute();
   const overs = (route.params as any)?.overs || 5;
 
-  const [currentScreen, setCurrentScreen] = useState<'choose' | 'flipping' | 'result'>('choose');
+  const [currentScreen, setCurrentScreen] = useState<'choose' | 'flipping' | 'result' | 'chooseAction'>('choose');
   const [timeLeft, setTimeLeft] = useState(10);
   const [selectedSide, setSelectedSide] = useState<'heads' | 'tails' | null>(null);
   const [tossResult, setTossResult] = useState<'heads' | 'tails' | null>(null);
   const [userWonToss, setUserWonToss] = useState(false);
+  const [chosenAction, setChosenAction] = useState<'bat' | 'ball' | null>(null);
   const [timerProgress, setTimerProgress] = useState(100);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -54,7 +55,7 @@ export default function TossArena() {
       setTossResult(result);
       const won = selectedSide === result || (!selectedSide && result === 'heads');
       setUserWonToss(won);
-      setCurrentScreen('result');
+      setCurrentScreen(won ? 'chooseAction' : 'result');
     });
   }, [coinAnim, scaleAnim, selectedSide]);
 
@@ -72,6 +73,19 @@ export default function TossArena() {
   const handleStartMatch = () => {
     navigation.goBack();
   };
+
+  // Handle bat/ball choice (screen 2 when user wins toss)
+  const handleActionChoice = useCallback((action: 'bat' | 'ball', isTimeout = false) => {
+    if (currentScreen !== 'chooseAction') return;
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    setChosenAction(action);
+    // Proceed to match start
+    setTimeout(() => {
+      handleStartMatch();
+    }, 300);
+  }, [currentScreen, handleStartMatch]);
 
   const radius = 44;
   const circumference = 2 * Math.PI * radius;
@@ -93,13 +107,29 @@ export default function TossArena() {
           return newTime;
         });
       }, 1000);
+    } else if (currentScreen === 'chooseAction') {
+      // Timer for bat/ball choice (screen 2)
+      setTimeLeft(10);
+      setTimerProgress(100);
+      timerRef.current = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(timerRef.current!);
+            handleActionChoice('bat', true); // default bat
+            return 0;
+          }
+          const newTime = prev - 1;
+          setTimerProgress((newTime / 10) * 100);
+          return newTime;
+        });
+      }, 1000);
     }
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
     };
-  }, [currentScreen, handleTossChoice]);
+  }, [currentScreen, handleTossChoice, handleActionChoice]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -118,6 +148,11 @@ export default function TossArena() {
         {currentScreen === 'choose' && (
           <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
             CHOOSE YOUR SIDE!
+          </Text>
+        )}
+        {currentScreen === 'chooseAction' && (
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+            CHOOSE TO BAT OR BOWL!
           </Text>
         )}
         {currentScreen === 'result' && (
@@ -203,6 +238,84 @@ export default function TossArena() {
           </>
         )}
 
+        {currentScreen === 'chooseAction' && (
+          <>
+            {/* Timer (reused) */}
+            <View style={styles.timerContainer}>
+              <View style={[styles.timerCircle, { backgroundColor: colors.surface }]}>
+                <Svg width="100" height="100" viewBox="0 0 100 100" style={styles.timerSvg}>
+                  <Circle
+                    cx="50"
+                    cy="50"
+                    r={radius}
+                    fill="transparent"
+                    stroke={isDark ? '#234832' : '#e0e0e0'}
+                    strokeWidth="6"
+                  />
+                  <Circle
+                    cx="50"
+                    cy="50"
+                    r={radius}
+                    fill="transparent"
+                    stroke={colors.primary}
+                    strokeWidth="6"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={strokeDashoffset}
+                    strokeLinecap="round"
+                    transform="rotate(-90 50 50)"
+                  />
+                </Svg>
+                <View style={styles.timerTextContainer}>
+                  <Text style={[styles.timerNumber, { color: colors.textPrimary }]}>
+                    {timeLeft}
+                  </Text>
+                  <Text style={[styles.timerSec, { color: colors.primary }]}>SEC</Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Coin showing toss result */}
+            <View style={styles.coinContainer}>
+              <View style={[styles.coinOuter, { borderColor: colors.primary, backgroundColor: colors.surface, shadowColor: colors.primary }]}>
+                <LinearGradient
+                  colors={['#ffd700', '#f9a825', '#c67c00']}
+                  style={styles.coinInner}
+                  start={{ x: 0.2, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  <View style={styles.coinHighlight}>
+                    <Text style={styles.coinLetter}>{tossResult === 'tails' ? 'T' : 'H'}</Text>
+                  </View>
+                </LinearGradient>
+              </View>
+              <Text style={[styles.coinLabel, { color: colors.textMuted }]}>{tossResult?.toUpperCase()}</Text>
+            </View>
+
+            {/* Bat/Ball buttons (screen 2) */}
+            <View style={styles.buttonsContainer}>
+              <TouchableOpacity
+                style={[styles.button, styles.headsButton, { backgroundColor: colors.primary }]}
+                onPress={() => handleActionChoice('bat')}
+                activeOpacity={0.9}
+              >
+                <Text style={[styles.buttonText, { color: colors.textPrimary }]}>BAT</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.button, styles.tailsButton, { borderColor: isDark ? '#234832' : '#e0e0e0', backgroundColor: 'transparent' }]}
+                onPress={() => handleActionChoice('ball')}
+                activeOpacity={0.9}
+              >
+                <Text style={[styles.buttonText, { color: colors.textPrimary }]}>BALL</Text>
+              </TouchableOpacity>
+            </View>
+
+            <Text style={[styles.footerText, { color: colors.textMuted }]}>
+              SELECT TO ENTER THE MATCH
+            </Text>
+          </>
+        )}
+
         {currentScreen === 'flipping' && (
           <View style={styles.flippingContainer}>
             <Animated.View
@@ -234,6 +347,7 @@ export default function TossArena() {
 
         {currentScreen === 'result' && (
           <View style={styles.resultContainer}>
+            {/* Show loss result */}
             <View style={[styles.coinOuter, { borderColor: colors.primary, backgroundColor: colors.surface, shadowColor: colors.primary }]}>
               <LinearGradient
                 colors={['#ffd700', '#f9a825', '#c67c00']}
@@ -251,8 +365,8 @@ export default function TossArena() {
               <Text style={[styles.resultTitle, { color: colors.textPrimary }]}>
                 {tossResult === 'heads' ? 'HEADS' : 'TAILS'}
               </Text>
-              <Text style={[styles.resultSubtitle, { color: userWonToss ? colors.primary : colors.textSecondary }]}>
-                {userWonToss ? 'YOU WON!' : 'BETTER LUCK NEXT TIME'}
+              <Text style={[styles.resultSubtitle, { color: colors.textSecondary }]}>
+                OPPONENT WON THE TOSS
               </Text>
             </View>
 
