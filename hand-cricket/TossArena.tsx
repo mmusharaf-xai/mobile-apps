@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Animated,
   Easing,
+  Platform,
 } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -18,6 +19,12 @@ export default function TossArena() {
   const navigation = useNavigation();
   const route = useRoute();
   const overs = (route.params as any)?.overs || 5;
+
+  // Platform-specific adjustments for consistent UI (iOS/Android font/padding)
+  const titleFontSize = Platform.OS === 'ios' ? 32 : 28;
+  const titleLetterSpacing = Platform.OS === 'ios' ? -1 : -0.5;
+  const headerPaddingBottom = Platform.OS === 'ios' ? 40 : 50;
+  const subtitleMarginTop = Platform.OS === 'ios' ? 16 : 24;
 
   const [currentScreen, setCurrentScreen] = useState<'choose' | 'flipping' | 'result' | 'chooseAction' | 'startMatch'>('choose');
   const [timeLeft, setTimeLeft] = useState(10);
@@ -132,25 +139,25 @@ export default function TossArena() {
         <View style={[styles.blurCircle2, { backgroundColor: colors.primary + (isDark ? '08' : '05') }]} />
       </View>
 
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.textPrimary }]}>TOSS ARENA</Text>
+      <View style={[styles.header, { paddingBottom: headerPaddingBottom }]}>
+        <Text style={[styles.title, { color: colors.textPrimary, fontSize: titleFontSize, letterSpacing: titleLetterSpacing }]}>TOSS ARENA</Text>
         <View style={[styles.oversBadge, { borderColor: colors.primary, backgroundColor: colors.surface }]}>
           <Text style={[styles.oversText, { color: colors.primary }]}>
             {overs} OVERS MATCH
           </Text>
         </View>
         {currentScreen === 'choose' && (
-          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+          <Text style={[styles.subtitle, { color: colors.textSecondary, marginTop: subtitleMarginTop }]}>
             CHOOSE YOUR SIDE!
           </Text>
         )}
         {currentScreen === 'chooseAction' && (
-          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+          <Text style={[styles.subtitle, { color: colors.textSecondary, marginTop: subtitleMarginTop }]}>
             CHOOSE TO BAT OR BOWL!
           </Text>
         )}
         {currentScreen === 'result' && (
-          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+          <Text style={[styles.subtitle, { color: colors.textSecondary, marginTop: subtitleMarginTop }]}>
             {userWonToss ? 'YOU WON THE TOSS!' : 'OPPONENT WON THE TOSS'}
           </Text>
         )}
