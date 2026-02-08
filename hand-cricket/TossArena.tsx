@@ -19,7 +19,7 @@ export default function TossArena() {
   const route = useRoute();
   const overs = (route.params as any)?.overs || 5;
 
-  const [currentScreen, setCurrentScreen] = useState<'choose' | 'flipping' | 'result' | 'chooseAction'>('choose');
+  const [currentScreen, setCurrentScreen] = useState<'choose' | 'flipping' | 'result' | 'chooseAction' | 'startMatch'>('choose');
   const [timeLeft, setTimeLeft] = useState(10);
   const [selectedSide, setSelectedSide] = useState<'heads' | 'tails' | null>(null);
   const [tossResult, setTossResult] = useState<'heads' | 'tails' | null>(null);
@@ -81,41 +81,47 @@ export default function TossArena() {
       clearInterval(timerRef.current);
     }
     setChosenAction(action);
-    // Proceed to match start
+    // Move to screen 3 summary before match
     setTimeout(() => {
-      handleStartMatch();
+      setCurrentScreen('startMatch');
     }, 300);
-  }, [currentScreen, handleStartMatch]);
+  }, [currentScreen]);
 
   const radius = 44;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference * (1 - timerProgress / 100);
 
-  // Robust timer for both screens (10s countdown, green arc shrinks)
+  // Robust 10s timer (precise 1s ticks via ref/timeout; green arc shrinks for both screens)
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-    if (currentScreen === 'choose' || currentScreen === 'chooseAction') {
-      setTimeLeft(10);
-      setTimerProgress(100);
-      const isAction = currentScreen === 'chooseAction';
-      let currentTime = 10;
-      interval = setInterval(() => {
-        currentTime -= 1;
-        setTimeLeft(currentTime);
-        setTimerProgress((currentTime / 10) * 100);
-        if (currentTime <= 0) {
-          clearInterval(interval!);
-          if (isAction) {
-            handleActionChoice('bat', true); // default bat on screen 2
-          } else {
-            handleTossChoice('heads', true);
-          }
-        }
-      }, 1000);
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
     }
+    if (currentScreen !== 'choose' && currentScreen !== 'chooseAction') {
+      return;
+    }
+    setTimeLeft(10);
+    setTimerProgress(100);
+    const isAction = currentScreen === 'chooseAction';
+    let time = 10;
+    const tick = () => {
+      time -= 1;
+      setTimeLeft(time);
+      setTimerProgress((time / 10) * 100);
+      if (time > 0) {
+        timerRef.current = setTimeout(tick, 1000);
+      } else {
+        if (isAction) {
+          handleActionChoice('bat', true); // default bat on screen 2
+        } else {
+          handleTossChoice('heads', true);
+        }
+      }
+    };
+    timerRef.current = setTimeout(tick, 1000); // start after first sec
     return () => {
-      if (interval) clearInterval(interval);
-      if (timerRef.current) clearInterval(timerRef.current);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
     };
   }, [currentScreen, handleTossChoice, handleActionChoice]);
 
@@ -355,6 +361,47 @@ export default function TossArena() {
               </Text>
               <Text style={[styles.resultSubtitle, { color: colors.textSecondary }]}>
                 OPPONENT WON THE TOSS
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              style={[styles.startButton, { backgroundColor: colors.primary }]}
+              onPress={handleStartMatch}
+            >
+              <Text style={[styles.startButtonText, { color: colors.textPrimary }]}>START MATCH</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.backButton, { borderColor: colors.textSecondary }]}
+              onPress={() => navigation.goBack()}
+            >
+              <Text style={[styles.backButtonText, { color: colors.textSecondary }]}>BACK TO HOME</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {currentScreen === 'startMatch' && (
+          <View style={styles.resultContainer}>
+            {/* Screen 3: Match summary after bat/ball choice */}
+            <View style={[styles.coinOuter, { borderColor: colors.primary, backgroundColor: colors.surface, shadowColor: colors.primary }]}>
+              <LinearGradient
+                colors={['#ffd700', '#f9a825', '#c67c00']}
+                style={styles.coinInner}
+                start={{ x: 0.2, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <View style={styles.coinHighlight}>
+                  <Text style={styles.coinLetter}>{chosenAction === 'ball' ? 'B' : 'A'}</Text>
+                </View>
+              </LinearGradient>
+            </View>
+
+            <View style={styles.resultTextContainer}>
+              <Text style={[styles.resultTitle, { color: colors.textPrimary }]}>
+                {chosenAction?.toUpperCase() || 'BAT'}
+              </Text>
+              <Text style={[styles.resultSubtitle, { color: colors.primary }]}>
+                MATCH STARTING...
               </Text>
             </View>
 
