@@ -92,30 +92,23 @@ export default function TossArena() {
   const strokeDashoffset = circumference * (1 - timerProgress / 100);
 
   useEffect(() => {
-    if (currentScreen === 'choose') {
+    if (currentScreen === 'choose' || currentScreen === 'chooseAction') {
+      // Prevent multiple intervals (strict mode / re-renders)
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
       setTimeLeft(10);
       setTimerProgress(100);
+      const isAction = currentScreen === 'chooseAction';
       timerRef.current = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
             clearInterval(timerRef.current!);
-            handleTossChoice('heads', true);
-            return 0;
-          }
-          const newTime = prev - 1;
-          setTimerProgress((newTime / 10) * 100);
-          return newTime;
-        });
-      }, 1000);
-    } else if (currentScreen === 'chooseAction') {
-      // Timer for bat/ball choice (screen 2)
-      setTimeLeft(10);
-      setTimerProgress(100);
-      timerRef.current = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(timerRef.current!);
-            handleActionChoice('bat', true); // default bat
+            if (isAction) {
+              handleActionChoice('bat', true); // default bat
+            } else {
+              handleTossChoice('heads', true);
+            }
             return 0;
           }
           const newTime = prev - 1;
@@ -423,7 +416,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingTop: 60,
-    paddingBottom: 20,
+    paddingBottom: 40,
     paddingHorizontal: 24,
     alignItems: 'center',
     zIndex: 10,
