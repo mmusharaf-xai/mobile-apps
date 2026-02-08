@@ -91,36 +91,31 @@ export default function TossArena() {
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference * (1 - timerProgress / 100);
 
+  // Robust timer for both screens (10s countdown, green arc shrinks)
   useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
     if (currentScreen === 'choose' || currentScreen === 'chooseAction') {
-      // Prevent multiple intervals (strict mode / re-renders)
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
       setTimeLeft(10);
       setTimerProgress(100);
       const isAction = currentScreen === 'chooseAction';
-      timerRef.current = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(timerRef.current!);
-            if (isAction) {
-              handleActionChoice('bat', true); // default bat
-            } else {
-              handleTossChoice('heads', true);
-            }
-            return 0;
+      let currentTime = 10;
+      interval = setInterval(() => {
+        currentTime -= 1;
+        setTimeLeft(currentTime);
+        setTimerProgress((currentTime / 10) * 100);
+        if (currentTime <= 0) {
+          clearInterval(interval!);
+          if (isAction) {
+            handleActionChoice('bat', true); // default bat on screen 2
+          } else {
+            handleTossChoice('heads', true);
           }
-          const newTime = prev - 1;
-          setTimerProgress((newTime / 10) * 100);
-          return newTime;
-        });
+        }
       }, 1000);
     }
     return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
+      if (interval) clearInterval(interval);
+      if (timerRef.current) clearInterval(timerRef.current);
     };
   }, [currentScreen, handleTossChoice, handleActionChoice]);
 
