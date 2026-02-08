@@ -131,7 +131,7 @@ export default function TossArena() {
         {currentScreen === 'choose' && (
           <>
             <View style={styles.timerContainer}>
-              <View style={styles.timerCircle}>
+              <View style={[styles.timerCircle, { backgroundColor: colors.surface }]}>
                 <Svg width="100" height="100" viewBox="0 0 100 100" style={styles.timerSvg}>
                   <Circle
                     cx="50"
@@ -367,7 +367,6 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: colors.surface,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
