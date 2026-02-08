@@ -20,9 +20,10 @@ export default function TossArena() {
   const route = useRoute();
   const overs = (route.params as any)?.overs || 5;
 
-  // Platform-specific adjustments for consistent UI (iOS/Android font/padding; Android fonts render bolder/larger)
+  // Platform-specific adjustments for consistent UI (iOS/Android font/padding; Android fonts render bolder/larger, italic causes truncate)
   const titleFontSize = Platform.OS === 'ios' ? 32 : 24;
   const titleLetterSpacing = Platform.OS === 'ios' ? -1 : -0.8;
+  const titleFontStyle = Platform.OS === 'ios' ? 'italic' : 'normal';
   const headerPaddingBottom = Platform.OS === 'ios' ? 40 : 55;
   const subtitleMarginTop = Platform.OS === 'ios' ? 16 : 28;
 
@@ -140,7 +141,7 @@ export default function TossArena() {
       </View>
 
       <View style={[styles.header, { paddingBottom: headerPaddingBottom }]}>
-        <Text style={[styles.title, { color: colors.textPrimary, fontSize: titleFontSize, letterSpacing: titleLetterSpacing }]}>TOSS ARENA</Text>
+        <Text style={[styles.title, { color: colors.textPrimary, fontSize: titleFontSize, letterSpacing: titleLetterSpacing, fontStyle: titleFontStyle, textAlign: 'center' }]}>TOSS ARENA</Text>
         <View style={[styles.oversBadge, { borderColor: colors.primary, backgroundColor: colors.surface }]}>
           <Text style={[styles.oversText, { color: colors.primary }]}>
             {overs} OVERS MATCH
@@ -475,7 +476,6 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     textTransform: 'uppercase',
     letterSpacing: -1,
-    fontStyle: 'italic',
   },
   oversBadge: {
     marginTop: 12,
