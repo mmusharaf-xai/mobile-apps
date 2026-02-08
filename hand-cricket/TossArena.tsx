@@ -273,11 +273,6 @@ export default function TossArena() {
         )}
       </View>
 
-      <View style={styles.bottomNav}>
-        <MaterialIcons name="home" size={24} color={colors.textSecondary} />
-        <MaterialIcons name="history" size={24} color={colors.textSecondary} />
-        <MaterialIcons name="leaderboard" size={24} color={colors.textSecondary} />
-        <MaterialIcons name="person" size={24} color={colors.textSecondary} />
       </View>
     </View>
   );
@@ -548,20 +543,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textTransform: 'uppercase',
     letterSpacing: 1,
-  },
-  bottomNav: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 80,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
-    paddingHorizontal: 20,
-    zIndex: 20,
   },
 });
