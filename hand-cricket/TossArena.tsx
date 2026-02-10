@@ -434,7 +434,6 @@ export default function TossArena() {
                   <MaterialIcons name="psychology" size={38} color="#ffffff" />
                 </View>
               </Animated.View>
-              <View style={[styles.pingRing, { backgroundColor: colors.primary }]} />
             </View>
 
             {/* thinking text + dots */}
@@ -475,7 +474,7 @@ export default function TossArena() {
 
         {currentScreen === 'startMatch' && (
           <View style={styles.screen3Container}>
-            {/* action coin (A/B) with bot icon overlay if bot won */}
+            {/* toss coin (H/T) with bot icon overlay if bot won */}
             <View style={styles.screen3CoinWrapper}>
               <View style={[styles.coinOuter, { borderColor: colors.primary, backgroundColor: colors.surface, shadowColor: colors.primary, width: 192, height: 192, borderRadius: 96, borderWidth: 8 }]}>
                 <LinearGradient
@@ -486,7 +485,7 @@ export default function TossArena() {
                 >
                   <View style={[styles.coinHighlight, { width: 120, height: 120, borderRadius: 60 }]}>
                     <Text style={[styles.coinLetter, { fontSize: 64 }]}>
-                      {(userWonToss ? chosenAction : botAction) === 'ball' ? 'B' : 'A'}
+                      {tossResult === 'tails' ? 'T' : 'H'}
                     </Text>
                   </View>
                 </LinearGradient>
@@ -502,7 +501,7 @@ export default function TossArena() {
 
             {/* action summary text */}
             <View style={styles.screen3Text}>
-              <Text style={[styles.resultTitle, { color: colors.textPrimary, fontSize: 32, marginBottom: 8 }]}>
+              <Text style={[styles.resultTitle, { color: colors.textPrimary, fontSize: 32, marginBottom: 8, textAlign: 'center' }]}>
                 {userWonToss ? 'YOU WON THE TOSS!' : 'BOT WON THE TOSS!'}
               </Text>
               <View style={[styles.actionBadge, { backgroundColor: colors.surface }]}>
@@ -855,15 +854,6 @@ const styles = StyleSheet.create({
     elevation: 6,
     borderWidth: 3,
     borderColor: '#fff',
-  },
-  pingRing: {
-    position: 'absolute',
-    top: 20,
-    left: 20,
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    opacity: 0.15,
   },
   thinkingText: {
     alignItems: 'center',
