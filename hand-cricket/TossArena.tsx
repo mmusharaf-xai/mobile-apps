@@ -27,17 +27,20 @@ export default function TossArena() {
   const headerPaddingBottom = Platform.OS === 'ios' ? 40 : 55;
   const subtitleMarginTop = Platform.OS === 'ios' ? 16 : 28;
 
-  const [currentScreen, setCurrentScreen] = useState<'choose' | 'flipping' | 'result' | 'chooseAction' | 'startMatch'>('choose');
+  const [currentScreen, setCurrentScreen] = useState<'choose' | 'flipping' | 'chooseAction' | 'startMatch' | 'botThinking'>('choose');
   const [timeLeft, setTimeLeft] = useState(10);
   const [selectedSide, setSelectedSide] = useState<'heads' | 'tails' | null>(null);
   const [tossResult, setTossResult] = useState<'heads' | 'tails' | null>(null);
   const [userWonToss, setUserWonToss] = useState(false);
   const [chosenAction, setChosenAction] = useState<'bat' | 'ball' | null>(null);
+  const [botAction, setBotAction] = useState<'bat' | 'ball' | null>(null);
   const [timerProgress, setTimerProgress] = useState(100);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const coinAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const brainScaleAnim = useRef(new Animated.Value(1)).current;
+  const botProgressAnim = useRef(new Animated.Value(0)).current;
 
   const startCoinFlip = useCallback(() => {
     setCurrentScreen('flipping');
@@ -63,7 +66,7 @@ export default function TossArena() {
       setTossResult(result);
       const won = selectedSide === result || (!selectedSide && result === 'heads');
       setUserWonToss(won);
-      setCurrentScreen(won ? 'chooseAction' : 'result');
+      setCurrentScreen(won ? 'chooseAction' : 'botThinking');
     });
   }, [coinAnim, scaleAnim, selectedSide]);
 
@@ -133,6 +136,38 @@ export default function TossArena() {
     };
   }, [currentScreen, handleTossChoice, handleActionChoice]);
 
+  // Bot thinking 3s loader on loss then random action to screen 3
+  useEffect(() => {
+    if (currentScreen !== 'botThinking') return;
+    botProgressAnim.setValue(0);
+    coinAnim.setValue(0);
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(brainScaleAnim, { toValue: 1.2, duration: 800, useNativeDriver: true }),
+        Animated.timing(brainScaleAnim, { toValue: 1, duration: 800, useNativeDriver: true }),
+      ])
+    ).start();
+    Animated.timing(coinAnim, {
+      toValue: 1,
+      duration: 3000,
+      easing: Easing.linear,
+      useNativeDriver: true,
+    }).start();
+    Animated.timing(botProgressAnim, {
+      toValue: 1,
+      duration: 3000,
+      easing: Easing.linear,
+      useNativeDriver: false,
+    }).start(() => {
+      brainScaleAnim.stopAnimation();
+      const randomNum = Math.floor(Math.random() * 2) + 1;
+      const action: 'bat' | 'ball' = randomNum === 2 ? 'ball' : 'bat';
+      setBotAction(action);
+      setCurrentScreen('startMatch');
+    });
+    return () => brainScaleAnim.stopAnimation();
+  }, [currentScreen]);
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.backgroundEffects}>
@@ -157,9 +192,9 @@ export default function TossArena() {
             CHOOSE TO BAT OR BOWL!
           </Text>
         )}
-        {currentScreen === 'result' && (
+        {currentScreen === 'botThinking' && (
           <Text style={[styles.subtitle, { color: colors.textSecondary, marginTop: subtitleMarginTop }]}>
-            {userWonToss ? 'YOU WON THE TOSS!' : 'OPPONENT WON THE TOSS'}
+            BOT IS THINKING...
           </Text>
         )}
       </View>
@@ -347,50 +382,87 @@ export default function TossArena() {
           </View>
         )}
 
-        {currentScreen === 'result' && (
-          <View style={styles.resultContainer}>
-            {/* Show loss result */}
-            <View style={[styles.coinOuter, { borderColor: colors.primary, backgroundColor: colors.surface, shadowColor: colors.primary }]}>
-              <LinearGradient
-                colors={['#ffd700', '#f9a825', '#c67c00']}
-                style={styles.coinInner}
-                start={{ x: 0.2, y: 0 }}
-                end={{ x: 1, y: 1 }}
+        {currentScreen === 'botThinking' && (
+          <View style={styles.botThinkingContainer}>
+            {/* faint bg coin with ? spinning */}
+            <Animated.View
+              style={[
+                styles.faintCoin,
+                {
+                  transform: [{ rotate: coinAnim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] }) }],
+                },
+              ]}
+            >
+              <View style={[styles.coinOuter, { borderColor: colors.primary, backgroundColor: colors.surface, shadowColor: colors.primary, opacity: 0.08 }]}>
+                <LinearGradient
+                  colors={['#ffd700', '#f9a825', '#c67c00']}
+                  style={styles.coinInner}
+                  start={{ x: 0.2, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  <View style={styles.coinHighlight}>
+                    <Text style={[styles.coinLetter, { opacity: 0.4 }]}>?</Text>
+                  </View>
+                </LinearGradient>
+              </View>
+            </Animated.View>
+
+            {/* robot with pulsing brain */}
+            <View style={styles.robotWrapper}>
+              <View style={[styles.robotIconBg, { backgroundColor: colors.surface, borderColor: colors.primary }]}>
+                <MaterialIcons name="smart-toy" size={110} color={colors.textPrimary} />
+              </View>
+              <Animated.View
+                style={[
+                  styles.brainOverlay,
+                  { transform: [{ scale: brainScaleAnim }] },
+                ]}
               >
-                <View style={styles.coinHighlight}>
-                  <Text style={styles.coinLetter}>{tossResult === 'tails' ? 'T' : 'H'}</Text>
+                <View style={[styles.brainCircle, { backgroundColor: colors.primary }]}>
+                  <MaterialIcons name="psychology" size={38} color="#ffffff" />
                 </View>
-              </LinearGradient>
+              </Animated.View>
+              <View style={[styles.pingRing, { backgroundColor: colors.primary }]} />
             </View>
 
-            <View style={styles.resultTextContainer}>
-              <Text style={[styles.resultTitle, { color: colors.textPrimary }]}>
-                {tossResult === 'heads' ? 'HEADS' : 'TAILS'}
-              </Text>
-              <Text style={[styles.resultSubtitle, { color: colors.textSecondary }]}>
-                OPPONENT WON THE TOSS
-              </Text>
+            {/* thinking text + dots */}
+            <View style={styles.thinkingText}>
+              <Text style={[styles.botTitle, { color: colors.textPrimary }]}>BOT IS THINKING...</Text>
+              <View style={styles.dots}>
+                <View style={[styles.dot, { backgroundColor: colors.primary }]} />
+                <View style={[styles.dot, { backgroundColor: colors.primary, opacity: 0.6 }]} />
+                <View style={[styles.dot, { backgroundColor: colors.primary, opacity: 0.3 }]} />
+              </View>
             </View>
 
-            <TouchableOpacity
-              style={[styles.startButton, { backgroundColor: colors.primary }]}
-              onPress={handleStartMatch}
-            >
-              <Text style={[styles.startButtonText, { color: colors.textPrimary }]}>START MATCH</Text>
-            </TouchableOpacity>
+            {/* progress bar */}
+            <View style={styles.progressWrapper}>
+              <View style={[styles.progressBg, { backgroundColor: isDark ? colors.surfaceBorder : '#e5e7eb' }]}>
+                <Animated.View
+                  style={[
+                    styles.progressFill,
+                    {
+                      backgroundColor: colors.primary,
+                      width: botProgressAnim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }),
+                    },
+                  ]}
+                />
+              </View>
+            </View>
 
-            <TouchableOpacity
-              style={[styles.backButton, { borderColor: colors.textSecondary }]}
-              onPress={() => navigation.goBack()}
-            >
-              <Text style={[styles.backButtonText, { color: colors.textSecondary }]}>BACK TO HOME</Text>
-            </TouchableOpacity>
+            {/* 3s info */}
+            <View style={styles.infoRow}>
+              <View style={[styles.smallTimer, { backgroundColor: colors.surface }]}>
+                <MaterialIcons name="timer" size={18} color={colors.textSecondary} />
+                <Text style={[styles.smallTimerText, { color: colors.textSecondary }]}>3s</Text>
+              </View>
+              <Text style={[styles.calcText, { color: colors.textMuted }]}>CALCULATING TOSS PROBABILITIES</Text>
+            </View>
           </View>
         )}
 
         {currentScreen === 'startMatch' && (
           <View style={styles.resultContainer}>
-            {/* Screen 3: Match summary after bat/ball choice */}
             <View style={[styles.coinOuter, { borderColor: colors.primary, backgroundColor: colors.surface, shadowColor: colors.primary }]}>
               <LinearGradient
                 colors={['#ffd700', '#f9a825', '#c67c00']}
@@ -399,14 +471,18 @@ export default function TossArena() {
                 end={{ x: 1, y: 1 }}
               >
                 <View style={styles.coinHighlight}>
-                  <Text style={styles.coinLetter}>{chosenAction === 'ball' ? 'B' : 'A'}</Text>
+                  <Text style={styles.coinLetter}>
+                    {(userWonToss ? chosenAction : botAction) === 'ball' ? 'B' : 'A'}
+                  </Text>
                 </View>
               </LinearGradient>
             </View>
 
             <View style={styles.resultTextContainer}>
               <Text style={[styles.resultTitle, { color: colors.textPrimary }]}>
-                {chosenAction?.toUpperCase() || 'BAT'}
+                {userWonToss
+                  ? (chosenAction?.toUpperCase() || 'BAT')
+                  : `${(botAction?.toUpperCase() || 'BAT')} (BOT)`}
               </Text>
               <Text style={[styles.resultSubtitle, { color: colors.primary }]}>
                 MATCH STARTING...
@@ -697,5 +773,144 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textTransform: 'uppercase',
     letterSpacing: 1,
+  },
+  botThinkingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    width: '100%',
+    position: 'relative',
+  },
+  faintCoin: {
+    position: 'absolute',
+    top: -80,
+    opacity: 0.05,
+    zIndex: 1,
+  },
+  robotWrapper: {
+    position: 'relative',
+    marginBottom: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  robotIconBg: {
+    width: 160,
+    height: 160,
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 3,
+    shadowOffset: { width: 0, height: 15 },
+    shadowOpacity: 0.15,
+    shadowRadius: 25,
+    elevation: 10,
+  },
+  brainOverlay: {
+    position: 'absolute',
+    top: -20,
+    right: -20,
+    zIndex: 2,
+  },
+  brainCircle: {
+    width: 62,
+    height: 62,
+    borderRadius: 31,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+    borderWidth: 3,
+    borderColor: '#fff',
+  },
+  pingRing: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    opacity: 0.15,
+  },
+  thinkingText: {
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  botTitle: {
+    fontSize: 26,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+    letterSpacing: -0.5,
+    marginBottom: 12,
+  },
+  dots: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  dot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  progressWrapper: {
+    width: '100%',
+    maxWidth: 280,
+    marginBottom: 20,
+  },
+  progressBg: {
+    height: 14,
+    borderRadius: 999,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    padding: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: 999,
+    shadowColor: '#19e62b',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 10,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  smallTimer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  smallTimerText: {
+    fontSize: 15,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  calcText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    letterSpacing: 1.5,
+    opacity: 0.7,
   },
 });

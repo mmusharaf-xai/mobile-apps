@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Toss Arena - Bot Thinking</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700;800;900&amp;family=Noto+Sans:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --primary-neon: #19e62b;
+            --off-white: #f8faf9;
+            --stadium-dark: #0a1a0f;
+        }
+        @layer base {
+            body {
+                @apply bg-[#f2f4f2] text-[#0a1a0f] font-display overflow-x-hidden;
+            }
+        }
+        @keyframes pulse-brain {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        .animate-brain {
+            animation: pulse-brain 2s ease-in-out infinite;
+        }
+        @keyframes loading-bar {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+        .progress-fill {
+            animation: loading-bar 3s linear infinite;
+        }
+        .coin-spin {
+            animation: spin 8s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#19e62b",
+                        "stadium": "#0a1a0f",
+                        "off-white": "#f8faf9",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center bg-[#e5e7eb] p-4">
+<div class="relative flex h-[844px] w-full max-w-[390px] flex-col bg-off-white shadow-[0_0_50px_rgba(0,0,0,0.1)] overflow-hidden rounded-[3rem] border-[8px] border-white">
+<header class="pt-12 pb-4 px-6 text-center z-10">
+<h1 class="text-3xl font-black tracking-tight text-stadium uppercase italic">Toss Arena</h1>
+<div class="mt-2 inline-flex items-center gap-2 bg-primary/10 px-4 py-1.5 rounded-full border border-primary/30">
+<span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1">sports_cricket</span>
+<span class="text-stadium text-[10px] font-black tracking-[0.1em] uppercase">3 Overs Match</span>
+</div>
+</header>
+<main class="flex-1 px-6 pb-24 flex flex-col items-center justify-center relative">
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.05]">
+<div class="size-72 rounded-full border-[12px] border-primary flex items-center justify-center coin-spin">
+<div class="size-60 rounded-full bg-gradient-to-br from-[#ffd700] to-[#c67c00] flex items-center justify-center border-4 border-[#fff176] shadow-inner">
+<span class="text-[120px] font-black text-[#5d4037] italic opacity-40">?</span>
+</div>
+</div>
+</div>
+<div class="w-full flex flex-col items-center z-10">
+<div class="relative mb-12">
+<div class="size-40 rounded-[2.5rem] bg-white border-2 border-primary/20 shadow-[0_20px_40px_rgba(0,0,0,0.08)] flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-8xl text-stadium/80">smart_toy</span>
+</div>
+<div class="absolute -top-3 -right-3 size-16 rounded-full bg-white flex items-center justify-center shadow-lg border-2 border-primary/30 animate-brain">
+<div class="size-12 rounded-full bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-3xl" style="font-variation-settings: 'FILL' 1">psychology</span>
+</div>
+</div>
+<div class="absolute inset-0 -z-10 animate-ping opacity-20 bg-primary/30 rounded-[2.5rem]"></div>
+</div>
+<div class="text-center mb-10">
+<h2 class="text-2xl font-black text-stadium italic tracking-tighter uppercase mb-3">Bot is Thinking...</h2>
+<div class="flex items-center justify-center gap-2">
+<div class="h-1.5 w-6 bg-primary rounded-full animate-pulse"></div>
+<div class="h-1.5 w-4 bg-primary/60 rounded-full animate-pulse [animation-delay:0.2s]"></div>
+<div class="h-1.5 w-2 bg-primary/30 rounded-full animate-pulse [animation-delay:0.4s]"></div>
+</div>
+</div>
+<div class="w-full max-w-[280px] space-y-5">
+<div class="relative h-4 w-full bg-gray-200/50 rounded-full overflow-hidden border border-gray-100 p-0.5 shadow-inner">
+<div class="h-full bg-primary progress-fill rounded-full shadow-[0_0_15px_rgba(25,230,43,0.5)] transition-all duration-300"></div>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="flex items-center gap-2 px-3 py-1 bg-stadium/5 rounded-lg border border-stadium/5">
+<span class="material-symbols-outlined text-[18px] text-stadium">timer</span>
+<span class="text-sm font-black text-stadium tracking-widest italic uppercase">3s</span>
+</div>
+<span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest italic">Calculating Toss Probabilities</span>
+</div>
+</div>
+</div>
+</main>
+<nav class="absolute bottom-0 w-full h-24 bg-white/90 backdrop-blur-md border-t border-gray-100 flex items-center justify-around px-2 z-20 opacity-40 grayscale pointer-events-none">
+<div class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1">home</span>
+<span class="text-[9px] font-black uppercase tracking-wider">Home</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-gray-400">
+<span class="material-symbols-outlined text-2xl">history</span>
+<span class="text-[9px] font-black uppercase tracking-wider">History</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-gray-400">
+<span class="material-symbols-outlined text-2xl">leaderboard</span>
+<span class="text-[9px] font-black uppercase tracking-wider">Ranking</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-gray-400">
+<span class="material-symbols-outlined text-2xl">person</span>
+<span class="text-[9px] font-black uppercase tracking-wider">Profile</span>
+</div>
+</nav>
+<div class="absolute top-0 left-0 w-full h-full pointer-events-none -z-10">
+<div class="absolute top-[-10%] right-[-10%] w-[80%] h-[40%] bg-primary/5 blur-[120px] rounded-full"></div>
+<div class="absolute bottom-0 left-0 w-full h-[40%] bg-gradient-to-t from-gray-200/40 to-transparent"></div>
+</div>
+</div>
+
+</body></html>
