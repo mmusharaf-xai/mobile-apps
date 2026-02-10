@@ -42,8 +42,11 @@ export default function HomeScreen() {
               <Text style={{ fontSize: 10, fontWeight: '900', color: colors.primary, textTransform: 'uppercase', letterSpacing: 1 }}>Pro League</Text>
             </View>
           </View>
-          <TouchableOpacity style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 }}>
-            <MaterialIcons name="notifications" size={20} color={colors.textPrimary} />
+          <TouchableOpacity
+            style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 }}
+            onPress={() => navigation.navigate('GameRules' as never)}
+          >
+            <MaterialIcons name="menu-book" size={22} color={colors.textPrimary} />
           </TouchableOpacity>
         </View>
 
