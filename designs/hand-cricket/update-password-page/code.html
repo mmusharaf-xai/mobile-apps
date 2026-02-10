@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HandCricket - Change Password</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#19e62b",
+                        "forest-green": "#2d5a27",
+                        "background-light": "#f8faf8",
+                        "background-dark": "#112112",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Lexend', sans-serif;
+            @apply bg-background-light text-[#000000];
+        }
+        .profile-container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            @apply bg-white;
+        }
+        .input-focus-ring:focus-within {
+            @apply border-primary ring-1 ring-primary/20;
+        }
+        .input-error-ring {
+            @apply border-red-500 ring-1 ring-red-500/20 bg-red-50/30;
+        }
+    </style>
+</head>
+<body class="transition-colors duration-300">
+<div class="profile-container relative shadow-xl">
+<header class="sticky top-0 z-50 w-full bg-white border-b border-[#e7f3e8] px-6 py-4 flex items-center justify-between">
+<button class="flex items-center justify-center p-1 active:opacity-50 transition-opacity">
+<span class="material-symbols-outlined text-black">arrow_back_ios</span>
+</button>
+<h1 class="text-lg font-bold text-black">Change Password</h1>
+<div class="size-8"></div>
+</header>
+<main class="flex-1 px-6 pt-8">
+<div class="mb-8">
+<h2 class="text-xl font-bold text-primary mb-2">Update Credentials</h2>
+<p class="text-sm text-gray-700">Ensure your account is using a strong, unique password to stay secure.</p>
+</div>
+<form class="space-y-6">
+<div class="space-y-2">
+<label class="text-[11px] font-bold text-black uppercase tracking-wider block ml-1">Current Password</label>
+<div class="relative group input-focus-ring border border-gray-200 bg-gray-50 rounded-2xl transition-all">
+<input class="w-full bg-transparent border-none focus:ring-0 py-4 pl-4 pr-12 text-black font-medium placeholder:text-gray-400" placeholder="Enter current password" type="password" value="••••••••"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 active:text-primary" type="button">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+<div class="space-y-4">
+<div class="space-y-2">
+<label class="text-[11px] font-bold text-black uppercase tracking-wider block ml-1">New Password</label>
+<div class="relative group input-error-ring border border-red-500 bg-red-50/30 rounded-2xl transition-all">
+<input class="w-full bg-transparent border-none focus:ring-0 py-4 pl-4 pr-12 text-black font-medium placeholder:text-gray-400" placeholder="Min. 8 characters" type="password" value="weakpass"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 active:text-primary" type="button">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+<p class="text-[11px] font-medium text-red-600 px-1 leading-relaxed">
+                            Password must be 8-16 characters with at least one number, uppercase letter, and special character.
+                        </p>
+</div>
+<div class="flex gap-1.5 px-1 pt-1">
+<div class="h-1 flex-1 rounded-full bg-red-500"></div>
+<div class="h-1 flex-1 rounded-full bg-red-500"></div>
+<div class="h-1 flex-1 rounded-full bg-gray-200"></div>
+<div class="h-1 flex-1 rounded-full bg-gray-200"></div>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-[11px] font-bold text-black uppercase tracking-wider block ml-1">Confirm New Password</label>
+<div class="relative group input-focus-ring border border-gray-200 bg-gray-50 rounded-2xl transition-all">
+<input class="w-full bg-transparent border-none focus:ring-0 py-4 pl-4 pr-12 text-black font-medium placeholder:text-gray-400" placeholder="Repeat new password" type="password"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 active:text-primary" type="button">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+</form>
+<div class="mt-8 p-4 bg-green-50/50 rounded-2xl border border-green-100 flex gap-3">
+<span class="material-symbols-outlined text-primary text-xl">info</span>
+<p class="text-xs text-black leading-relaxed">
+                    Changing your password will sign you out of all other active sessions on different devices.
+                </p>
+</div>
+</main>
+<footer class="sticky bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md px-6 pt-4 pb-8 flex flex-col gap-3 shadow-[0_-10px_20px_-5px_rgba(0,0,0,0.05)]">
+<button class="w-full bg-primary text-black font-bold py-4 rounded-2xl shadow-lg shadow-primary/20 active:scale-[0.98] transition-transform flex items-center justify-center gap-2">
+<span>Update Password</span>
+<span class="material-symbols-outlined text-xl font-bold">task_alt</span>
+</button>
+<button class="w-full text-black font-bold py-2 text-sm active:opacity-60">
+                Cancel
+            </button>
+</footer>
+</div>
+
+</body></html>

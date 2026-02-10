@@ -1,36 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Image, ImageBackground, ScrollView, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from './ThemeContext';
+import { useUser } from './UserContext';
 
 export default function HomeScreen() {
   const { colors, isDark } = useTheme();
-  const [user, setUser] = useState<any>(null);
+  const { user, setUser } = useUser(); // Global user from context (auto-synced)
   const [selectedOvers, setSelectedOvers] = useState(1);
   const navigation = useNavigation();
 
+  // Redirect if no user (in effect to avoid render update error)
   useEffect(() => {
-    const checkUser = async () => {
-      const currentUser = await AsyncStorage.getItem('currentUser');
-      if (currentUser) {
-        const parsedUser = JSON.parse(currentUser);
-        // Ensure stats exist for backward compatibility
-        parsedUser.played = parsedUser.played || 0;
-        parsedUser.wins = parsedUser.wins || 0;
-        setUser(parsedUser);
-      } else {
-        navigation.navigate('Auth' as never);
-      }
-    };
-    checkUser();
-  }, []);
-
-  if (!user) {
-    return <View />;
-  }
+    if (!user) {
+      navigation.navigate('Auth' as never);
+    }
+  }, [user, navigation]);
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>

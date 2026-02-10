@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, Animated, Platform, Alert } from 'react-native';
 import { BlurView } from 'expo-blur';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from './ThemeContext';
+import { useUser } from './UserContext';
 import AlertModal from './AlertModal';
+import UnsavedAlert from './UnsavedAlert';
 
 const avatars = [
   { name: 'cricket', icon: 'sports-cricket' },
@@ -17,7 +18,7 @@ const avatars = [
 
 export default function ProfileScreen() {
   const { colors, isDark, toggleTheme } = useTheme();
-  const [user, setUser] = useState<any>(null);
+  const { user: currentUser, updateUser, logout } = useUser();
   const [editedUsername, setEditedUsername] = useState('');
   const [editedEmail, setEditedEmail] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState(0);
@@ -26,47 +27,64 @@ export default function ProfileScreen() {
   const [modalTitle, setModalTitle] = useState('');
   const [modalMessage, setModalMessage] = useState('');
   const [modalButtons, setModalButtons] = useState<any[]>([]);
+  // Separate state for unsaved alert (vertical buttons per design)
+  const [unsavedVisible, setUnsavedVisible] = useState(false);
+  const [unsavedTitle, setUnsavedTitle] = useState('');
+  const [unsavedMessage, setUnsavedMessage] = useState('');
+  const [unsavedButtons, setUnsavedButtons] = useState<any[]>([]);
   const usernameInputRef = useRef<TextInput>(null);
   const navigation = useNavigation();
 
+  // Animated value for smooth toggle knob movement
+  const switchAnim = useRef(new Animated.Value(2)).current;
+
+  // Use lighter bold weight on iOS for consistent thickness across platforms
+  const boldWeight = Platform.OS === 'ios' ? '600' : 'bold';
+
+  // Sync edited fields from context user
   useEffect(() => {
-    const loadUser = async () => {
-      const currentUser = await AsyncStorage.getItem('currentUser');
-      if (currentUser) {
-        const parsedUser = JSON.parse(currentUser);
-        setUser(parsedUser);
-        setEditedUsername(parsedUser.username);
-        setEditedEmail(parsedUser.email);
-        setSelectedAvatar(parsedUser.avatar || 0);
-      }
-    };
-    loadUser();
-  }, []);
+    if (currentUser) {
+      setEditedUsername(currentUser.username);
+      setEditedEmail(currentUser.email);
+      setSelectedAvatar(currentUser.avatar || 0);
+    }
+  }, [currentUser]);
+
+  // Animate toggle knob on theme change
+  useEffect(() => {
+    Animated.timing(switchAnim, {
+      toValue: isDark ? 26 : 2,
+      duration: 250,
+      useNativeDriver: false,
+    }).start();
+  }, [isDark]);
 
   useEffect(() => {
-    if (user) {
+    if (currentUser) {
       setHasChanges(
-        editedUsername !== user.username ||
-        editedEmail !== user.email ||
-        selectedAvatar !== (user.avatar || 0)
+        editedUsername !== currentUser.username ||
+        editedEmail !== currentUser.email ||
+        selectedAvatar !== (currentUser.avatar || 0)
       );
     }
-  }, [editedUsername, editedEmail, selectedAvatar, user]);
+  }, [editedUsername, editedEmail, selectedAvatar, currentUser]);
 
   const saveChanges = async () => {
-    if (!user) return;
-    const updatedUser = { ...user, username: editedUsername, email: editedEmail, avatar: selectedAvatar };
-    setUser(updatedUser);
-    await AsyncStorage.setItem('currentUser', JSON.stringify(updatedUser));
-    // Update in users array too
-    const users = JSON.parse(await AsyncStorage.getItem('users') || '[]');
-    const index = users.findIndex((u: any) => u.userId === user.userId);
-    if (index !== -1) {
-      users[index] = updatedUser;
-      await AsyncStorage.setItem('users', JSON.stringify(users));
-    }
+    if (!currentUser) return;
+    await updateUser({ username: editedUsername, email: editedEmail, avatar: selectedAvatar });
     setHasChanges(false);
     Alert.alert('Success', 'Profile updated successfully!');
+  };
+
+  // Discard changes and revert edited fields to original (from context)
+  const handleDiscard = () => {
+    if (currentUser) {
+      setEditedUsername(currentUser.username);
+      setEditedEmail(currentUser.email);
+      setSelectedAvatar(currentUser.avatar || 0);
+      setHasChanges(false);
+    }
+    navigation.goBack();
   };
 
   const showModal = (title: string, message: string, buttons: any[]) => {
@@ -76,13 +94,56 @@ export default function ProfileScreen() {
     setModalVisible(true);
   };
 
+  const showUnsaved = (title: string, message: string, buttons: any[]) => {
+    setUnsavedTitle(title);
+    setUnsavedMessage(message);
+    setUnsavedButtons(buttons);
+    setUnsavedVisible(true);
+  };
+
+  // Prevent back if unsaved changes, show alert (matches design with cancel)
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+      if (!hasChanges) return;
+      e.preventDefault();
+      showUnsaved('Unsaved Changes', 'You have unsaved changes. What would you like to do?', [
+        { text: 'Cancel', onPress: () => {}, style: 'cancel' },
+        { text: 'Go Back', onPress: handleDiscard, style: 'cancel' },
+        { text: 'Save and Go Back', onPress: async () => { await saveChanges(); navigation.goBack(); } },
+      ]);
+    });
+    return unsubscribe;
+  }, [hasChanges, navigation]);
+
+  // Custom back handler for header button (triggers alert if unsaved)
+  const handleBack = () => {
+    if (hasChanges) {
+      showUnsaved('Unsaved Changes', 'You have unsaved changes. What would you like to do?', [
+        { text: 'Cancel', onPress: () => {}, style: 'cancel' },
+        { text: 'Go Back', onPress: handleDiscard, style: 'cancel' },
+        { text: 'Save and Go Back', onPress: async () => { await saveChanges(); navigation.goBack(); } },
+      ]);
+      return;
+    }
+    navigation.goBack();
+  };
+
   const handleLogout = () => {
+    if (hasChanges) {
+      // Unsaved alert before logout (Cancel, Save And Logout green, Logout red)
+      showUnsaved('Unsaved Changes', 'You have unsaved changes. What would you like to do?', [
+        { text: 'Cancel', onPress: () => {}, style: 'cancel' },
+        { text: 'Save And Logout', onPress: async () => { await saveChanges(); await logout(); navigation.reset({ index: 0, routes: [{ name: 'Auth' }] }); }, style: 'save' },
+        { text: 'Logout', onPress: async () => { await logout(); navigation.reset({ index: 0, routes: [{ name: 'Auth' }] }); }, style: 'destructive' },
+      ]);
+      return;
+    }
     showModal('Logout', 'Are you sure you want to logout?', [
       { text: 'Cancel', onPress: () => {}, style: 'cancel' },
       {
         text: 'Logout',
         onPress: async () => {
-          await AsyncStorage.removeItem('currentUser');
+          await logout();
           navigation.reset({ index: 0, routes: [{ name: 'Auth' }] });
         },
         style: 'destructive',
@@ -90,7 +151,7 @@ export default function ProfileScreen() {
     ]);
   };
 
-  if (!user) return <View />;
+  if (!currentUser) return <View />;
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -98,12 +159,12 @@ export default function ProfileScreen() {
       <View style={{ paddingTop: 50, paddingHorizontal: 24, paddingBottom: 20, backgroundColor: colors.background }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
+            onPress={handleBack}
             style={{ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' }}
           >
             <MaterialIcons name="arrow-back-ios" size={24} color={colors.textPrimary} />
           </TouchableOpacity>
-          <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.textPrimary }}>Profile Settings</Text>
+          <Text style={{ fontSize: 18, fontWeight: boldWeight, color: colors.textPrimary }}>Profile Settings</Text>
           <View style={{ width: 40 }} />
         </View>
       </View>
@@ -116,13 +177,13 @@ export default function ProfileScreen() {
           </View>
           <View style={{ marginTop: 16, flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.surface, paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: colors.surfaceBorder }}>
             <MaterialIcons name="lock" size={16} color={colors.primary} />
-            <Text style={{ fontSize: 14, color: colors.textSecondary }}>{user.email}</Text>
+            <Text style={{ fontSize: 14, color: colors.textSecondary }}>{currentUser.email}</Text>
           </View>
         </View>
 
         {/* Username */}
         <View style={{ marginBottom: 20 }}>
-          <Text style={{ fontSize: 11, fontWeight: 'bold', color: colors.textMuted, textTransform: 'uppercase', letterSpacing: 1, marginLeft: 4, marginBottom: 8 }}>Username</Text>
+          <Text style={{ fontSize: 11, fontWeight: boldWeight, color: colors.textMuted, textTransform: 'uppercase', letterSpacing: 1, marginLeft: 4, marginBottom: 8 }}>Username</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder, borderRadius: 16, paddingHorizontal: 20, paddingVertical: 16 }}>
             <TextInput
               ref={usernameInputRef}
@@ -148,7 +209,7 @@ export default function ProfileScreen() {
               <MaterialIcons name="key" size={24} color={colors.primary} />
             </View>
             <View>
-              <Text style={{ fontSize: 16, fontWeight: 'bold', color: colors.textPrimary }}>Change Password</Text>
+              <Text style={{ fontSize: 16, fontWeight: boldWeight, color: colors.textPrimary }}>Change Password</Text>
               <Text style={{ fontSize: 10, color: colors.textMuted }}>Last updated recently</Text>
             </View>
           </View>
@@ -162,20 +223,28 @@ export default function ProfileScreen() {
               <MaterialIcons name="dark-mode" size={24} color={colors.textMuted} />
             </View>
             <View>
-              <Text style={{ fontSize: 16, fontWeight: 'bold', color: colors.textPrimary }}>Dark Mode</Text>
+              <Text style={{ fontSize: 16, fontWeight: boldWeight, color: colors.textPrimary }}>Dark Mode</Text>
               <Text style={{ fontSize: 10, color: colors.textMuted }}>Currently {isDark ? 'enabled' : 'disabled'}</Text>
             </View>
           </View>
           <TouchableOpacity onPress={toggleTheme}>
-            <View style={{ width: 48, height: 24, borderRadius: 12, backgroundColor: isDark ? colors.primary : colors.surfaceBorder, justifyContent: isDark ? 'flex-end' : 'flex-start', padding: 2 }}>
-              <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: 'white' }} />
+            <View style={{ width: 48, height: 24, borderRadius: 12, backgroundColor: isDark ? colors.primary : colors.surfaceBorder, position: 'relative' }}>
+              <Animated.View style={{
+                width: 20,
+                height: 20,
+                borderRadius: 10,
+                backgroundColor: 'white',
+                position: 'absolute',
+                top: 2,
+                left: switchAnim,
+              }} />
             </View>
           </TouchableOpacity>
         </View>
 
         {/* Avatar Selection */}
         <View style={{ marginBottom: 20 }}>
-          <Text style={{ fontSize: 11, fontWeight: 'bold', color: colors.textMuted, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 16 }}>Your Avatar</Text>
+          <Text style={{ fontSize: 11, fontWeight: boldWeight, color: colors.textMuted, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 16 }}>Your Avatar</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -24, paddingHorizontal: 24 }}>
             {avatars.map((avatar, index) => (
               <TouchableOpacity
@@ -206,7 +275,7 @@ export default function ProfileScreen() {
                   </View>
                 </View>
                 {selectedAvatar === index && (
-                  <Text style={{ fontSize: 9, fontWeight: 'bold', color: colors.primary, textTransform: 'uppercase', marginTop: 4 }}>Active</Text>
+                  <Text style={{ fontSize: 9, fontWeight: boldWeight, color: colors.primary, textTransform: 'uppercase', marginTop: 4 }}>Active</Text>
                 )}
               </TouchableOpacity>
             ))}
@@ -215,7 +284,11 @@ export default function ProfileScreen() {
       </ScrollView>
 
       {/* Footer */}
-      <BlurView intensity={80} tint={isDark ? 'dark' : 'light'} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: 24, paddingTop: 16, paddingBottom: 40, borderTopWidth: 1, borderTopColor: colors.surfaceBorder }}>
+      <BlurView
+        intensity={Platform.OS === 'android' ? 100 : 85}
+        tint={isDark ? 'dark' : 'light'}
+        style={{ position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: 24, paddingTop: 16, paddingBottom: 40, borderTopWidth: 1, borderTopColor: colors.surfaceBorder }}
+      >
         {hasChanges && (
           <TouchableOpacity
             onPress={saveChanges}
@@ -241,7 +314,7 @@ export default function ProfileScreen() {
           style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 12 }}
         >
           <MaterialIcons name="logout" size={20} color="#dc2626" />
-          <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#dc2626', textTransform: 'uppercase', letterSpacing: 1 }}>Logout</Text>
+          <Text style={{ fontSize: 14, fontWeight: boldWeight, color: '#dc2626', textTransform: 'uppercase', letterSpacing: 1 }}>Logout</Text>
         </TouchableOpacity>
       </BlurView>
 
@@ -252,6 +325,16 @@ export default function ProfileScreen() {
         buttons={modalButtons}
         onClose={() => setModalVisible(false)}
       />
+
+      {/* Unsaved changes alert with vertical buttons (exact design match) */}
+      <UnsavedAlert
+        visible={unsavedVisible}
+        title={unsavedTitle}
+        message={unsavedMessage}
+        buttons={unsavedButtons}
+        onClose={() => setUnsavedVisible(false)}
+      />
+    
     </View>
   );
 }
