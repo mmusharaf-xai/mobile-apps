@@ -204,11 +204,6 @@ export default function TossArena() {
             CHOOSE TO BAT OR BOWL!
           </Text>
         )}
-        {currentScreen === 'botThinking' && (
-          <Text style={[styles.subtitle, { color: colors.textSecondary, marginTop: subtitleMarginTop }]}>
-            BOT IS THINKING...
-          </Text>
-        )}
       </View>
 
       <View style={styles.main}>
