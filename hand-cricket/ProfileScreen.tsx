@@ -69,11 +69,13 @@ export default function ProfileScreen() {
     }
   }, [editedUsername, editedEmail, selectedAvatar, currentUser]);
 
-  const saveChanges = async () => {
+  const saveChanges = async (suppressAlert = false) => {
     if (!currentUser) return;
     await updateUser({ username: editedUsername, email: editedEmail, avatar: selectedAvatar });
     setHasChanges(false);
-    Alert.alert('Success', 'Profile updated successfully!');
+    if (!suppressAlert) {
+      Alert.alert('Success', 'Profile updated successfully!');
+    }
   };
 
   // Discard changes and revert edited fields to original (from context)
@@ -131,9 +133,21 @@ export default function ProfileScreen() {
   const handleLogout = () => {
     if (hasChanges) {
       // Unsaved alert before logout (Cancel, Save And Logout green, Logout red)
+      // On save+logout: update then show profile success alert; OK then logout/redirect (no direct auth)
       showUnsaved('Unsaved Changes', 'You have unsaved changes. What would you like to do?', [
         { text: 'Cancel', onPress: () => {}, style: 'cancel' },
-        { text: 'Save And Logout', onPress: async () => { await saveChanges(); await logout(); navigation.reset({ index: 0, routes: [{ name: 'Auth' }] }); }, style: 'save' },
+        { text: 'Save And Logout', onPress: async () => {
+          await saveChanges(true); // suppress auto alert
+          showModal('Success', 'Profile updated successfully!', [
+            {
+              text: 'OK',
+              onPress: async () => {
+                await logout();
+                navigation.reset({ index: 0, routes: [{ name: 'Auth' }] });
+              },
+            },
+          ]);
+        }, style: 'save' },
         { text: 'Logout', onPress: async () => { await logout(); navigation.reset({ index: 0, routes: [{ name: 'Auth' }] }); }, style: 'destructive' },
       ]);
       return;
