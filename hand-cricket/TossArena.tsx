@@ -384,7 +384,11 @@ export default function TossArena() {
 
         {currentScreen === 'botThinking' && (
           <View style={styles.botThinkingContainer}>
-            {/* faint bg coin with ? spinning */}
+            <View style={styles.resultTextContainer}>
+              <Text style={[styles.resultTitle, { color: colors.textPrimary, fontSize: 32 }]}>
+                BOT WON THE TOSS
+              </Text>
+            </View>
             <Animated.View
               style={[
                 styles.faintCoin,
@@ -776,8 +780,6 @@ const styles = StyleSheet.create({
   },
   botThinkingContainer: {
     alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
     width: '100%',
     position: 'relative',
   },
