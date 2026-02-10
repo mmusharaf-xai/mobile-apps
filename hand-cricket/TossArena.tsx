@@ -190,7 +190,8 @@ export default function TossArena() {
       <View style={[styles.header, { paddingBottom: headerPaddingBottom }]}>
         <Text style={[styles.title, { color: colors.textPrimary, fontSize: titleFontSize, letterSpacing: titleLetterSpacing, fontStyle: titleFontStyle, textAlign: 'center' }]}>TOSS ARENA</Text>
         <View style={[styles.oversBadge, { borderColor: colors.primary, backgroundColor: colors.surface }]}>
-          <Text style={[styles.oversText, { color: colors.primary }]}>
+          <MaterialIcons name="sports-cricket" size={16} color={colors.primary} />
+          <Text style={[styles.oversText, { color: colors.primary, marginLeft: 6 }]}>
             {overs} OVERS MATCH
           </Text>
         </View>
@@ -478,46 +479,64 @@ export default function TossArena() {
         )}
 
         {currentScreen === 'startMatch' && (
-          <View style={styles.resultContainer}>
-            <View style={[styles.coinOuter, { borderColor: colors.primary, backgroundColor: colors.surface, shadowColor: colors.primary }]}>
-              <LinearGradient
-                colors={['#ffd700', '#f9a825', '#c67c00']}
-                style={styles.coinInner}
-                start={{ x: 0.2, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <View style={styles.coinHighlight}>
-                  <Text style={styles.coinLetter}>
-                    {(userWonToss ? chosenAction : botAction) === 'ball' ? 'B' : 'A'}
-                  </Text>
+          <View style={styles.screen3Container}>
+            {/* action coin (A/B) with bot icon overlay if bot won */}
+            <View style={styles.screen3CoinWrapper}>
+              <View style={[styles.coinOuter, { borderColor: colors.primary, backgroundColor: colors.surface, shadowColor: colors.primary, width: 192, height: 192, borderRadius: 96, borderWidth: 8 }]}>
+                <LinearGradient
+                  colors={['#ffd700', '#f9a825', '#c67c00']}
+                  style={styles.coinInner}
+                  start={{ x: 0.2, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  <View style={[styles.coinHighlight, { width: 120, height: 120, borderRadius: 60 }]}>
+                    <Text style={[styles.coinLetter, { fontSize: 64 }]}>
+                      {(userWonToss ? chosenAction : botAction) === 'ball' ? 'B' : 'A'}
+                    </Text>
+                  </View>
+                </LinearGradient>
+              </View>
+              {!userWonToss && (
+                <View style={styles.botIconBadge}>
+                  <View style={[styles.botIconInner, { backgroundColor: colors.textPrimary }]}>
+                    <MaterialIcons name="smart-toy" size={28} color={colors.surface} />
+                  </View>
                 </View>
-              </LinearGradient>
+              )}
             </View>
 
-            <View style={styles.resultTextContainer}>
-              <Text style={[styles.resultTitle, { color: colors.textPrimary }]}>
-                {userWonToss
-                  ? (chosenAction?.toUpperCase() || 'BAT')
-                  : `${(botAction?.toUpperCase() || 'BAT')} (BOT)`}
+            {/* action summary text */}
+            <View style={styles.screen3Text}>
+              <Text style={[styles.resultTitle, { color: colors.textPrimary, fontSize: 32, marginBottom: 8 }]}>
+                {userWonToss ? 'YOU WON THE TOSS!' : 'BOT WON THE TOSS!'}
               </Text>
-              <Text style={[styles.resultSubtitle, { color: colors.primary }]}>
-                MATCH STARTING...
-              </Text>
+              <View style={[styles.actionBadge, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.actionText, { color: colors.textSecondary }]}>
+                  {userWonToss ? 'You have chosen to ' : 'The Bot has chosen to '}
+                  <Text style={[styles.actionHighlight, { color: colors.primary, backgroundColor: colors.textPrimary }]}>
+                    {(userWonToss ? chosenAction : botAction)?.toUpperCase() || 'BAT'}
+                  </Text>
+                  {' first.'}
+                </Text>
+              </View>
             </View>
 
-            <TouchableOpacity
-              style={[styles.startButton, { backgroundColor: colors.primary }]}
-              onPress={handleStartMatch}
-            >
-              <Text style={[styles.startButtonText, { color: colors.textPrimary }]}>START MATCH</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.backButton, { borderColor: colors.textSecondary }]}
-              onPress={() => navigation.goBack()}
-            >
-              <Text style={[styles.backButtonText, { color: colors.textSecondary }]}>BACK TO HOME</Text>
-            </TouchableOpacity>
+            {/* start button + footer (match design) */}
+            <View style={styles.startSection}>
+              <TouchableOpacity
+                style={[styles.startButton, { backgroundColor: colors.primary }]}
+                onPress={handleStartMatch}
+                activeOpacity={0.9}
+              >
+                <View style={styles.startContent}>
+                  <Text style={[styles.startButtonText, { color: colors.textPrimary }]}>START MATCH</Text>
+                  <MaterialIcons name="play-arrow" size={28} color={colors.textPrimary} />
+                </View>
+              </TouchableOpacity>
+              <Text style={[styles.footerHint, { color: colors.textMuted }]}>
+                PREPARE YOUR FIELD STRATEGY
+              </Text>
+            </View>
           </View>
         )}
       </View>
@@ -579,6 +598,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   oversText: {
     fontSize: 12,
@@ -925,5 +947,79 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 1.5,
     opacity: 0.7,
+  },
+
+  // screen 3 (action summary) styles matching design
+  screen3Container: {
+    alignItems: 'center',
+    width: '100%',
+    paddingHorizontal: 24,
+  },
+  screen3CoinWrapper: {
+    position: 'relative',
+    marginBottom: 32,
+  },
+  botIconBadge: {
+    position: 'absolute',
+    bottom: -12,
+    right: -12,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    padding: 4,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  botIconInner: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  screen3Text: {
+    alignItems: 'center',
+    marginBottom: 40,
+    width: '100%',
+  },
+  actionBadge: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  actionText: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  actionHighlight: {
+    fontWeight: '900',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 999,
+    color: '#fff',
+  },
+  startSection: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  startContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  footerHint: {
+    marginTop: 16,
+    fontSize: 11,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+    letterSpacing: 2,
+    opacity: 0.6,
   },
 });
