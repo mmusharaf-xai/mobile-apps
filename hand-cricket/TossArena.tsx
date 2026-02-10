@@ -34,6 +34,7 @@ export default function TossArena() {
   const [userWonToss, setUserWonToss] = useState(false);
   const [chosenAction, setChosenAction] = useState<'bat' | 'ball' | null>(null);
   const [botAction, setBotAction] = useState<'bat' | 'ball' | null>(null);
+  const [botTimeLeft, setBotTimeLeft] = useState(3);
   const [timerProgress, setTimerProgress] = useState(100);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -141,6 +142,7 @@ export default function TossArena() {
     if (currentScreen !== 'botThinking') return;
     botProgressAnim.setValue(0);
     coinAnim.setValue(0);
+    setBotTimeLeft(3);
     Animated.loop(
       Animated.sequence([
         Animated.timing(brainScaleAnim, { toValue: 1.2, duration: 800, useNativeDriver: true }),
@@ -165,7 +167,17 @@ export default function TossArena() {
       setBotAction(action);
       setCurrentScreen('startMatch');
     });
-    return () => brainScaleAnim.stopAnimation();
+    // countdown 3->1 over 3s
+    let time = 3;
+    const botTimer = setInterval(() => {
+      time -= 1;
+      setBotTimeLeft(time);
+      if (time <= 1) clearInterval(botTimer);
+    }, 1000);
+    return () => {
+      brainScaleAnim.stopAnimation();
+      clearInterval(botTimer);
+    };
   }, [currentScreen]);
 
   return (
@@ -454,11 +466,11 @@ export default function TossArena() {
               </View>
             </View>
 
-            {/* 3s info */}
-            <View style={styles.infoRow}>
+            {/* centered countdown timer (3->1) + calc text on next line */}
+            <View style={styles.infoContainer}>
               <View style={[styles.smallTimer, { backgroundColor: colors.surface }]}>
                 <MaterialIcons name="timer" size={18} color={colors.textSecondary} />
-                <Text style={[styles.smallTimerText, { color: colors.textSecondary }]}>3s</Text>
+                <Text style={[styles.smallTimerText, { color: colors.textSecondary }]}>{botTimeLeft}s</Text>
               </View>
               <Text style={[styles.calcText, { color: colors.textMuted }]}>CALCULATING TOSS PROBABILITIES</Text>
             </View>
@@ -882,8 +894,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.6,
     shadowRadius: 10,
   },
-  infoRow: {
-    flexDirection: 'row',
+  infoContainer: {
     alignItems: 'center',
     gap: 12,
   },
