@@ -3,15 +3,17 @@ import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-nati
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from './ThemeContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function GameRules() {
   const { colors, isDark } = useTheme();
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header matching design */}
-      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.surfaceBorder }]}>
+      {/* Header matching design - safe area for notch + center content */}
+      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.surfaceBorder, paddingTop: insets.top }]}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backButton}
