@@ -13,6 +13,7 @@ import HistoryScreen from './HistoryScreen';
 import ProfileScreen from './ProfileScreen';
 import TossArena from './TossArena';
 import UpdatePassword from './UpdatePassword';
+import GameRules from './GameRules';
 import { MaterialIcons } from '@expo/vector-icons';
 
 const Stack = createNativeStackNavigator();
@@ -91,6 +92,7 @@ export default function App() {
             <Stack.Screen name="Main" component={TabNavigator} />
             <Stack.Screen name="TossArena" component={TossArena} />
             <Stack.Screen name="UpdatePassword" component={UpdatePassword} />
+            <Stack.Screen name="GameRules" component={GameRules} />
           </Stack.Navigator>
         </NavigationContainer>
       </GestureHandlerRootView>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Toss Arena - Bot Won Result</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700;800;900&amp;family=Noto+Sans:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --primary-neon: #19e62b;
+            --off-white: #f8faf9;
+            --stadium-dark: #0a1a0f;
+        }
+        @layer base {
+            body {
+                @apply bg-[#f2f4f2] text-[#0a1a0f] font-display overflow-x-hidden;
+            }
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#19e62b",
+                        "stadium": "#0a1a0f",
+                        "off-white": "#f8faf9",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="min-h-screen flex flex-col items-center">
+<div class="relative flex h-screen max-w-[450px] w-full flex-col bg-off-white shadow-2xl overflow-hidden border-x border-gray-200">
+<header class="pt-8 pb-4 px-6 text-center z-10">
+<h1 class="text-3xl font-black tracking-tight text-stadium uppercase italic">Toss Arena</h1>
+<div class="mt-2 inline-flex items-center gap-2 bg-primary/10 px-4 py-1.5 rounded-full border border-primary/30">
+<span class="material-symbols-outlined text-[16px] text-primary">sports_cricket</span>
+<span class="text-stadium text-[10px] font-black tracking-[0.1em] uppercase">3 Overs Match</span>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto px-6 pb-24 flex flex-col items-center justify-center">
+<div class="relative mb-12">
+<div class="absolute inset-0 bg-red-500/5 rounded-full blur-[60px]"></div>
+<div class="relative size-48 rounded-full border-[8px] border-white flex items-center justify-center shadow-2xl">
+<div class="size-40 rounded-full bg-gradient-to-br from-[#ffd700] via-[#f9a825] to-[#c67c00] flex items-center justify-center border-4 border-[#fff176] shadow-inner">
+<div class="size-32 rounded-full border-2 border-[#fff176]/30 flex items-center justify-center">
+<span class="text-6xl font-black text-[#5d4037] drop-shadow-lg">T</span>
+</div>
+</div>
+</div>
+<div class="absolute -bottom-2 -right-2 w-16 h-16 bg-white rounded-full p-1 shadow-lg flex items-center justify-center">
+<div class="w-full h-full bg-stadium rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-2xl">smart_toy</span>
+</div>
+</div>
+</div>
+<div class="w-full text-center space-y-4">
+<div class="space-y-2">
+<h2 class="text-4xl font-black text-stadium italic tracking-tighter uppercase leading-none">BOT WON THE TOSS!</h2>
+<div class="inline-block bg-stadium/5 px-6 py-2 rounded-xl">
+<p class="text-stadium font-bold text-sm tracking-wide">The Bot has chosen to <span class="text-primary bg-stadium px-2 py-0.5 rounded">BAT</span> first.</p>
+</div>
+</div>
+<div class="pt-8 w-full">
+<button class="w-full h-20 bg-primary rounded-2xl flex items-center justify-center transition-transform active:scale-95 shadow-[0_12px_30px_rgba(25,230,43,0.4)] relative group overflow-hidden">
+<div class="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex items-center gap-3">
+<span class="text-stadium font-black text-3xl italic tracking-tighter">START MATCH</span>
+<span class="material-symbols-outlined text-stadium font-black text-3xl">play_arrow</span>
+</div>
+</button>
+<p class="mt-4 text-gray-400 text-[10px] font-black tracking-[0.2em] uppercase">Prepare your field strategy</p>
+</div>
+</div>
+</main>
+<nav class="absolute bottom-0 w-full h-20 bg-white border-t border-gray-100 flex items-center justify-around px-2 z-20">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined text-2xl">home</span>
+<span class="text-[10px] font-black uppercase tracking-wider">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-gray-300" href="#">
+<span class="material-symbols-outlined text-2xl">history</span>
+<span class="text-[10px] font-black uppercase tracking-wider">History</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-gray-300" href="#">
+<span class="material-symbols-outlined text-2xl">leaderboard</span>
+<span class="text-[10px] font-black uppercase tracking-wider">Ranking</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-gray-300" href="#">
+<span class="material-symbols-outlined text-2xl">person</span>
+<span class="text-[10px] font-black uppercase tracking-wider">Profile</span>
+</a>
+</nav>
+<div class="absolute top-0 left-0 w-full h-full pointer-events-none -z-10">
+<div class="absolute top-[-10%] right-[-10%] w-[80%] h-[40%] bg-primary/5 blur-[100px] rounded-full"></div>
+<div class="absolute bottom-0 left-0 w-full h-[30%] bg-gradient-to-t from-gray-100/50 to-transparent"></div>
+</div>
+</div>
+
+</body></html>
