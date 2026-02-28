@@ -8,6 +8,8 @@ import {
   Dimensions,
   SafeAreaView,
   Image,
+  Platform,
+  Modal,
 } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -36,6 +38,8 @@ interface GameState {
   target: number | null;
   isFirstInnings: boolean;
   userBatting: boolean;
+  gameOver: boolean;
+  winner: 'user' | 'bot' | null;
 }
 
 export default function GameArena() {
@@ -44,19 +48,21 @@ export default function GameArena() {
   const route = useRoute();
   const overs = (route.params as any)?.overs || 5;
 
-  // Game state
+  // Game state - start fresh with first innings
   const [gameState, setGameState] = useState<GameState>({
-    userScore: 24,
-    userWickets: 1,
+    userScore: 0,
+    userWickets: 0,
     botScore: 0,
     botWickets: 0,
-    userOvers: 1,
-    userBalls: 4,
+    userOvers: 0,
+    userBalls: 0,
     botOvers: 0,
     botBalls: 0,
-    target: 48,
-    isFirstInnings: false,
-    userBatting: true,
+    target: null,
+    isFirstInnings: true,
+    userBatting: true, // User bats first
+    gameOver: false,
+    winner: null,
   });
 
   // Timer state
@@ -66,6 +72,8 @@ export default function GameArena() {
   const [botSelectedNumber, setBotSelectedNumber] = useState<number | null>(null);
   const [isBotThinking, setIsBotThinking] = useState(false);
   const [selectedMove, setSelectedMove] = useState<number | null>(null);
+  const [showResultModal, setShowResultModal] = useState(false);
+  const [resultMessage, setResultMessage] = useState('');
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const botTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -88,8 +96,7 @@ export default function GameArena() {
       clearInterval(timerRef.current);
     }
     
-    // Don't start timer if waiting for bot or user has selected
-    if (isBotThinking || userSelectedNumber !== null) {
+    if (isBotThinking || userSelectedNumber !== null || gameState.gameOver) {
       return;
     }
 
@@ -115,12 +122,146 @@ export default function GameArena() {
         clearTimeout(timerRef.current);
       }
     };
-  }, [isBotThinking, userSelectedNumber]);
+  }, [isBotThinking, userSelectedNumber, gameState.gameOver]);
+
+  // Process game logic after both players have selected
+  const processGameLogic = useCallback((userNum: number, botNum: number) => {
+    setGameState(prev => {
+      const newState = { ...prev };
+      const currentBatsman = prev.userBatting ? 'user' : 'bot';
+      const currentBowler = prev.userBatting ? 'bot' : 'user';
+      
+      // Check if batsman is out (same number selected)
+      if (userNum === botNum) {
+        // Wicket falls
+        if (currentBatsman === 'user') {
+          newState.userWickets = 1;
+        } else {
+          newState.botWickets = 1;
+        }
+        
+        // Check if first innings just ended
+        if (prev.isFirstInnings) {
+          newState.isFirstInnings = false;
+          newState.target = (currentBatsman === 'user' ? newState.userScore : newState.botScore) + 1;
+          // Swap roles for second innings
+          newState.userBatting = !prev.userBatting;
+          
+          if (currentBatsman === 'user') {
+            setResultMessage(`You're OUT! Target: ${newState.target} runs`);
+          } else {
+            setResultMessage(`Bot is OUT! Target: ${newState.target} runs`);
+          }
+          setShowResultModal(true);
+        } else {
+          // Second innings - game over
+          newState.gameOver = true;
+          // If batsman was out, bowler wins
+          newState.winner = currentBowler === 'user' ? 'user' : 'bot';
+          setResultMessage(newState.winner === 'user' ? 'You WIN!' : 'Bot WINS!');
+          setShowResultModal(true);
+        }
+      } else {
+        // Add runs to batsman
+        const runs = prev.userBatting ? userNum : botNum;
+        if (currentBatsman === 'user') {
+          newState.userScore += runs;
+        } else {
+          newState.botScore += runs;
+        }
+        
+        // Check if target chased in second innings
+        if (!prev.isFirstInnings && prev.target) {
+          const batsmanScore = currentBatsman === 'user' ? newState.userScore : newState.botScore;
+          if (batsmanScore >= prev.target) {
+            newState.gameOver = true;
+            newState.winner = currentBatsman === 'user' ? 'user' : 'bot';
+            setResultMessage(newState.winner === 'user' ? 'You chased the target! You WIN!' : 'Bot chased the target! Bot WINS!');
+            setShowResultModal(true);
+          }
+        }
+      }
+      
+      // Update balls and overs
+      if (prev.userBatting) {
+        newState.userBalls += 1;
+        if (newState.userBalls >= 6) {
+          newState.userBalls = 0;
+          newState.userOvers += 1;
+          // Check if over finished - swap roles
+          if (newState.userOvers < overs && !newState.gameOver && newState.userWickets === 0) {
+            newState.userBatting = false;
+            setResultMessage('Over finished! Swapping roles.');
+            setShowResultModal(true);
+          }
+          // Check if all overs completed in first innings
+          if (newState.userOvers >= overs && prev.isFirstInnings && newState.userWickets === 0) {
+            newState.isFirstInnings = false;
+            newState.target = newState.userScore + 1;
+            newState.userBatting = false;
+            setResultMessage(`First innings over! Target: ${newState.target} runs`);
+            setShowResultModal(true);
+          }
+        }
+      } else {
+        newState.botBalls += 1;
+        if (newState.botBalls >= 6) {
+          newState.botBalls = 0;
+          newState.botOvers += 1;
+          // Check if over finished - swap roles
+          if (newState.botOvers < overs && !newState.gameOver && newState.botWickets === 0) {
+            newState.userBatting = true;
+            setResultMessage('Over finished! Swapping roles.');
+            setShowResultModal(true);
+          }
+          // Check if all overs completed in first innings
+          if (newState.botOvers >= overs && prev.isFirstInnings && newState.botWickets === 0) {
+            newState.isFirstInnings = false;
+            newState.target = newState.botScore + 1;
+            newState.userBatting = true;
+            setResultMessage(`First innings over! Target: ${newState.target} runs`);
+            setShowResultModal(true);
+          }
+        }
+      }
+      
+      // Check if all overs completed in second innings without chasing target
+      if (!newState.isFirstInnings && !newState.gameOver) {
+        if (newState.userOvers >= overs || newState.botOvers >= overs) {
+          newState.gameOver = true;
+          const userScore = newState.userScore;
+          const botScore = newState.botScore;
+          
+          if (prev.target) {
+            // Whoever was batting second failed to chase
+            const currentBatsmanScore = currentBatsman === 'user' ? userScore : botScore;
+            if (currentBatsmanScore < prev.target) {
+              newState.winner = currentBowler === 'user' ? 'user' : 'bot';
+            } else {
+              newState.winner = currentBatsman === 'user' ? 'user' : 'bot';
+            }
+          } else {
+            newState.winner = userScore > botScore ? 'user' : (botScore > userScore ? 'bot' : null);
+          }
+          
+          if (newState.winner === 'user') {
+            setResultMessage('You WIN!');
+          } else if (newState.winner === 'bot') {
+            setResultMessage('Bot WINS!');
+          } else {
+            setResultMessage('It\'s a TIE!');
+          }
+          setShowResultModal(true);
+        }
+      }
+      
+      return newState;
+    });
+  }, [overs]);
 
   const handleMoveSelect = useCallback((number: number) => {
-    if (userSelectedNumber !== null || isBotThinking) return;
+    if (userSelectedNumber !== null || isBotThinking || gameState.gameOver) return;
     
-    // Clear timer
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
@@ -129,11 +270,13 @@ export default function GameArena() {
     setUserSelectedNumber(number);
     setIsBotThinking(true);
 
-    // Bot selects after a delay (simulating thinking)
     botTimerRef.current = setTimeout(() => {
       const botNumber = Math.floor(Math.random() * 6) + 1;
       setBotSelectedNumber(botNumber);
       setIsBotThinking(false);
+      
+      // Process game logic
+      processGameLogic(number, botNumber);
       
       // Reset for next turn after showing result
       setTimeout(() => {
@@ -142,7 +285,29 @@ export default function GameArena() {
         setSelectedMove(null);
       }, 2000);
     }, 1500);
-  }, [userSelectedNumber, isBotThinking]);
+  }, [userSelectedNumber, isBotThinking, gameState.gameOver, processGameLogic]);
+
+  const resetGame = () => {
+    setGameState({
+      userScore: 0,
+      userWickets: 0,
+      botScore: 0,
+      botWickets: 0,
+      userOvers: 0,
+      userBalls: 0,
+      botOvers: 0,
+      botBalls: 0,
+      target: null,
+      isFirstInnings: true,
+      userBatting: true,
+      gameOver: false,
+      winner: null,
+    });
+    setShowResultModal(false);
+    setUserSelectedNumber(null);
+    setBotSelectedNumber(null);
+    setSelectedMove(null);
+  };
 
   const getCurrentScore = () => {
     if (gameState.userBatting) {
@@ -158,10 +323,18 @@ export default function GameArena() {
     return `(${gameState.botOvers}.${gameState.botBalls}/${overs})`;
   };
 
-  // Glass effect colors from design - bg-white/40 backdrop-blur-xl
-  const glassBg = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.4)';
-  const glassBorder = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.6)';
-  const glassButtonBg = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.5)';
+  // Platform-specific glass effect colors
+  // Android needs different alpha values because it renders transparency differently
+  const isAndroid = Platform.OS === 'android';
+  const glassBg = isDark 
+    ? (isAndroid ? 'rgba(40,60,50,0.7)' : 'rgba(255,255,255,0.08)')
+    : (isAndroid ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.4)');
+  const glassBorder = isDark 
+    ? (isAndroid ? 'rgba(100,150,120,0.3)' : 'rgba(255,255,255,0.15)')
+    : (isAndroid ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.6)');
+  const glassButtonBg = isDark 
+    ? (isAndroid ? 'rgba(50,70,60,0.6)' : 'rgba(255,255,255,0.1)')
+    : (isAndroid ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.5)');
 
   const renderHeader = () => (
     <View style={[styles.header, { 
@@ -265,7 +438,7 @@ export default function GameArena() {
               cy="50"
               r={radius}
               fill="transparent"
-              stroke={isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.5)'}
+              stroke={isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)'}
               strokeWidth="4"
             />
             <Circle
@@ -389,6 +562,34 @@ export default function GameArena() {
         {renderYouVsBot()}
         {renderChooseMove()}
       </ScrollView>
+
+      {/* Result Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={showResultModal}
+        onRequestClose={() => setShowResultModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: isDark ? '#142a1d' : '#fff' }]}>
+            <Text style={[styles.modalText, { color: colors.textPrimary }]}>{resultMessage}</Text>
+            <TouchableOpacity
+              style={[styles.modalButton, { backgroundColor: colors.primary }]}
+              onPress={() => {
+                if (gameState.gameOver) {
+                  resetGame();
+                } else {
+                  setShowResultModal(false);
+                }
+              }}
+            >
+              <Text style={[styles.modalButtonText, { color: '#fff' }]}>
+                {gameState.gameOver ? 'Play Again' : 'Continue'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -663,6 +864,38 @@ const styles = StyleSheet.create({
   },
   moveButtonText: {
     fontSize: 32,
+    fontWeight: '900',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    margin: 20,
+    padding: 30,
+    borderRadius: 24,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  modalText: {
+    fontSize: 18,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  modalButton: {
+    paddingHorizontal: 30,
+    paddingVertical: 12,
+    borderRadius: 20,
+  },
+  modalButtonText: {
+    fontSize: 16,
     fontWeight: '900',
   },
 });
