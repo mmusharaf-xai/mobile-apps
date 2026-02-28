@@ -75,8 +75,13 @@ export default function GameArena() {
   const [showResultModal, setShowResultModal] = useState(false);
   const [resultMessage, setResultMessage] = useState('');
 
+  // Event indication state (wicket, 4, 6)
+  const [lastEvent, setLastEvent] = useState<'wicket' | 'boundary4' | 'boundary6' | null>(null);
+  const [showEventIndication, setShowEventIndication] = useState(false);
+
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const botTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const eventTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const radius = 36;
   const circumference = 2 * Math.PI * radius;
@@ -87,6 +92,7 @@ export default function GameArena() {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
       if (botTimerRef.current) clearTimeout(botTimerRef.current);
+      if (eventTimerRef.current) clearTimeout(eventTimerRef.current);
     };
   }, []);
 
@@ -126,6 +132,13 @@ export default function GameArena() {
 
   // Process game logic after both players have selected
   const processGameLogic = useCallback((userNum: number, botNum: number) => {
+    // Clear any existing event indication
+    if (eventTimerRef.current) {
+      clearTimeout(eventTimerRef.current);
+    }
+    setShowEventIndication(false);
+    setLastEvent(null);
+
     setGameState(prev => {
       const newState = { ...prev };
       const currentBatsman = prev.userBatting ? 'user' : 'bot';
@@ -133,6 +146,14 @@ export default function GameArena() {
       
       // Check if batsman is out (same number selected)
       if (userNum === botNum) {
+        // Wicket falls - show wicket indication
+        setLastEvent('wicket');
+        setShowEventIndication(true);
+        eventTimerRef.current = setTimeout(() => {
+          setShowEventIndication(false);
+          setLastEvent(null);
+        }, 2500);
+
         // Wicket falls
         if (currentBatsman === 'user') {
           newState.userWickets = 1;
@@ -164,6 +185,17 @@ export default function GameArena() {
       } else {
         // Add runs to batsman
         const runs = prev.userBatting ? userNum : botNum;
+        
+        // Check for boundary (4 or 6)
+        if (runs === 4 || runs === 6) {
+          setLastEvent(runs === 4 ? 'boundary4' : 'boundary6');
+          setShowEventIndication(true);
+          eventTimerRef.current = setTimeout(() => {
+            setShowEventIndication(false);
+            setLastEvent(null);
+          }, 2500);
+        }
+        
         if (currentBatsman === 'user') {
           newState.userScore += runs;
         } else {
@@ -288,6 +320,13 @@ export default function GameArena() {
   }, [userSelectedNumber, isBotThinking, gameState.gameOver, processGameLogic]);
 
   const resetGame = () => {
+    // Clear event indication
+    if (eventTimerRef.current) {
+      clearTimeout(eventTimerRef.current);
+    }
+    setLastEvent(null);
+    setShowEventIndication(false);
+    
     setGameState({
       userScore: 0,
       userWickets: 0,
@@ -380,7 +419,56 @@ export default function GameArena() {
     </View>
   );
 
-  const renderYouVsBot = () => (
+  const renderYouVsBot = () => {
+    // Determine if there's an active event indication
+    const isWicket = showEventIndication && lastEvent === 'wicket';
+    const isBoundary4 = showEventIndication && lastEvent === 'boundary4';
+    const isBoundary6 = showEventIndication && lastEvent === 'boundary6';
+    const isBoundary = isBoundary4 || isBoundary6;
+    
+    // Current batsman for highlighting
+    const currentBatsmanIsUser = gameState.userBatting;
+    
+    // Avatar border colors
+    const userAvatarBorderColor = isWicket && currentBatsmanIsUser 
+      ? '#ef4444' // Red for wicket
+      : isBoundary && currentBatsmanIsUser 
+        ? '#22c55e' // Green for 4/6
+        : null;
+    
+    const botAvatarBorderColor = isWicket && !currentBatsmanIsUser 
+      ? '#ef4444' // Red for wicket
+      : isBoundary && !currentBatsmanIsUser 
+        ? '#22c55e' // Green for 4/6
+        : null;
+
+    // Event pill content
+    const getEventPill = () => {
+      if (!showEventIndication || !lastEvent) return null;
+      
+      if (lastEvent === 'wicket') {
+        return (
+          <View style={[styles.eventPill, { backgroundColor: '#ef4444' }]}>
+            <Text style={styles.eventPillText}>WICKET!</Text>
+          </View>
+        );
+      } else if (lastEvent === 'boundary4') {
+        return (
+          <View style={[styles.eventPill, { backgroundColor: '#22c55e' }]}>
+            <Text style={styles.eventPillText}>FOUR!</Text>
+          </View>
+        );
+      } else if (lastEvent === 'boundary6') {
+        return (
+          <View style={[styles.eventPill, { backgroundColor: '#22c55e' }]}>
+            <Text style={styles.eventPillText}>SIX!</Text>
+          </View>
+        );
+      }
+      return null;
+    };
+
+    return (
     <View style={[styles.glassPanel, { backgroundColor: glassBg, borderColor: glassBorder }]}>
       <Text style={[styles.vsLabel, { color: colors.textSecondary }]}>YOU vs BOT</Text>
       
@@ -389,7 +477,12 @@ export default function GameArena() {
         <View style={styles.playerSide}>
           <View style={styles.avatarContainer}>
             <LinearGradient
-              colors={gameState.userBatting ? [colors.primary, '#86efac'] : ['rgba(255,255,255,0.6)', 'rgba(255,255,255,0.3)']}
+              colors={userAvatarBorderColor 
+                ? [userAvatarBorderColor, userAvatarBorderColor]
+                : gameState.userBatting 
+                  ? [colors.primary, '#86efac'] 
+                  : ['rgba(255,255,255,0.6)', 'rgba(255,255,255,0.3)']
+              }
               style={styles.avatarGradient}
             >
               <View style={[styles.avatarInner, { backgroundColor: colors.surface }]}>
@@ -398,6 +491,12 @@ export default function GameArena() {
                   style={styles.avatarImg}
                   resizeMode="cover"
                 />
+                {/* W overlay for wicket */}
+                {isWicket && currentBatsmanIsUser && (
+                  <View style={styles.wicketOverlay}>
+                    <Text style={styles.wicketOverlayText}>W</Text>
+                  </View>
+                )}
               </View>
             </LinearGradient>
             {gameState.userBatting && (
@@ -412,6 +511,10 @@ export default function GameArena() {
             )}
           </View>
           <Text style={[styles.playerLabel, { color: colors.textSecondary }]}>YOU</Text>
+          {/* OUT text for wicket */}
+          {isWicket && currentBatsmanIsUser && (
+            <Text style={[styles.outText, { color: '#ef4444' }]}>OUT</Text>
+          )}
           <View style={[styles.numberBox, { borderColor: userSelectedNumber !== null ? colors.primary : glassBorder }]}>
             {userSelectedNumber !== null ? (
               <LinearGradient
@@ -430,8 +533,9 @@ export default function GameArena() {
           </View>
         </View>
 
-        {/* Timer Circle */}
+        {/* Timer Circle with Event Pill */}
         <View style={styles.timerContainer}>
+          {getEventPill()}
           <Svg width={80} height={80} viewBox="0 0 100 100" style={styles.timerSvg}>
             <Circle
               cx="50"
@@ -466,7 +570,12 @@ export default function GameArena() {
         <View style={styles.playerSide}>
           <View style={styles.avatarContainer}>
             <LinearGradient
-              colors={!gameState.userBatting ? [colors.primary, '#86efac'] : ['rgba(255,255,255,0.6)', 'rgba(255,255,255,0.3)']}
+              colors={botAvatarBorderColor 
+                ? [botAvatarBorderColor, botAvatarBorderColor]
+                : !gameState.userBatting 
+                  ? [colors.primary, '#86efac'] 
+                  : ['rgba(255,255,255,0.6)', 'rgba(255,255,255,0.3)']
+              }
               style={styles.avatarGradient}
             >
               <View style={[styles.avatarInner, { backgroundColor: colors.surface }]}>
@@ -475,6 +584,12 @@ export default function GameArena() {
                   style={styles.avatarImg}
                   resizeMode="cover"
                 />
+                {/* W overlay for wicket */}
+                {isWicket && !currentBatsmanIsUser && (
+                  <View style={styles.wicketOverlay}>
+                    <Text style={styles.wicketOverlayText}>W</Text>
+                  </View>
+                )}
               </View>
             </LinearGradient>
             {!gameState.userBatting && (
@@ -489,6 +604,10 @@ export default function GameArena() {
             )}
           </View>
           <Text style={[styles.playerLabel, { color: colors.textSecondary }]}>BOT</Text>
+          {/* OUT text for wicket */}
+          {isWicket && !currentBatsmanIsUser && (
+            <Text style={[styles.outText, { color: '#ef4444' }]}>OUT</Text>
+          )}
           <View style={[styles.numberBox, { borderColor: glassBorder, backgroundColor: glassButtonBg }]}>
             {isBotThinking ? (
               <View style={styles.thinkingDots}>
@@ -506,6 +625,7 @@ export default function GameArena() {
       </View>
     </View>
   );
+  };
 
   const renderChooseMove = () => (
     <View style={[styles.glassPanel, { backgroundColor: glassBg, borderColor: glassBorder }]}>
@@ -897,5 +1017,48 @@ const styles = StyleSheet.create({
   modalButtonText: {
     fontSize: 16,
     fontWeight: '900',
+  },
+  // Event indication styles
+  eventPill: {
+    position: 'absolute',
+    top: -12,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 16,
+    zIndex: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  eventPillText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '900',
+    letterSpacing: 1,
+  },
+  wicketOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(239, 68, 68, 0.7)',
+    borderRadius: 29,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  wicketOverlayText: {
+    color: '#fff',
+    fontSize: 28,
+    fontWeight: '900',
+  },
+  outText: {
+    fontSize: 12,
+    fontWeight: '900',
+    letterSpacing: 1,
+    marginTop: -4,
+    marginBottom: 4,
   },
 });
