@@ -17,8 +17,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-// Calculate button size for 3-column grid with proper spacing
-const BUTTON_SIZE = (SCREEN_WIDTH - 80) / 3;
+// Calculate button size for 3-column grid with gap
+const GAP = 12;
+const BUTTON_SIZE = (SCREEN_WIDTH - 64 - (GAP * 2)) / 3; // 64 = 32px padding on each side
 
 interface GameState {
   userScore: number;
@@ -154,9 +155,10 @@ export default function GameArena() {
     return `(${gameState.botOvers}.${gameState.botBalls}/${overs})`;
   };
 
-  // Glass panel background colors
-  const glassBg = isDark ? 'rgba(20,42,29,0.5)' : 'rgba(255,255,255,0.5)';
+  // Glass panel colors from design
+  const glassBg = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.4)';
   const glassBorder = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.6)';
+  const glassShadow = isDark ? 'rgba(0,0,0,0.3)' : 'rgba(31,38,135,0.07)';
 
   const renderHeader = () => (
     <View style={[styles.header, { 
@@ -171,10 +173,7 @@ export default function GameArena() {
   );
 
   const renderLiveScoreCard = () => (
-    <LinearGradient
-      colors={isDark ? ['rgba(20,42,29,0.6)', 'rgba(10,26,17,0.4)'] : ['rgba(255,255,255,0.6)', 'rgba(255,255,255,0.4)']}
-      style={[styles.scoreCard, { borderColor: glassBorder }]}
-    >
+    <View style={[styles.glassPanel, { backgroundColor: glassBg, borderColor: glassBorder }]}>
       <View style={styles.scoreCardContent}>
         <View style={styles.scoreLeft}>
           <Text style={[styles.liveLabel, { color: colors.primary }]}>LIVE SCOREBOARD</Text>
@@ -202,14 +201,11 @@ export default function GameArena() {
           />
         </View>
       </View>
-    </LinearGradient>
+    </View>
   );
 
   const renderYouVsBot = () => (
-    <LinearGradient
-      colors={isDark ? ['rgba(20,42,29,0.6)', 'rgba(10,26,17,0.4)'] : ['rgba(255,255,255,0.6)', 'rgba(255,255,255,0.4)']}
-      style={[styles.vsCard, { borderColor: glassBorder }]}
-    >
+    <View style={[styles.glassPanel, { backgroundColor: glassBg, borderColor: glassBorder }]}>
       <Text style={[styles.vsLabel, { color: colors.textSecondary }]}>YOU vs BOT</Text>
       
       <View style={styles.vsContent}>
@@ -240,16 +236,11 @@ export default function GameArena() {
             )}
           </View>
           <Text style={[styles.playerLabel, { color: colors.textSecondary }]}>YOU</Text>
-          <LinearGradient
-            colors={userSelectedNumber !== null ? [colors.primary, '#15cc25'] : [isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.5)', isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.3)']}
-            style={[styles.numberBox, { 
-              borderColor: userSelectedNumber !== null ? colors.primary : glassBorder,
-            }]}
-          >
-            <Text style={[styles.numberText, { color: userSelectedNumber !== null ? '#fff' : colors.primary }]}>
+          <View style={[styles.numberBoxGlass, { borderColor: userSelectedNumber !== null ? colors.primary : glassBorder }]}>
+            <Text style={[styles.numberText, { color: userSelectedNumber !== null ? colors.primary : colors.textSecondary }]}>
               {userSelectedNumber !== null ? userSelectedNumber : '-'}
             </Text>
-          </LinearGradient>
+          </View>
         </View>
 
         {/* Timer Circle */}
@@ -311,10 +302,7 @@ export default function GameArena() {
             )}
           </View>
           <Text style={[styles.playerLabel, { color: colors.textSecondary }]}>BOT</Text>
-          <LinearGradient
-            colors={[isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.5)', isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.3)']}
-            style={[styles.numberBox, { borderColor: glassBorder }]}
-          >
+          <View style={[styles.numberBoxGlass, { borderColor: glassBorder }]}>
             {isBotThinking ? (
               <View style={styles.thinkingDots}>
                 <View style={[styles.dot, { backgroundColor: colors.primary }]} />
@@ -326,61 +314,62 @@ export default function GameArena() {
                 {botSelectedNumber !== null ? botSelectedNumber : '-'}
               </Text>
             )}
-          </LinearGradient>
+          </View>
         </View>
       </View>
-    </LinearGradient>
+    </View>
   );
 
   const renderChooseMove = () => (
-    <LinearGradient
-      colors={isDark ? ['rgba(20,42,29,0.6)', 'rgba(10,26,17,0.4)'] : ['rgba(255,255,255,0.6)', 'rgba(255,255,255,0.4)']}
-      style={[styles.moveCard, { borderColor: glassBorder }]}
-    >
+    <View style={[styles.glassPanel, { backgroundColor: glassBg, borderColor: glassBorder }]}>
       <Text style={[styles.moveTitle, { color: colors.textPrimary }]}>CHOOSE YOUR MOVE</Text>
       
       <View style={styles.moveGrid}>
-        {[1, 2, 3, 4, 5, 6].map((num) => (
+        {[1, 2, 3, 4, 5, 6].map((num, index) => (
           <TouchableOpacity
             key={num}
-            style={styles.moveButtonContainer}
+            style={[
+              styles.moveButtonWrapper,
+              { marginRight: (index + 1) % 3 === 0 ? 0 : GAP }
+            ]}
             onPress={() => handleMoveSelect(num)}
             activeOpacity={0.8}
             disabled={userSelectedNumber !== null || isBotThinking}
           >
-            <LinearGradient
-              colors={selectedMove === num 
-                ? [colors.primary, '#15cc25'] 
-                : [isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.7)', isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.4)']}
-              style={[
-                styles.moveButton,
-                {
-                  borderColor: selectedMove === num 
-                    ? colors.primary 
-                    : glassBorder,
-                  shadowColor: selectedMove === num ? colors.primary : 'transparent',
-                },
-              ]}
-            >
-              <Text style={[
-                styles.moveButtonText,
-                { color: selectedMove === num ? '#fff' : colors.textPrimary },
-              ]}>
-                {num}
-              </Text>
-            </LinearGradient>
+            {selectedMove === num ? (
+              <LinearGradient
+                colors={[colors.primary, '#15cc25']}
+                style={[styles.moveButton, styles.moveButtonActive, { borderColor: colors.primary }]}
+              >
+                <Text style={[styles.moveButtonText, { color: '#fff' }]}>
+                  {num}
+                </Text>
+              </LinearGradient>
+            ) : (
+              <View style={[styles.moveButton, { borderColor: glassBorder, backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.6)' }]}>
+                <Text style={[styles.moveButtonText, { color: colors.textPrimary }]}>
+                  {num}
+                </Text>
+              </View>
+            )}
           </TouchableOpacity>
         ))}
       </View>
-    </LinearGradient>
+    </View>
   );
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Background Effects */}
+      {/* Background Effects - Stadium Gradient */}
       <View style={styles.backgroundEffects}>
-        <View style={[styles.blurCircle1, { backgroundColor: colors.primary + (isDark ? '15' : '08') }]} />
-        <View style={[styles.blurCircle2, { backgroundColor: isDark ? '#23483215' : '#e3f2fd' }]} />
+        <LinearGradient
+          colors={isDark ? ['#0a1a11', '#142a1d', '#0a1a11'] : ['#e8f5e9', '#f0f4f8', '#e3f2fd']}
+          style={styles.stadiumGradient}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+        />
+        <View style={[styles.blurCircle1, { backgroundColor: colors.primary + (isDark ? '15' : '10') }]} />
+        <View style={[styles.blurCircle2, { backgroundColor: isDark ? '#23483220' : '#90caf9' }]} />
       </View>
 
       {renderHeader()}
@@ -410,23 +399,30 @@ const styles = StyleSheet.create({
     bottom: 0,
     zIndex: -1,
   },
+  stadiumGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
   blurCircle1: {
     position: 'absolute',
     top: '-10%',
     right: '-10%',
-    width: 300,
-    height: 300,
-    borderRadius: 150,
-    opacity: 0.1,
+    width: 400,
+    height: 400,
+    borderRadius: 200,
+    opacity: 0.15,
   },
   blurCircle2: {
     position: 'absolute',
     bottom: '-10%',
     left: '-10%',
-    width: 250,
-    height: 250,
-    borderRadius: 125,
-    opacity: 0.1,
+    width: 350,
+    height: 350,
+    borderRadius: 175,
+    opacity: 0.12,
   },
   header: {
     paddingTop: 16,
@@ -454,12 +450,15 @@ const styles = StyleSheet.create({
     gap: 16,
     paddingBottom: 40,
   },
-  scoreCard: {
-    borderRadius: 24,
-    padding: 20,
+  glassPanel: {
+    borderRadius: 40,
+    padding: 24,
     borderWidth: 1,
-    borderTopWidth: 2,
-    borderTopColor: 'rgba(25,230,43,0.2)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.1,
+    shadowRadius: 32,
+    elevation: 4,
   },
   scoreCardContent: {
     flexDirection: 'row',
@@ -511,13 +510,6 @@ const styles = StyleSheet.create({
   stadiumImg: {
     width: '100%',
     height: '100%',
-  },
-  vsCard: {
-    borderRadius: 24,
-    padding: 20,
-    borderWidth: 1,
-    borderLeftWidth: 2,
-    borderLeftColor: 'rgba(25,230,43,0.2)',
   },
   vsLabel: {
     fontSize: 10,
@@ -579,13 +571,14 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: 1,
   },
-  numberBox: {
+  numberBoxGlass: {
     width: 48,
     height: 48,
     borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
+    borderWidth: 1,
+    backgroundColor: 'rgba(255,255,255,0.5)',
   },
   numberText: {
     fontSize: 24,
@@ -624,13 +617,6 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 3,
   },
-  moveCard: {
-    borderRadius: 24,
-    padding: 20,
-    borderWidth: 1,
-    borderBottomWidth: 2,
-    borderBottomColor: 'rgba(25,230,43,0.2)',
-  },
   moveTitle: {
     fontSize: 14,
     fontWeight: '900',
@@ -641,25 +627,27 @@ const styles = StyleSheet.create({
   moveGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    gap: 0,
+    justifyContent: 'flex-start',
   },
-  moveButtonContainer: {
+  moveButtonWrapper: {
     width: BUTTON_SIZE,
     height: BUTTON_SIZE,
-    marginBottom: 12,
+    marginBottom: GAP,
   },
   moveButton: {
     width: '100%',
     height: '100%',
-    borderRadius: 20,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+  },
+  moveButtonActive: {
+    shadowColor: '#19e62b',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
+    elevation: 10,
   },
   moveButtonText: {
     fontSize: 32,
