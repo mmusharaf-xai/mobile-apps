@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HandCricket Game Rules</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#19e62b",
+                        "off-white": "#fcfdfc",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "1.25rem",
+                        "xl": "1.5rem",
+                        "2xl": "2rem",
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Spline Sans', sans-serif;
+            background-color: theme('colors.off-white');
+        }
+        .rule-card {
+            @apply flex flex-col gap-3 p-5 bg-white border border-slate-100 rounded-2xl shadow-sm;
+        }
+        .pro-tips-container {
+            @apply bg-white border-2 border-primary rounded-2xl p-6;
+        }
+        .glowing-logo {
+            box-shadow: 0 0 15px rgba(25, 230, 43, 0.6);
+        }
+    </style>
+</head>
+<body class="text-slate-900 min-h-screen antialiased">
+<header class="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-slate-100 z-50 px-4 py-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<button aria-label="Go back" class="p-2 -ml-2 hover:bg-slate-100 rounded-full transition-colors group flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-800 font-bold text-2xl group-active:scale-90 transition-transform">arrow_back</span>
+</button>
+<div class="flex items-center gap-2">
+<div class="relative flex items-center justify-center">
+<div class="size-8 rounded-full bg-primary flex items-center justify-center glowing-logo">
+<span class="material-symbols-outlined text-white text-xl font-bold">sports_cricket</span>
+</div>
+</div>
+<span class="text-lg font-black tracking-tight text-slate-800">HandCricket</span>
+</div>
+</div>
+</header>
+<main class="max-w-md mx-auto px-6 py-8 flex flex-col gap-10">
+<div class="text-center space-y-2">
+<h1 class="text-4xl font-black text-slate-900 tracking-tight">Game Rules</h1>
+<p class="text-slate-500 font-medium">Everything you need to know to win</p>
+</div>
+<section class="space-y-4">
+<div class="flex items-center gap-2 px-1">
+<span class="material-symbols-outlined text-primary font-black">sports_cricket</span>
+<h2 class="text-lg font-extrabold text-slate-900 uppercase tracking-widest">Basics: How to Play</h2>
+</div>
+<div class="flex flex-col gap-4">
+<div class="rule-card">
+<div class="flex items-center gap-4">
+<div class="bg-primary text-slate-900 size-9 rounded-full flex items-center justify-center font-black text-sm shadow-sm">1</div>
+<h3 class="font-bold text-slate-800">Input Your Move</h3>
+</div>
+<p class="text-slate-600 leading-relaxed text-[15px]">Select a number from <span class="font-bold text-slate-900">1 to 6</span>. You and the opponent play simultaneously.</p>
+</div>
+<div class="rule-card">
+<div class="flex items-center gap-4">
+<div class="bg-primary text-slate-900 size-9 rounded-full flex items-center justify-center font-black text-sm shadow-sm">2</div>
+<h3 class="font-bold text-slate-800">Batting &amp; Scoring</h3>
+</div>
+<p class="text-slate-600 leading-relaxed text-[15px]">If numbers match, you are <span class="text-red-500 font-bold">OUT</span>. Otherwise, your number is added to your runs.</p>
+</div>
+<div class="rule-card">
+<div class="flex items-center gap-4">
+<div class="bg-primary text-slate-900 size-9 rounded-full flex items-center justify-center font-black text-sm shadow-sm">3</div>
+<h3 class="font-bold text-slate-800">Chasing the Target</h3>
+</div>
+<p class="text-slate-600 leading-relaxed text-[15px]">Roles swap after a wicket. Match the opponent's number to get them out before they beat your score.</p>
+</div>
+</div>
+</section>
+<section class="pro-tips-container">
+<div class="flex items-center gap-3 mb-5">
+<div class="p-2 bg-primary/10 rounded-lg">
+<span class="material-symbols-outlined text-primary font-bold text-2xl">tips_and_updates</span>
+</div>
+<h3 class="text-lg font-black text-slate-900 uppercase tracking-tight">Pro Tips</h3>
+</div>
+<ul class="space-y-5">
+<li class="flex items-start gap-4">
+<span class="material-symbols-outlined text-primary font-bold mt-0.5">verified</span>
+<span class="text-slate-700 text-[15px] font-semibold leading-snug">Study patterns! The opponent tends to repeat certain sequences.</span>
+</li>
+<li class="flex items-start gap-4">
+<span class="material-symbols-outlined text-primary font-bold mt-0.5">verified</span>
+<span class="text-slate-700 text-[15px] font-semibold leading-snug">Risk vs Reward: '6' gives max points but is the riskiest move.</span>
+</li>
+<li class="flex items-start gap-4">
+<span class="material-symbols-outlined text-primary font-bold mt-0.5">verified</span>
+<span class="text-slate-700 text-[15px] font-semibold leading-snug">Stay unpredictable to survive longer at the crease.</span>
+</li>
+</ul>
+</section>
+<div class="pt-4 pb-12">
+<button class="w-full bg-primary hover:brightness-95 active:scale-[0.98] text-slate-900 font-black py-5 rounded-2xl shadow-[0_10px_20px_-5px_rgba(25,230,43,0.4)] transition-all flex items-center justify-center gap-3 group">
+<span class="text-lg uppercase tracking-wider">Ready to Play?</span>
+<span class="material-symbols-outlined font-black group-hover:translate-x-1 transition-transform">sports_kabaddi</span>
+</button>
+</div>
+</main>
+
+</body></html>

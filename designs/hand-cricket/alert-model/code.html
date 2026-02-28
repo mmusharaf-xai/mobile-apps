@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HandCricket Error Alert</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#2bee75",
+              "background-light": "#f6f8f7",
+              "background-dark": "#102217",
+            },
+            fontFamily: {
+              "display": ["Public Sans", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .modal-blur {
+            backdrop-filter: blur(8px);
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display min-h-screen flex flex-col items-center justify-center">
+<!-- Background Simulation (App Home Screen) -->
+<div class="fixed inset-0 z-0 flex flex-col overflow-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<div class="px-4 md:px-40 flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#28392f] px-10 py-3">
+<div class="flex items-center gap-4 text-white">
+<div class="size-6 text-primary">
+<span class="material-symbols-outlined">sports_cricket</span>
+</div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">HandCricket</h2>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<div class="flex gap-2">
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#28392f] text-white gap-2 text-sm font-bold px-2.5">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#28392f] text-white gap-2 text-sm font-bold px-2.5">
+<span class="material-symbols-outlined">person</span>
+</button>
+</div>
+</div>
+</header>
+<div class="flex flex-col items-center pt-20">
+<h1 class="text-white text-4xl font-extrabold text-center mb-4">Start Your Match</h1>
+<p class="text-gray-400 text-center mb-8">Join a lobby or play with friends online.</p>
+<div class="grid grid-cols-2 gap-4 w-full max-w-md">
+<div class="aspect-square bg-[#1a2e22] rounded-xl flex flex-col items-center justify-center border border-[#28392f]">
+<span class="material-symbols-outlined text-primary text-4xl mb-2">stadium</span>
+<span class="text-white font-bold">Stadium</span>
+</div>
+<div class="aspect-square bg-[#1a2e22] rounded-xl flex flex-col items-center justify-center border border-[#28392f]">
+<span class="material-symbols-outlined text-primary text-4xl mb-2">groups</span>
+<span class="text-white font-bold">Friends</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Alert Modal Overlay -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-blur">
+<!-- Modal Card Container -->
+<div class="bg-white dark:bg-[#1a2e22] w-full max-w-[360px] rounded-xl shadow-2xl overflow-hidden border border-white/10 flex flex-col">
+<!-- Icon/Visual Header -->
+<div class="flex flex-col items-center pt-10 pb-4">
+<div class="relative flex items-center justify-center">
+<!-- Subtle Glow -->
+<div class="absolute inset-0 bg-red-500/20 blur-xl rounded-full scale-150"></div>
+<!-- Icon: Broken Wicket / Out Visual -->
+<div class="relative bg-red-500 text-white p-4 rounded-full flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined !text-4xl">error_outline</span>
+</div>
+</div>
+</div>
+<!-- Headline Text -->
+<div class="layout-content-container flex flex-col flex-1">
+<h1 class="text-black dark:text-white tracking-light text-[28px] font-bold leading-tight px-6 text-center pt-2">Out!</h1>
+</div>
+<!-- Error Details (Title & Body) -->
+<div class="layout-content-container flex flex-col flex-1 px-2">
+<h2 class="text-gray-800 dark:text-gray-200 text-[18px] font-semibold leading-tight tracking-[-0.015em] px-4 text-center pb-2 pt-3">Username already exists</h2>
+<p class="text-gray-600 dark:text-gray-400 text-sm font-normal leading-relaxed pb-6 px-6 text-center">
+                    That username is already taken by another player. Please choose a unique name for your cricket profile to join the match.
+                </p>
+</div>
+<!-- Action Area -->
+<div class="p-6 pt-0">
+<button class="w-full bg-primary hover:bg-primary/90 text-[#102217] h-14 rounded-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98] font-bold text-lg tracking-wide uppercase">
+<span>Try Again</span>
+<span class="material-symbols-outlined">refresh</span>
+</button>
+<button class="w-full mt-3 bg-transparent text-gray-500 dark:text-gray-400 h-10 rounded-lg flex items-center justify-center text-sm font-medium hover:text-white transition-colors">
+                    Dismiss
+                </button>
+</div>
+<!-- Bottom Cricket Accent Decoration -->
+<div class="h-1.5 w-full bg-gradient-to-r from-red-500 via-primary to-red-500 opacity-50"></div>
+</div>
+</div>
+</body></html>

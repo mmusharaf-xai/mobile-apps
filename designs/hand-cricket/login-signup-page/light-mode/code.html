@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HandCricket - Signup Light</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#2ECC71",
+                        "forest-green": "#1B4332",
+                        "soft-grey": "#F8FAFB",
+                        "field-bg": "#FFFFFF",
+                        "field-border": "#E2E8F0"
+                    },
+                    fontFamily: {
+                        display: "Lexend"
+                    },
+                    borderRadius: {
+                        DEFAULT: "1rem",
+                        lg: "2rem",
+                        xl: "3rem",
+                        full: "9999px"
+                    }
+                }
+            }
+        };
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Lexend', sans-serif;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .light-stadium-gradient {
+            background: linear-gradient(180deg, #F8FAFB 0%, #EDF2F4 100%);
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
+<div class="relative w-full max-w-[420px] h-[844px] bg-soft-grey border-8 border-white rounded-[3rem] shadow-2xl overflow-hidden flex flex-col light-stadium-gradient">
+<div class="w-full h-10 flex justify-between items-center px-8 pt-4 shrink-0">
+<span class="text-forest-green text-xs font-semibold">9:41</span>
+<div class="flex gap-1.5 items-center">
+<span class="material-symbols-outlined text-forest-green text-[14px]">signal_cellular_4_bar</span>
+<span class="material-symbols-outlined text-forest-green text-[14px]">wifi</span>
+<span class="material-symbols-outlined text-forest-green text-[14px]">battery_full</span>
+</div>
+</div>
+<header class="flex flex-col items-center mt-6 px-6 shrink-0">
+<div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-[0_10px_20px_rgba(46,204,113,0.3)]">
+<span class="material-symbols-outlined text-white text-4xl font-bold">sports_cricket</span>
+</div>
+<h1 class="text-forest-green text-2xl font-bold mt-4 tracking-tight">HandCricket</h1>
+<p class="text-slate-500 text-xs mt-1">Ready for your next innings?</p>
+</header>
+<div class="px-8 mt-8 shrink-0">
+<div class="flex h-12 w-full items-center justify-center rounded-full bg-slate-200/50 p-1 border border-slate-200">
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-white has-[:checked]:text-forest-green has-[:checked]:shadow-sm text-slate-500 text-xs font-bold leading-normal transition-all">
+<span class="truncate">Login</span>
+<input class="invisible w-0" name="auth-mode" type="radio" value="Login"/>
+</label>
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-full px-2 has-[:checked]:bg-primary has-[:checked]:text-white text-slate-500 text-xs font-bold leading-normal transition-all">
+<span class="truncate">Signup</span>
+<input checked="" class="invisible w-0" name="auth-mode" type="radio" value="Signup"/>
+</label>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto hide-scrollbar px-8 pt-6 pb-4">
+<div class="space-y-6">
+<h2 class="text-forest-green text-lg font-bold text-center">New Player Profile</h2>
+<div class="space-y-2">
+<label class="text-slate-500 text-[11px] font-bold uppercase tracking-widest ml-1">Username</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">account_circle</span>
+<input class="w-full bg-white border border-field-border rounded-2xl h-12 pl-12 pr-6 text-forest-green placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm" placeholder="PitchKing" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-slate-500 text-[11px] font-bold uppercase tracking-widest ml-1">Email Address</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">alternate_email</span>
+<input class="w-full bg-white border border-field-border rounded-2xl h-12 pl-12 pr-6 text-forest-green placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm" placeholder="player@stadium.com" type="email"/>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-center px-1">
+<label class="text-slate-500 text-[11px] font-bold uppercase tracking-widest">Choose Avatar</label>
+<span class="text-primary text-[9px] font-bold uppercase tracking-widest">Select One</span>
+</div>
+<div class="flex overflow-x-auto gap-3 py-2 hide-scrollbar -mx-2 px-2">
+<div class="flex-shrink-0 relative cursor-pointer">
+<div class="w-16 h-16 rounded-full border-2 border-primary p-0.5 bg-white overflow-hidden shadow-sm">
+<div class="w-full h-full rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl">sports_cricket</span>
+</div>
+</div>
+<div class="absolute -top-1 -right-1 bg-primary text-white rounded-full p-0.5 flex items-center justify-center border-2 border-white">
+<span class="material-symbols-outlined text-[12px] font-bold">check</span>
+</div>
+</div>
+<div class="flex-shrink-0 relative cursor-pointer">
+<div class="w-16 h-16 rounded-full border-2 border-transparent p-0.5 bg-white overflow-hidden hover:border-slate-200 shadow-sm">
+<div class="w-full h-full rounded-full bg-slate-50 flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-400 text-3xl">front_hand</span>
+</div>
+</div>
+</div>
+<div class="flex-shrink-0 relative cursor-pointer">
+<div class="w-16 h-16 rounded-full border-2 border-transparent p-0.5 bg-white overflow-hidden hover:border-slate-200 shadow-sm">
+<div class="w-full h-full rounded-full bg-slate-50 flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-400 text-3xl">sports_baseball</span>
+</div>
+</div>
+</div>
+<div class="flex-shrink-0 relative cursor-pointer">
+<div class="w-16 h-16 rounded-full border-2 border-transparent p-0.5 bg-white overflow-hidden hover:border-slate-200 shadow-sm">
+<div class="w-full h-full rounded-full bg-slate-50 flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-400 text-3xl">military_tech</span>
+</div>
+</div>
+</div>
+<div class="flex-shrink-0 relative cursor-pointer pr-4">
+<div class="w-16 h-16 rounded-full border-2 border-transparent p-0.5 bg-white overflow-hidden hover:border-slate-200 shadow-sm">
+<div class="w-full h-full rounded-full bg-slate-50 flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-400 text-3xl">emoji_events</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="px-8 pb-10 pt-4 bg-transparent mt-auto">
+<button class="w-full h-14 bg-primary text-white font-bold text-lg uppercase tracking-wider rounded-2xl shadow-[0_8px_25px_rgba(46,204,113,0.35)] hover:bg-green-500 hover:scale-[1.01] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+<span>Start Playing</span>
+<span class="material-symbols-outlined font-bold text-2xl">sports_baseball</span>
+</button>
+<p class="text-slate-500 text-[11px] text-center mt-6">
+                Already on the squad? <span class="text-primary font-bold hover:underline cursor-pointer">Login</span>
+</p>
+</div>
+<div class="w-full flex justify-center pb-2 shrink-0">
+<div class="w-32 h-1 bg-slate-300 rounded-full"></div>
+</div>
+</div>
+
+</body></html>

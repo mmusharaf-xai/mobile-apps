@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Toss Arena - Choose Side</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700;800;900&amp;family=Noto+Sans:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --primary-neon: #19e62b;
+            --off-white: #fcfcfc;
+            --stadium-dark: #0a1a0f;
+        }
+        @layer base {
+            body {
+                @apply bg-[#fcfcfc] text-slate-900 font-display overflow-x-hidden;
+            }
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#19e62b",
+                        "off-white": "#fcfcfc",
+                        "stadium": "#0a1a0f",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="min-h-screen flex flex-col items-center">
+<div class="relative flex h-screen max-w-[450px] w-full flex-col bg-off-white shadow-2xl overflow-hidden border-x border-slate-100">
+<header class="pt-10 pb-4 px-6 text-center z-10 flex flex-col items-center">
+<h1 class="text-3xl font-black tracking-tight text-slate-900 uppercase italic">Toss Arena</h1>
+<div class="mt-2 inline-flex items-center px-4 py-1.5 border-2 border-primary bg-white rounded-full shadow-sm">
+<span class="text-[11px] font-black text-primary tracking-[0.15em] uppercase">5 Overs Match</span>
+</div>
+<p class="text-slate-500 text-[10px] font-bold mt-4 uppercase tracking-widest">Choose your side!</p>
+</header>
+<main class="flex-1 overflow-y-auto px-6 pb-24 flex flex-col items-center">
+<div class="relative mt-2 mb-6 flex justify-center">
+<div class="relative w-[84px] h-[84px] rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.08)] flex items-center justify-center">
+<svg class="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
+<circle class="text-slate-100" cx="50" cy="50" fill="transparent" r="44" stroke="currentColor" stroke-width="6"></circle>
+<circle class="text-primary" cx="50" cy="50" fill="transparent" r="44" stroke="currentColor" stroke-dasharray="276.46" stroke-dashoffset="80" stroke-linecap="round" stroke-width="6"></circle>
+</svg>
+<div class="flex flex-col items-center justify-center z-10">
+<span class="text-2xl font-black text-slate-900 leading-none">10</span>
+<span class="text-[8px] font-black text-primary tracking-widest uppercase">Sec</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-center py-4 w-full">
+<div class="relative mb-10">
+<div class="absolute inset-0 bg-primary/20 rounded-full blur-[40px]"></div>
+<div class="relative size-44 rounded-full border-[12px] border-primary flex items-center justify-center shadow-[0_0_25px_rgba(25,230,43,0.5)] bg-white p-1">
+<div class="size-full rounded-full bg-gradient-to-br from-[#ffd700] via-[#f9a825] to-[#c67c00] flex items-center justify-center border-4 border-[#fff176] shadow-inner">
+<div class="size-28 rounded-full border-2 border-[#fff176]/40 flex items-center justify-center bg-gradient-to-tr from-transparent to-white/10">
+<span class="text-7xl font-black text-[#5d4037] drop-shadow-[0_2px_1px_rgba(255,255,255,0.3)]">H</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col w-full gap-4 mt-2 px-4">
+<button class="w-full h-16 bg-primary rounded-2xl flex items-center justify-center transition-transform active:scale-[0.98] shadow-[0_8px_20px_rgba(25,230,43,0.35)]">
+<span class="text-slate-900 font-black text-2xl italic tracking-tighter uppercase">Heads</span>
+</button>
+<button class="w-full h-16 border-2 border-slate-300 bg-transparent rounded-2xl flex items-center justify-center transition-transform active:scale-[0.98]">
+<span class="text-slate-900 font-black text-2xl italic tracking-tighter uppercase">Tails</span>
+</button>
+</div>
+<p class="mt-8 text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em]">Select your side to enter the match</p>
+</div>
+</main>
+<nav class="absolute bottom-0 w-full h-20 bg-white border-t border-slate-100 flex items-center justify-around px-2 z-20 shadow-[0_-4px_15px_rgba(0,0,0,0.02)]">
+<a class="flex flex-col items-center gap-1 text-slate-900" href="#">
+<span class="material-symbols-outlined text-2xl fill-1">home</span>
+<span class="text-[10px] font-bold">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-600" href="#">
+<span class="material-symbols-outlined text-2xl">history</span>
+<span class="text-[10px] font-bold">History</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-600" href="#">
+<span class="material-symbols-outlined text-2xl">leaderboard</span>
+<span class="text-[10px] font-bold">Ranking</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-600" href="#">
+<span class="material-symbols-outlined text-2xl">person</span>
+<span class="text-[10px] font-bold">Profile</span>
+</a>
+</nav>
+<div class="absolute top-0 left-0 w-full h-full pointer-events-none -z-10">
+<div class="absolute top-[-10%] left-[-20%] w-[140%] h-[50%] bg-primary/5 blur-[120px] rounded-full"></div>
+<div class="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+</div>
+</div>
+
+</body></html>
