@@ -167,6 +167,14 @@ export default function GameArena() {
           newState.target = (currentBatsman === 'user' ? newState.userScore : newState.botScore) + 1;
           // Swap roles for second innings
           newState.userBatting = !prev.userBatting;
+          // Reset balls/overs for the new batsman (second innings)
+          if (newState.userBatting) {
+            newState.userBalls = 0;
+            newState.userOvers = 0;
+          } else {
+            newState.botBalls = 0;
+            newState.botOvers = 0;
+          }
           
           if (currentBatsman === 'user') {
             setResultMessage(`You're OUT! Target: ${newState.target} runs`);
@@ -175,9 +183,8 @@ export default function GameArena() {
           }
           setShowResultModal(true);
         } else {
-          // Second innings - game over
+          // Second innings - game over, bowler wins
           newState.gameOver = true;
-          // If batsman was out, bowler wins
           newState.winner = currentBowler === 'user' ? 'user' : 'bot';
           setResultMessage(newState.winner === 'user' ? 'You WIN!' : 'Bot WINS!');
           setShowResultModal(true);
@@ -214,25 +221,30 @@ export default function GameArena() {
         }
       }
       
-      // Update balls and overs
+      // Update balls and overs - NO swapping between overs, batsman plays full innings
       if (prev.userBatting) {
         newState.userBalls += 1;
         if (newState.userBalls >= 6) {
           newState.userBalls = 0;
           newState.userOvers += 1;
-          // Check if over finished - swap roles
-          if (newState.userOvers < overs && !newState.gameOver && newState.userWickets === 0) {
-            newState.userBatting = false;
-            setResultMessage('Over finished! Swapping roles.');
-            setShowResultModal(true);
-          }
-          // Check if all overs completed in first innings
-          if (newState.userOvers >= overs && prev.isFirstInnings && newState.userWickets === 0) {
-            newState.isFirstInnings = false;
-            newState.target = newState.userScore + 1;
-            newState.userBatting = false;
-            setResultMessage(`First innings over! Target: ${newState.target} runs`);
-            setShowResultModal(true);
+          // Check if all overs completed - innings over, swap with target
+          if (newState.userOvers >= overs && !newState.gameOver) {
+            if (prev.isFirstInnings) {
+              // First innings complete - set target and swap
+              newState.isFirstInnings = false;
+              newState.target = newState.userScore + 1;
+              newState.userBatting = false;
+              newState.botBalls = 0;
+              newState.botOvers = 0;
+              setResultMessage(`Innings over! Target: ${newState.target} runs`);
+              setShowResultModal(true);
+            } else {
+              // Second innings complete without chasing target - bowler wins
+              newState.gameOver = true;
+              newState.winner = 'bot';
+              setResultMessage('Bot WINS! You failed to chase the target.');
+              setShowResultModal(true);
+            }
           }
         }
       } else {
@@ -240,50 +252,25 @@ export default function GameArena() {
         if (newState.botBalls >= 6) {
           newState.botBalls = 0;
           newState.botOvers += 1;
-          // Check if over finished - swap roles
-          if (newState.botOvers < overs && !newState.gameOver && newState.botWickets === 0) {
-            newState.userBatting = true;
-            setResultMessage('Over finished! Swapping roles.');
-            setShowResultModal(true);
-          }
-          // Check if all overs completed in first innings
-          if (newState.botOvers >= overs && prev.isFirstInnings && newState.botWickets === 0) {
-            newState.isFirstInnings = false;
-            newState.target = newState.botScore + 1;
-            newState.userBatting = true;
-            setResultMessage(`First innings over! Target: ${newState.target} runs`);
-            setShowResultModal(true);
-          }
-        }
-      }
-      
-      // Check if all overs completed in second innings without chasing target
-      if (!newState.isFirstInnings && !newState.gameOver) {
-        if (newState.userOvers >= overs || newState.botOvers >= overs) {
-          newState.gameOver = true;
-          const userScore = newState.userScore;
-          const botScore = newState.botScore;
-          
-          if (prev.target) {
-            // Whoever was batting second failed to chase
-            const currentBatsmanScore = currentBatsman === 'user' ? userScore : botScore;
-            if (currentBatsmanScore < prev.target) {
-              newState.winner = currentBowler === 'user' ? 'user' : 'bot';
+          // Check if all overs completed - innings over, swap with target
+          if (newState.botOvers >= overs && !newState.gameOver) {
+            if (prev.isFirstInnings) {
+              // First innings complete - set target and swap
+              newState.isFirstInnings = false;
+              newState.target = newState.botScore + 1;
+              newState.userBatting = true;
+              newState.userBalls = 0;
+              newState.userOvers = 0;
+              setResultMessage(`Innings over! Target: ${newState.target} runs`);
+              setShowResultModal(true);
             } else {
-              newState.winner = currentBatsman === 'user' ? 'user' : 'bot';
+              // Second innings complete without chasing target - bowler wins
+              newState.gameOver = true;
+              newState.winner = 'user';
+              setResultMessage('You WIN! Bot failed to chase the target.');
+              setShowResultModal(true);
             }
-          } else {
-            newState.winner = userScore > botScore ? 'user' : (botScore > userScore ? 'bot' : null);
           }
-          
-          if (newState.winner === 'user') {
-            setResultMessage('You WIN!');
-          } else if (newState.winner === 'bot') {
-            setResultMessage('Bot WINS!');
-          } else {
-            setResultMessage('It\'s a TIE!');
-          }
-          setShowResultModal(true);
         }
       }
       
