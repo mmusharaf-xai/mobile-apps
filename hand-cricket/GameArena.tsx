@@ -4,17 +4,21 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  Animated,
-  Easing,
   ScrollView,
   Dimensions,
+  SafeAreaView,
+  Image,
 } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Svg, { Circle } from 'react-native-svg';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+// Calculate button size for 3-column grid with proper spacing
+const BUTTON_SIZE = (SCREEN_WIDTH - 80) / 3;
 
 interface GameState {
   userScore: number;
@@ -150,8 +154,15 @@ export default function GameArena() {
     return `(${gameState.botOvers}.${gameState.botBalls}/${overs})`;
   };
 
+  // Glass panel background colors
+  const glassBg = isDark ? 'rgba(20,42,29,0.5)' : 'rgba(255,255,255,0.5)';
+  const glassBorder = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.6)';
+
   const renderHeader = () => (
-    <View style={[styles.header, { backgroundColor: isDark ? 'rgba(10,26,17,0.95)' : 'rgba(255,255,255,0.95)' }]}>
+    <View style={[styles.header, { 
+      backgroundColor: isDark ? 'rgba(10,26,17,0.3)' : 'rgba(255,255,255,0.3)',
+      borderBottomColor: glassBorder,
+    }]}>
       <View style={styles.headerContent}>
         <MaterialIcons name="sports-cricket" size={28} color={colors.primary} />
         <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Game Arena</Text>
@@ -160,10 +171,10 @@ export default function GameArena() {
   );
 
   const renderLiveScoreCard = () => (
-    <View style={[styles.scoreCard, { 
-      backgroundColor: isDark ? 'rgba(20,42,29,0.6)' : 'rgba(255,255,255,0.6)',
-      borderColor: isDark ? colors.surfaceBorder : 'rgba(255,255,255,0.6)',
-    }]}>
+    <LinearGradient
+      colors={isDark ? ['rgba(20,42,29,0.6)', 'rgba(10,26,17,0.4)'] : ['rgba(255,255,255,0.6)', 'rgba(255,255,255,0.4)']}
+      style={[styles.scoreCard, { borderColor: glassBorder }]}
+    >
       <View style={styles.scoreCardContent}>
         <View style={styles.scoreLeft}>
           <Text style={[styles.liveLabel, { color: colors.primary }]}>LIVE SCOREBOARD</Text>
@@ -183,33 +194,42 @@ export default function GameArena() {
             </View>
           )}
         </View>
-        <View style={[styles.stadiumImage, { borderColor: isDark ? colors.surfaceBorder : 'rgba(255,255,255,0.6)' }]}>
-          <MaterialIcons name="stadium" size={48} color={colors.primary} />
+        <View style={[styles.stadiumImage, { borderColor: glassBorder }]}>
+          <Image
+            source={{ uri: 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=200&h=200&fit=crop' }}
+            style={styles.stadiumImg}
+            resizeMode="cover"
+          />
         </View>
       </View>
-    </View>
+    </LinearGradient>
   );
 
   const renderYouVsBot = () => (
-    <View style={[styles.vsCard, { 
-      backgroundColor: isDark ? 'rgba(20,42,29,0.6)' : 'rgba(255,255,255,0.6)',
-      borderColor: isDark ? colors.surfaceBorder : 'rgba(255,255,255,0.6)',
-    }]}>
+    <LinearGradient
+      colors={isDark ? ['rgba(20,42,29,0.6)', 'rgba(10,26,17,0.4)'] : ['rgba(255,255,255,0.6)', 'rgba(255,255,255,0.4)']}
+      style={[styles.vsCard, { borderColor: glassBorder }]}
+    >
       <Text style={[styles.vsLabel, { color: colors.textSecondary }]}>YOU vs BOT</Text>
       
       <View style={styles.vsContent}>
         {/* User Side */}
         <View style={styles.playerSide}>
           <View style={styles.avatarContainer}>
-            <View style={[styles.avatarGradient, { 
-              backgroundColor: gameState.userBatting ? colors.primary : colors.surfaceBorder 
-            }]}>
+            <LinearGradient
+              colors={gameState.userBatting ? [colors.primary, '#86efac'] : ['rgba(255,255,255,0.6)', 'rgba(255,255,255,0.3)']}
+              style={styles.avatarGradient}
+            >
               <View style={[styles.avatarInner, { backgroundColor: colors.surface }]}>
-                <MaterialIcons name="person" size={32} color={colors.textPrimary} />
+                <Image
+                  source={{ uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face' }}
+                  style={styles.avatarImg}
+                  resizeMode="cover"
+                />
               </View>
-            </View>
+            </LinearGradient>
             {gameState.userBatting && (
-              <View style={[styles.roleBadge, { backgroundColor: colors.primary }]}>
+              <View style={[styles.roleBadge, { backgroundColor: colors.primary, shadowColor: colors.primary }]}>
                 <MaterialIcons name="sports-cricket" size={14} color="#fff" />
               </View>
             )}
@@ -220,14 +240,16 @@ export default function GameArena() {
             )}
           </View>
           <Text style={[styles.playerLabel, { color: colors.textSecondary }]}>YOU</Text>
-          <View style={[styles.numberBox, { 
-            backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.5)',
-            borderColor: userSelectedNumber !== null ? colors.primary : (isDark ? colors.surfaceBorder : 'rgba(255,255,255,0.7)'),
-          }]}>
-            <Text style={[styles.numberText, { color: colors.primary }]}>
+          <LinearGradient
+            colors={userSelectedNumber !== null ? [colors.primary, '#15cc25'] : [isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.5)', isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.3)']}
+            style={[styles.numberBox, { 
+              borderColor: userSelectedNumber !== null ? colors.primary : glassBorder,
+            }]}
+          >
+            <Text style={[styles.numberText, { color: userSelectedNumber !== null ? '#fff' : colors.primary }]}>
               {userSelectedNumber !== null ? userSelectedNumber : '-'}
             </Text>
-          </View>
+          </LinearGradient>
         </View>
 
         {/* Timer Circle */}
@@ -238,7 +260,7 @@ export default function GameArena() {
               cy="50"
               r={radius}
               fill="transparent"
-              stroke={isDark ? colors.surfaceBorder : '#e0e0e0'}
+              stroke={isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.5)'}
               strokeWidth="4"
             />
             <Circle
@@ -265,15 +287,20 @@ export default function GameArena() {
         {/* Bot Side */}
         <View style={styles.playerSide}>
           <View style={styles.avatarContainer}>
-            <View style={[styles.avatarGradient, { 
-              backgroundColor: !gameState.userBatting ? colors.primary : colors.surfaceBorder 
-            }]}>
+            <LinearGradient
+              colors={!gameState.userBatting ? [colors.primary, '#86efac'] : ['rgba(255,255,255,0.6)', 'rgba(255,255,255,0.3)']}
+              style={styles.avatarGradient}
+            >
               <View style={[styles.avatarInner, { backgroundColor: colors.surface }]}>
-                <MaterialIcons name="smart-toy" size={32} color={colors.textPrimary} />
+                <Image
+                  source={{ uri: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=100&h=100&fit=crop' }}
+                  style={styles.avatarImg}
+                  resizeMode="cover"
+                />
               </View>
-            </View>
+            </LinearGradient>
             {!gameState.userBatting && (
-              <View style={[styles.roleBadge, { backgroundColor: colors.primary }]}>
+              <View style={[styles.roleBadge, { backgroundColor: colors.primary, shadowColor: colors.primary }]}>
                 <MaterialIcons name="sports-cricket" size={14} color="#fff" />
               </View>
             )}
@@ -284,10 +311,10 @@ export default function GameArena() {
             )}
           </View>
           <Text style={[styles.playerLabel, { color: colors.textSecondary }]}>BOT</Text>
-          <View style={[styles.numberBox, { 
-            backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.5)',
-            borderColor: isDark ? colors.surfaceBorder : 'rgba(255,255,255,0.7)',
-          }]}>
+          <LinearGradient
+            colors={[isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.5)', isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.3)']}
+            style={[styles.numberBox, { borderColor: glassBorder }]}
+          >
             {isBotThinking ? (
               <View style={styles.thinkingDots}>
                 <View style={[styles.dot, { backgroundColor: colors.primary }]} />
@@ -299,52 +326,57 @@ export default function GameArena() {
                 {botSelectedNumber !== null ? botSelectedNumber : '-'}
               </Text>
             )}
-          </View>
+          </LinearGradient>
         </View>
       </View>
-    </View>
+    </LinearGradient>
   );
 
   const renderChooseMove = () => (
-    <View style={[styles.moveCard, { 
-      backgroundColor: isDark ? 'rgba(20,42,29,0.6)' : 'rgba(255,255,255,0.6)',
-      borderColor: isDark ? colors.surfaceBorder : 'rgba(255,255,255,0.6)',
-    }]}>
+    <LinearGradient
+      colors={isDark ? ['rgba(20,42,29,0.6)', 'rgba(10,26,17,0.4)'] : ['rgba(255,255,255,0.6)', 'rgba(255,255,255,0.4)']}
+      style={[styles.moveCard, { borderColor: glassBorder }]}
+    >
       <Text style={[styles.moveTitle, { color: colors.textPrimary }]}>CHOOSE YOUR MOVE</Text>
       
       <View style={styles.moveGrid}>
         {[1, 2, 3, 4, 5, 6].map((num) => (
           <TouchableOpacity
             key={num}
-            style={[
-              styles.moveButton,
-              {
-                backgroundColor: selectedMove === num 
-                  ? colors.primary 
-                  : (isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.5)'),
-                borderColor: selectedMove === num 
-                  ? colors.primary 
-                  : (isDark ? colors.surfaceBorder : 'rgba(255,255,255,0.7)'),
-              },
-            ]}
+            style={styles.moveButtonContainer}
             onPress={() => handleMoveSelect(num)}
             activeOpacity={0.8}
             disabled={userSelectedNumber !== null || isBotThinking}
           >
-            <Text style={[
-              styles.moveButtonText,
-              { color: selectedMove === num ? '#fff' : colors.textPrimary },
-            ]}>
-              {num}
-            </Text>
+            <LinearGradient
+              colors={selectedMove === num 
+                ? [colors.primary, '#15cc25'] 
+                : [isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.7)', isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.4)']}
+              style={[
+                styles.moveButton,
+                {
+                  borderColor: selectedMove === num 
+                    ? colors.primary 
+                    : glassBorder,
+                  shadowColor: selectedMove === num ? colors.primary : 'transparent',
+                },
+              ]}
+            >
+              <Text style={[
+                styles.moveButtonText,
+                { color: selectedMove === num ? '#fff' : colors.textPrimary },
+              ]}>
+                {num}
+              </Text>
+            </LinearGradient>
           </TouchableOpacity>
         ))}
       </View>
-    </View>
+    </LinearGradient>
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Background Effects */}
       <View style={styles.backgroundEffects}>
         <View style={[styles.blurCircle1, { backgroundColor: colors.primary + (isDark ? '15' : '08') }]} />
@@ -362,7 +394,7 @@ export default function GameArena() {
         {renderYouVsBot()}
         {renderChooseMove()}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -397,11 +429,10 @@ const styles = StyleSheet.create({
     opacity: 0.1,
   },
   header: {
-    paddingTop: 50,
+    paddingTop: 16,
     paddingBottom: 16,
     paddingHorizontal: 24,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.1)',
     zIndex: 10,
   },
   headerContent: {
@@ -421,12 +452,14 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 20,
     gap: 16,
+    paddingBottom: 40,
   },
   scoreCard: {
     borderRadius: 24,
     padding: 20,
     borderWidth: 1,
     borderTopWidth: 2,
+    borderTopColor: 'rgba(25,230,43,0.2)',
   },
   scoreCardContent: {
     flexDirection: 'row',
@@ -472,15 +505,19 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 20,
     borderWidth: 2,
-    justifyContent: 'center',
-    alignItems: 'center',
+    overflow: 'hidden',
     backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+  stadiumImg: {
+    width: '100%',
+    height: '100%',
   },
   vsCard: {
     borderRadius: 24,
     padding: 20,
     borderWidth: 1,
     borderLeftWidth: 2,
+    borderLeftColor: 'rgba(25,230,43,0.2)',
   },
   vsLabel: {
     fontSize: 10,
@@ -514,6 +551,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 3,
     borderColor: '#fff',
+    overflow: 'hidden',
+  },
+  avatarImg: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 29,
   },
   roleBadge: {
     position: 'absolute',
@@ -526,6 +569,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 2,
     borderColor: '#fff',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   playerLabel: {
     fontSize: 10,
@@ -582,6 +629,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderWidth: 1,
     borderBottomWidth: 2,
+    borderBottomColor: 'rgba(25,230,43,0.2)',
   },
   moveTitle: {
     fontSize: 14,
@@ -593,16 +641,25 @@ const styles = StyleSheet.create({
   moveGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: 12,
+    justifyContent: 'space-between',
+    gap: 0,
+  },
+  moveButtonContainer: {
+    width: BUTTON_SIZE,
+    height: BUTTON_SIZE,
+    marginBottom: 12,
   },
   moveButton: {
-    width: (SCREEN_WIDTH - 80) / 3,
-    height: (SCREEN_WIDTH - 80) / 3,
+    width: '100%',
+    height: '100%',
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   moveButtonText: {
     fontSize: 32,
