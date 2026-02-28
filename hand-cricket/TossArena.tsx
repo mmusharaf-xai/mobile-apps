@@ -83,7 +83,7 @@ export default function TossArena() {
   }, [currentScreen, startCoinFlip]);
 
   const handleStartMatch = () => {
-    navigation.goBack();
+    navigation.navigate('GameArena', { overs });
   };
 
   // Handle bat/ball choice (screen 2 when user wins toss)
