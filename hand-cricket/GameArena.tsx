@@ -80,6 +80,7 @@ export default function GameArena() {
   const [lastWicketed, setLastWicketed] = useState<'user' | 'bot' | null>(null);
   const [inningsPulse, setInningsPulse] = useState(false);
   const pulseTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const statsUpdatedRef = useRef(false);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const botTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -221,13 +222,6 @@ export default function GameArena() {
       }
       
       if (newState.gameOver) {
-        if (user) {
-          const isWin = newState.winner === 'user';
-          updateUser({
-            played: (user.played || 0) + 1,
-            wins: (user.wins || 0) + (isWin ? 1 : 0),
-          });
-        }
         setTimeout(() => {
           navigation.navigate('GameCompletion' as never, {
             overs,
@@ -300,13 +294,6 @@ export default function GameArena() {
       }
 
       if (newState.gameOver) {
-        if (user) {
-          const isWin = newState.winner === 'user';
-          updateUser({
-            played: (user.played || 0) + 1,
-            wins: (user.wins || 0) + (isWin ? 1 : 0),
-          });
-        }
         setTimeout(() => {
           navigation.navigate('GameCompletion' as never, {
             overs,
@@ -325,7 +312,7 @@ export default function GameArena() {
       
       return newState;
     });
-  }, [navigation, overs]);
+  }, [navigation, overs, updateUser, user]);
 
   useEffect(() => {
     return () => {
@@ -334,6 +321,16 @@ export default function GameArena() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (!gameState.gameOver || statsUpdatedRef.current || !user) return;
+    const isWin = gameState.winner === 'user';
+    updateUser({
+      played: (user.played || 0) + 1,
+      wins: (user.wins || 0) + (isWin ? 1 : 0),
+    });
+    statsUpdatedRef.current = true;
+  }, [gameState.gameOver, gameState.winner, updateUser, user]);
 
   const handleMoveSelect = useCallback((number: number) => {
     if (userSelectedNumber !== null || isBotThinking || gameState.gameOver) return;
@@ -382,8 +379,8 @@ export default function GameArena() {
   // Android needs different alpha values because it renders transparency differently
   const isAndroid = Platform.OS === 'android';
   const glassBg = isDark 
-    ? (isAndroid ? 'rgba(40,60,50,0.7)' : 'rgba(255,255,255,0.08)')
-    : (isAndroid ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.4)');
+    ? (isAndroid ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.08)')
+    : (isAndroid ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.4)');
   const glassBorder = isDark 
     ? (isAndroid ? 'rgba(100,150,120,0.3)' : 'rgba(255,255,255,0.15)')
     : (isAndroid ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.6)');
