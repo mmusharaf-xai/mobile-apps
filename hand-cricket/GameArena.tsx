@@ -186,8 +186,6 @@ export default function GameArena() {
           // Second innings - game over, bowler wins
           newState.gameOver = true;
           newState.winner = currentBowler === 'user' ? 'user' : 'bot';
-          setResultMessage(newState.winner === 'user' ? 'You WIN!' : 'Bot WINS!');
-          setShowResultModal(true);
         }
       } else {
         // Add runs to batsman
@@ -215,12 +213,27 @@ export default function GameArena() {
           if (batsmanScore >= prev.target) {
             newState.gameOver = true;
             newState.winner = currentBatsman === 'user' ? 'user' : 'bot';
-            setResultMessage(newState.winner === 'user' ? 'You chased the target! You WIN!' : 'Bot chased the target! Bot WINS!');
-            setShowResultModal(true);
           }
         }
       }
       
+      if (newState.gameOver) {
+        setTimeout(() => {
+          navigation.navigate('GameCompletion' as never, {
+            overs,
+            userScore: newState.userScore,
+            userWickets: newState.userWickets,
+            botScore: newState.botScore,
+            botWickets: newState.botWickets,
+            userOvers: newState.userOvers,
+            userBalls: newState.userBalls,
+            botOvers: newState.botOvers,
+            botBalls: newState.botBalls,
+            winner: newState.winner,
+          } as never);
+        }, 300);
+      }
+
       // Update balls and overs - NO swapping between overs, batsman plays full innings
       if (prev.userBatting) {
         newState.userBalls += 1;
@@ -242,8 +255,6 @@ export default function GameArena() {
               // Second innings complete without chasing target - bowler wins
               newState.gameOver = true;
               newState.winner = 'bot';
-              setResultMessage('Bot WINS! You failed to chase the target.');
-              setShowResultModal(true);
             }
           }
         }
@@ -267,8 +278,6 @@ export default function GameArena() {
               // Second innings complete without chasing target - bowler wins
               newState.gameOver = true;
               newState.winner = 'user';
-              setResultMessage('You WIN! Bot failed to chase the target.');
-              setShowResultModal(true);
             }
           }
         }
@@ -306,34 +315,6 @@ export default function GameArena() {
     }, 1500);
   }, [userSelectedNumber, isBotThinking, gameState.gameOver, processGameLogic]);
 
-  const resetGame = () => {
-    // Clear event indication
-    if (eventTimerRef.current) {
-      clearTimeout(eventTimerRef.current);
-    }
-    setLastEvent(null);
-    setShowEventIndication(false);
-    
-    setGameState({
-      userScore: 0,
-      userWickets: 0,
-      botScore: 0,
-      botWickets: 0,
-      userOvers: 0,
-      userBalls: 0,
-      botOvers: 0,
-      botBalls: 0,
-      target: null,
-      isFirstInnings: true,
-      userBatting: true,
-      gameOver: false,
-      winner: null,
-    });
-    setShowResultModal(false);
-    setUserSelectedNumber(null);
-    setBotSelectedNumber(null);
-    setSelectedMove(null);
-  };
 
   const getCurrentScore = () => {
     if (gameState.userBatting) {
