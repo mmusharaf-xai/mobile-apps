@@ -9,13 +9,13 @@ import {
   SafeAreaView,
   Image,
   Platform,
-  Modal,
 } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Svg, { Circle } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useUser } from './UserContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -44,6 +44,7 @@ interface GameState {
 
 export default function GameArena() {
   const { colors, isDark } = useTheme();
+  const { user } = useUser();
   const navigation = useNavigation();
   const route = useRoute();
   const overs = (route.params as any)?.overs || 5;
@@ -72,8 +73,6 @@ export default function GameArena() {
   const [botSelectedNumber, setBotSelectedNumber] = useState<number | null>(null);
   const [isBotThinking, setIsBotThinking] = useState(false);
   const [selectedMove, setSelectedMove] = useState<number | null>(null);
-  const [showResultModal, setShowResultModal] = useState(false);
-  const [resultMessage, setResultMessage] = useState('');
 
   // Event indication state (wicket, 4, 6)
   const [lastEvent, setLastEvent] = useState<'wicket' | 'boundary4' | 'boundary6' | null>(null);
@@ -175,13 +174,6 @@ export default function GameArena() {
             newState.botBalls = 0;
             newState.botOvers = 0;
           }
-          
-          if (currentBatsman === 'user') {
-            setResultMessage(`You're OUT! Target: ${newState.target} runs`);
-          } else {
-            setResultMessage(`Bot is OUT! Target: ${newState.target} runs`);
-          }
-          setShowResultModal(true);
         } else {
           // Second innings - game over, bowler wins
           newState.gameOver = true;
@@ -249,8 +241,6 @@ export default function GameArena() {
               newState.userBatting = false;
               newState.botBalls = 0;
               newState.botOvers = 0;
-              setResultMessage(`Innings over! Target: ${newState.target} runs`);
-              setShowResultModal(true);
             } else {
               // Second innings complete without chasing target - bowler wins
               newState.gameOver = true;
@@ -272,8 +262,6 @@ export default function GameArena() {
               newState.userBatting = true;
               newState.userBalls = 0;
               newState.userOvers = 0;
-              setResultMessage(`Innings over! Target: ${newState.target} runs`);
-              setShowResultModal(true);
             } else {
               // Second innings complete without chasing target - bowler wins
               newState.gameOver = true;
@@ -282,10 +270,27 @@ export default function GameArena() {
           }
         }
       }
+
+      if (newState.gameOver) {
+        setTimeout(() => {
+          navigation.navigate('GameCompletion' as never, {
+            overs,
+            userScore: newState.userScore,
+            userWickets: newState.userWickets,
+            botScore: newState.botScore,
+            botWickets: newState.botWickets,
+            userOvers: newState.userOvers,
+            userBalls: newState.userBalls,
+            botOvers: newState.botOvers,
+            botBalls: newState.botBalls,
+            winner: newState.winner,
+          } as never);
+        }, 300);
+      }
       
       return newState;
     });
-  }, [overs]);
+  }, [navigation, overs]);
 
   const handleMoveSelect = useCallback((number: number) => {
     if (userSelectedNumber !== null || isBotThinking || gameState.gameOver) return;
@@ -393,6 +398,10 @@ export default function GameArena() {
     const isBoundary4 = showEventIndication && lastEvent === 'boundary4';
     const isBoundary6 = showEventIndication && lastEvent === 'boundary6';
     const isBoundary = isBoundary4 || isBoundary6;
+
+    const userAvatarIcon = user?.avatar !== undefined && user.avatar >= 0 && user.avatar < 5
+      ? ['sports-cricket', 'front-hand', 'sports-baseball', 'military-tech', 'emoji-events'][user.avatar]
+      : null;
     
     // Current batsman for highlighting
     const currentBatsmanIsUser = gameState.userBatting;
@@ -413,10 +422,10 @@ export default function GameArena() {
     // Event pill content
     const getEventPill = () => {
       if (!showEventIndication || !lastEvent) return null;
-      
+
       if (lastEvent === 'wicket') {
         return (
-          <View style={[styles.eventPill, { backgroundColor: '#ef4444' }]}>
+          <View style={[styles.eventPill, styles.wicketPill]}>
             <Text style={styles.eventPillText}>WICKET!</Text>
           </View>
         );
@@ -454,11 +463,18 @@ export default function GameArena() {
               style={styles.avatarGradient}
             >
               <View style={[styles.avatarInner, { backgroundColor: colors.surface }]}>
-                <Image
-                  source={{ uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face' }}
-                  style={styles.avatarImg}
-                  resizeMode="cover"
-                />
+                {userAvatarIcon ? (
+                  <View style={[styles.avatarIconWrap, { backgroundColor: colors.primary + '20' }]}
+                  >
+                    <MaterialIcons name={userAvatarIcon as any} size={30} color={colors.primary} />
+                  </View>
+                ) : (
+                  <Image
+                    source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAmmXZVo4op-z_y54Iq6tbd0otBBx5DjkZ2nb58iaRruLzm1RRZj2V7MgFydokNPhOKNwSmzTfSy_v09S_3DTVk1G_Xd0G_F-0ScGu1-D8JDa4G4WIffdpcnWPDPzVnwvLgC6dQWPQ7xJN0e-wWyMYDWWsonOfWdKTL3wLS1B_d15NcVX_aPAYlXhxsJtxYCper0P7kBmhwzZlul2Ssw2WKK6DkgAxJ5V5al47EsHM2Q8_4dmnAMqeNAlZcn-HLLUKd8b9CM6xCAfs' }}
+                    style={styles.avatarImg}
+                    resizeMode="cover"
+                  />
+                )}
                 {/* W overlay for wicket */}
                 {isWicket && currentBatsmanIsUser && (
                   <View style={styles.wicketOverlay}>
@@ -651,33 +667,6 @@ export default function GameArena() {
         {renderChooseMove()}
       </ScrollView>
 
-      {/* Result Modal */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={showResultModal}
-        onRequestClose={() => setShowResultModal(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: isDark ? '#142a1d' : '#fff' }]}>
-            <Text style={[styles.modalText, { color: colors.textPrimary }]}>{resultMessage}</Text>
-            <TouchableOpacity
-              style={[styles.modalButton, { backgroundColor: colors.primary }]}
-              onPress={() => {
-                if (gameState.gameOver) {
-                  resetGame();
-                } else {
-                  setShowResultModal(false);
-                }
-              }}
-            >
-              <Text style={[styles.modalButtonText, { color: '#fff' }]}>
-                {gameState.gameOver ? 'Play Again' : 'Continue'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </SafeAreaView>
   );
 }
@@ -845,6 +834,12 @@ const styles = StyleSheet.create({
     height: '100%',
     borderRadius: 29,
   },
+  avatarIconWrap: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   roleBadge: {
     position: 'absolute',
     bottom: -4,
@@ -954,57 +949,35 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: '900',
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    margin: 20,
-    padding: 30,
-    borderRadius: 24,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  modalText: {
-    fontSize: 18,
-    fontWeight: '700',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  modalButton: {
-    paddingHorizontal: 30,
-    paddingVertical: 12,
-    borderRadius: 20,
-  },
-  modalButtonText: {
-    fontSize: 16,
-    fontWeight: '900',
-  },
   // Event indication styles
   eventPill: {
     position: 'absolute',
-    top: -12,
-    paddingHorizontal: 16,
+    top: -44,
+    left: '50%',
+    paddingHorizontal: 18,
     paddingVertical: 6,
-    borderRadius: 16,
-    zIndex: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
+    borderRadius: 18,
+    zIndex: 20,
+    shadowColor: '#ef4444',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    transform: [{ translateX: -40 }, { rotate: '-12deg' }],
+  },
+  wicketPill: {
+    backgroundColor: '#ef4444',
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.85)',
   },
   eventPillText: {
     color: '#fff',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '900',
     letterSpacing: 1,
+    textAlign: 'center',
   },
   wicketOverlay: {
     position: 'absolute',
