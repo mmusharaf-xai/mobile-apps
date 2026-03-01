@@ -430,7 +430,8 @@ export default function GameArena() {
     
     // Current batsman for highlighting
     const currentBatsmanIsUser = gameState.userBatting;
-    const wicketBatsmanIsUser = isWicket ? !currentBatsmanIsUser : currentBatsmanIsUser;
+    // When wicket is true, it means the CURRENT batsman just got out.
+    const wicketBatsmanIsUser = isWicket ? currentBatsmanIsUser : false;
     
     // Avatar border colors
     const userAvatarBorderColor = isWicket && wicketBatsmanIsUser 
@@ -982,9 +983,9 @@ const styles = StyleSheet.create({
   // Event indication styles
   eventPill: {
     position: 'absolute',
-    top: -44,
     left: '50%',
-    paddingHorizontal: 18,
+    top: '50%',
+    paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 18,
     zIndex: 30,
@@ -995,7 +996,12 @@ const styles = StyleSheet.create({
     elevation: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    transform: [{ translateX: -40 }, { rotate: '-12deg' }],
+    transform: [
+      { translateX: -45 }, // Half of width approx
+      { translateY: -16 }, // Half of height approx
+      { rotate: '-12deg' }
+    ],
+    minWidth: 90,
   },
   wicketPill: {
     backgroundColor: '#ef4444',
@@ -1004,10 +1010,11 @@ const styles = StyleSheet.create({
   },
   eventPillText: {
     color: '#fff',
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: '900',
     letterSpacing: 1,
     textAlign: 'center',
+    includeFontPadding: false,
   },
   wicketOverlay: {
     position: 'absolute',
