@@ -66,8 +66,6 @@ export default function GameCompletion() {
     >
       <View style={styles.backgroundEffects}>
         <View style={[styles.stadiumGradient, { backgroundColor: isDark ? '#0a1a11' : '#f0f4f8' }]} />
-        <View style={[styles.blurCircle1, { backgroundColor: colors.primary + (isDark ? '25' : '20') }]} />
-        <View style={[styles.blurCircle2, { backgroundColor: isDark ? 'rgba(72,112,92,0.3)' : 'rgba(96,165,250,0.12)' }]} />
         <View style={[styles.dotPattern, { borderColor: colors.primary + '20' }]} />
       </View>
 
@@ -179,22 +177,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-  },
-  blurCircle1: {
-    position: 'absolute',
-    top: '-12%',
-    right: '-12%',
-    width: 360,
-    height: 360,
-    borderRadius: 180,
-  },
-  blurCircle2: {
-    position: 'absolute',
-    bottom: '-12%',
-    left: '-12%',
-    width: 320,
-    height: 320,
-    borderRadius: 160,
   },
   dotPattern: {
     position: 'absolute',

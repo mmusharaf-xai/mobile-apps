@@ -44,7 +44,7 @@ interface GameState {
 
 export default function GameArena() {
   const { colors, isDark } = useTheme();
-  const { user } = useUser();
+  const { user, updateUser } = useUser();
   const navigation = useNavigation();
   const route = useRoute();
   const overs = (route.params as any)?.overs || 5;
@@ -221,6 +221,13 @@ export default function GameArena() {
       }
       
       if (newState.gameOver) {
+        if (user) {
+          const isWin = newState.winner === 'user';
+          updateUser({
+            played: (user.played || 0) + 1,
+            wins: (user.wins || 0) + (isWin ? 1 : 0),
+          });
+        }
         setTimeout(() => {
           navigation.navigate('GameCompletion' as never, {
             overs,
@@ -293,6 +300,13 @@ export default function GameArena() {
       }
 
       if (newState.gameOver) {
+        if (user) {
+          const isWin = newState.winner === 'user';
+          updateUser({
+            played: (user.played || 0) + 1,
+            wins: (user.wins || 0) + (isWin ? 1 : 0),
+          });
+        }
         setTimeout(() => {
           navigation.navigate('GameCompletion' as never, {
             overs,
@@ -980,7 +994,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     transform: [
-      { translateX: -45 }, // Half of width approx
+      { translateX: -55 }, // Half of width approx (110 / 2)
       { translateY: -16 }, // Half of height approx
       { rotate: '-12deg' }
     ],
