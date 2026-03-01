@@ -77,6 +77,8 @@ export default function GameArena() {
   // Event indication state (wicket, 4, 6)
   const [lastEvent, setLastEvent] = useState<'wicket' | 'boundary4' | 'boundary6' | null>(null);
   const [showEventIndication, setShowEventIndication] = useState(false);
+  const [inningsPulse, setInningsPulse] = useState(false);
+  const pulseTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const botTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -166,6 +168,11 @@ export default function GameArena() {
           newState.target = (currentBatsman === 'user' ? newState.userScore : newState.botScore) + 1;
           // Swap roles for second innings
           newState.userBatting = !prev.userBatting;
+          setInningsPulse(true);
+          if (pulseTimerRef.current) {
+            clearTimeout(pulseTimerRef.current);
+          }
+          pulseTimerRef.current = setTimeout(() => setInningsPulse(false), 700);
           // Reset balls/overs for the new batsman (second innings)
           if (newState.userBatting) {
             newState.userBalls = 0;
@@ -241,6 +248,11 @@ export default function GameArena() {
               newState.userBatting = false;
               newState.botBalls = 0;
               newState.botOvers = 0;
+              setInningsPulse(true);
+              if (pulseTimerRef.current) {
+                clearTimeout(pulseTimerRef.current);
+              }
+              pulseTimerRef.current = setTimeout(() => setInningsPulse(false), 700);
             } else {
               // Second innings complete without chasing target - bowler wins
               newState.gameOver = true;
@@ -262,6 +274,11 @@ export default function GameArena() {
               newState.userBatting = true;
               newState.userBalls = 0;
               newState.userOvers = 0;
+              setInningsPulse(true);
+              if (pulseTimerRef.current) {
+                clearTimeout(pulseTimerRef.current);
+              }
+              pulseTimerRef.current = setTimeout(() => setInningsPulse(false), 700);
             } else {
               // Second innings complete without chasing target - bowler wins
               newState.gameOver = true;
@@ -292,13 +309,21 @@ export default function GameArena() {
     });
   }, [navigation, overs]);
 
+  useEffect(() => {
+    return () => {
+      if (pulseTimerRef.current) {
+        clearTimeout(pulseTimerRef.current);
+      }
+    };
+  }, []);
+
   const handleMoveSelect = useCallback((number: number) => {
     if (userSelectedNumber !== null || isBotThinking || gameState.gameOver) return;
-    
+
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
-    
+
     setSelectedMove(number);
     setUserSelectedNumber(number);
     setIsBotThinking(true);
@@ -405,15 +430,16 @@ export default function GameArena() {
     
     // Current batsman for highlighting
     const currentBatsmanIsUser = gameState.userBatting;
+    const wicketBatsmanIsUser = isWicket ? !currentBatsmanIsUser : currentBatsmanIsUser;
     
     // Avatar border colors
-    const userAvatarBorderColor = isWicket && currentBatsmanIsUser 
+    const userAvatarBorderColor = isWicket && wicketBatsmanIsUser 
       ? '#ef4444' // Red for wicket
       : isBoundary && currentBatsmanIsUser 
         ? '#22c55e' // Green for 4/6
         : null;
     
-    const botAvatarBorderColor = isWicket && !currentBatsmanIsUser 
+    const botAvatarBorderColor = isWicket && !wicketBatsmanIsUser 
       ? '#ef4444' // Red for wicket
       : isBoundary && !currentBatsmanIsUser 
         ? '#22c55e' // Green for 4/6
@@ -476,7 +502,7 @@ export default function GameArena() {
                   />
                 )}
                 {/* W overlay for wicket */}
-                {isWicket && currentBatsmanIsUser && (
+                {isWicket && wicketBatsmanIsUser && (
                   <View style={styles.wicketOverlay}>
                     <Text style={styles.wicketOverlayText}>W</Text>
                   </View>
@@ -484,19 +510,19 @@ export default function GameArena() {
               </View>
             </LinearGradient>
             {gameState.userBatting && (
-              <View style={[styles.roleBadge, { backgroundColor: colors.primary }]}>
+              <View style={[styles.roleBadge, { backgroundColor: colors.primary }, inningsPulse && styles.roleBadgePulse]}>
                 <MaterialIcons name="sports-cricket" size={14} color="#fff" />
               </View>
             )}
             {!gameState.userBatting && (
-              <View style={[styles.roleBadge, { backgroundColor: '#334155' }]}>
+              <View style={[styles.roleBadge, { backgroundColor: '#334155' }, inningsPulse && styles.roleBadgePulse]}>
                 <MaterialIcons name="sports-baseball" size={14} color="#fff" />
               </View>
             )}
           </View>
           <Text style={[styles.playerLabel, { color: colors.textSecondary }]}>YOU</Text>
           {/* OUT text for wicket */}
-          {isWicket && currentBatsmanIsUser && (
+          {isWicket && wicketBatsmanIsUser && (
             <Text style={[styles.outText, { color: '#ef4444' }]}>OUT</Text>
           )}
           <View style={[styles.numberBox, { borderColor: userSelectedNumber !== null ? colors.primary : glassBorder }]}>
@@ -569,7 +595,7 @@ export default function GameArena() {
                   resizeMode="cover"
                 />
                 {/* W overlay for wicket */}
-                {isWicket && !currentBatsmanIsUser && (
+                {isWicket && !wicketBatsmanIsUser && (
                   <View style={styles.wicketOverlay}>
                     <Text style={styles.wicketOverlayText}>W</Text>
                   </View>
@@ -577,19 +603,19 @@ export default function GameArena() {
               </View>
             </LinearGradient>
             {!gameState.userBatting && (
-              <View style={[styles.roleBadge, { backgroundColor: colors.primary }]}>
+              <View style={[styles.roleBadge, { backgroundColor: colors.primary }, inningsPulse && styles.roleBadgePulse]}>
                 <MaterialIcons name="sports-cricket" size={14} color="#fff" />
               </View>
             )}
             {gameState.userBatting && (
-              <View style={[styles.roleBadge, { backgroundColor: '#334155' }]}>
+              <View style={[styles.roleBadge, { backgroundColor: '#334155' }, inningsPulse && styles.roleBadgePulse]}>
                 <MaterialIcons name="sports-baseball" size={14} color="#fff" />
               </View>
             )}
           </View>
           <Text style={[styles.playerLabel, { color: colors.textSecondary }]}>BOT</Text>
           {/* OUT text for wicket */}
-          {isWicket && !currentBatsmanIsUser && (
+          {isWicket && !wicketBatsmanIsUser && (
             <Text style={[styles.outText, { color: '#ef4444' }]}>OUT</Text>
           )}
           <View style={[styles.numberBox, { borderColor: glassBorder, backgroundColor: glassButtonBg }]}>
@@ -856,6 +882,9 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 4,
   },
+  roleBadgePulse: {
+    transform: [{ scale: 1.15 }],
+  },
   playerLabel: {
     fontSize: 10,
     fontWeight: '900',
@@ -887,6 +916,7 @@ const styles = StyleSheet.create({
     height: 80,
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 5,
   },
   timerSvg: {
     position: 'absolute',
@@ -957,12 +987,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 6,
     borderRadius: 18,
-    zIndex: 20,
+    zIndex: 30,
     shadowColor: '#ef4444',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 10,
-    elevation: 8,
+    elevation: 10,
     alignItems: 'center',
     justifyContent: 'center',
     transform: [{ translateX: -40 }, { rotate: '-12deg' }],
