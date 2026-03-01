@@ -8,6 +8,7 @@ import {
   Image,
   ScrollView,
   Platform,
+  StatusBar,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -61,16 +62,23 @@ export default function GameCompletion() {
     ? ['sports-cricket', 'front-hand', 'sports-baseball', 'military-tech', 'emoji-events'][user.avatar]
     : null;
 
+  const isAndroid = Platform.OS === 'android';
+  const pageBackground = isDark ? '#0a1a11' : '#f0f4f8';
+  const safeAreaBackground = isAndroid && !isDark ? '#ffffff' : pageBackground;
+
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}
+    <SafeAreaView style={[styles.container, { backgroundColor: safeAreaBackground }]}
     >
+      {isAndroid && (
+        <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={safeAreaBackground} />
+      )}
       <View style={styles.backgroundEffects}>
-        <View style={[styles.stadiumGradient, { backgroundColor: isDark ? '#0a1a11' : '#f0f4f8' }]} />
-        <View style={[styles.dotPattern, { borderColor: colors.primary + '20' }]} />
+        <View style={[styles.stadiumGradient, { backgroundColor: pageBackground }]} />
+        {!isAndroid && <View style={[styles.dotPattern, { borderColor: colors.primary + '20' }]} />}
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={[styles.glassPanel, { backgroundColor: isDark ? 'rgba(20,40,29,0.7)' : 'rgba(255,255,255,0.5)', borderColor: isDark ? 'rgba(100,150,120,0.35)' : 'rgba(255,255,255,0.7)' }]}
+        <View style={[styles.glassPanel, { backgroundColor: isDark ? 'rgba(20,40,29,0.7)' : (isAndroid ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.5)'), borderColor: isDark ? 'rgba(100,150,120,0.35)' : 'rgba(255,255,255,0.7)' }]}
         >
           <View style={styles.trophyWrap}>
             <LinearGradient
@@ -90,7 +98,7 @@ export default function GameCompletion() {
             <Text style={[styles.resultLine, { color: colors.primary }]}>{resultLine}</Text>
           </View>
 
-          <View style={[styles.scoreCard, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.2)', borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.4)' }]}
+          <View style={[styles.scoreCard, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : (isAndroid ? 'rgba(255,255,255,0.98)' : 'rgba(255,255,255,0.2)'), borderColor: isDark ? 'rgba(255,255,255,0.12)' : (isAndroid ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.4)') }]}
           >
             <View style={styles.scoreRow}>
               <Text style={[styles.scoreLabel, { color: colors.textSecondary }]}>Your Score</Text>
