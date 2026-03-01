@@ -77,6 +77,7 @@ export default function GameArena() {
   // Event indication state (wicket, 4, 6)
   const [lastEvent, setLastEvent] = useState<'wicket' | 'boundary4' | 'boundary6' | null>(null);
   const [showEventIndication, setShowEventIndication] = useState(false);
+  const [lastWicketed, setLastWicketed] = useState<'user' | 'bot' | null>(null);
   const [inningsPulse, setInningsPulse] = useState(false);
   const pulseTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -139,6 +140,7 @@ export default function GameArena() {
     }
     setShowEventIndication(false);
     setLastEvent(null);
+    setLastWicketed(null);
 
     setGameState(prev => {
       const newState = { ...prev };
@@ -149,10 +151,12 @@ export default function GameArena() {
       if (userNum === botNum) {
         // Wicket falls - show wicket indication
         setLastEvent('wicket');
+        setLastWicketed(currentBatsman);
         setShowEventIndication(true);
         eventTimerRef.current = setTimeout(() => {
           setShowEventIndication(false);
           setLastEvent(null);
+          setLastWicketed(null);
         }, 2500);
 
         // Wicket falls
@@ -430,8 +434,7 @@ export default function GameArena() {
     
     // Current batsman for highlighting
     const currentBatsmanIsUser = gameState.userBatting;
-    // When wicket is true, it means the CURRENT batsman just got out.
-    const wicketBatsmanIsUser = isWicket ? currentBatsmanIsUser : false;
+    const wicketBatsmanIsUser = isWicket && lastWicketed ? lastWicketed === 'user' : false;
     
     // Avatar border colors
     const userAvatarBorderColor = isWicket && wicketBatsmanIsUser 
@@ -440,7 +443,7 @@ export default function GameArena() {
         ? '#22c55e' // Green for 4/6
         : null;
     
-    const botAvatarBorderColor = isWicket && !wicketBatsmanIsUser 
+    const botAvatarBorderColor = isWicket && lastWicketed === 'bot'
       ? '#ef4444' // Red for wicket
       : isBoundary && !currentBatsmanIsUser 
         ? '#22c55e' // Green for 4/6
@@ -503,7 +506,7 @@ export default function GameArena() {
                   />
                 )}
                 {/* W overlay for wicket */}
-                {isWicket && wicketBatsmanIsUser && (
+                {isWicket && lastWicketed === 'user' && (
                   <View style={styles.wicketOverlay}>
                     <Text style={styles.wicketOverlayText}>W</Text>
                   </View>
@@ -523,7 +526,7 @@ export default function GameArena() {
           </View>
           <Text style={[styles.playerLabel, { color: colors.textSecondary }]}>YOU</Text>
           {/* OUT text for wicket */}
-          {isWicket && wicketBatsmanIsUser && (
+          {isWicket && lastWicketed === 'user' && (
             <Text style={[styles.outText, { color: '#ef4444' }]}>OUT</Text>
           )}
           <View style={[styles.numberBox, { borderColor: userSelectedNumber !== null ? colors.primary : glassBorder }]}>
@@ -596,7 +599,7 @@ export default function GameArena() {
                   resizeMode="cover"
                 />
                 {/* W overlay for wicket */}
-                {isWicket && !wicketBatsmanIsUser && (
+                {isWicket && lastWicketed === 'bot' && (
                   <View style={styles.wicketOverlay}>
                     <Text style={styles.wicketOverlayText}>W</Text>
                   </View>
@@ -616,7 +619,7 @@ export default function GameArena() {
           </View>
           <Text style={[styles.playerLabel, { color: colors.textSecondary }]}>BOT</Text>
           {/* OUT text for wicket */}
-          {isWicket && !wicketBatsmanIsUser && (
+          {isWicket && lastWicketed === 'bot' && (
             <Text style={[styles.outText, { color: '#ef4444' }]}>OUT</Text>
           )}
           <View style={[styles.numberBox, { borderColor: glassBorder, backgroundColor: glassButtonBg }]}>
@@ -678,8 +681,6 @@ export default function GameArena() {
       {/* Background Effects */}
       <View style={styles.backgroundEffects}>
         <View style={[styles.stadiumGradient, { backgroundColor: isDark ? '#0a1a11' : '#f0f4f8' }]} />
-        <View style={[styles.blurCircle1, { backgroundColor: isDark ? 'rgba(25,230,43,0.2)' : 'rgba(25,230,43,0.15)' }]} />
-        <View style={[styles.blurCircle2, { backgroundColor: isDark ? 'rgba(35,72,50,0.3)' : 'rgba(144,202,249,0.3)' }]} />
       </View>
 
       {renderHeader()}
@@ -716,24 +717,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-  },
-  blurCircle1: {
-    position: 'absolute',
-    top: '-10%',
-    right: '-10%',
-    width: 400,
-    height: 400,
-    borderRadius: 200,
-    opacity: 0.15,
-  },
-  blurCircle2: {
-    position: 'absolute',
-    bottom: '-10%',
-    left: '-10%',
-    width: 350,
-    height: 350,
-    borderRadius: 175,
-    opacity: 0.12,
   },
   header: {
     paddingTop: 16,
@@ -1001,7 +984,7 @@ const styles = StyleSheet.create({
       { translateY: -16 }, // Half of height approx
       { rotate: '-12deg' }
     ],
-    minWidth: 90,
+    minWidth: 110,
   },
   wicketPill: {
     backgroundColor: '#ef4444',
