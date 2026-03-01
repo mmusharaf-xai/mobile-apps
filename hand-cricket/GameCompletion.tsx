@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   Image,
   ScrollView,
@@ -15,6 +14,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from './ThemeContext';
 import { useUser } from './UserContext';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface GameCompletionParams {
   overs: number;
@@ -77,7 +77,7 @@ export default function GameCompletion() {
         {!isAndroid && <View style={[styles.dotPattern, { borderColor: colors.primary + '20' }]} />}
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, isAndroid && styles.scrollContentAndroid]} showsVerticalScrollIndicator={false}>
         <View style={[styles.glassPanel, { backgroundColor: isDark ? 'rgba(20,40,29,0.7)' : (isAndroid ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.5)'), borderColor: isDark ? 'rgba(100,150,120,0.35)' : 'rgba(255,255,255,0.7)' }]}
         >
           <View style={styles.trophyWrap}>
@@ -201,6 +201,9 @@ const styles = StyleSheet.create({
     paddingTop: 24,
     paddingBottom: 40,
     gap: 20,
+  },
+  scrollContentAndroid: {
+    paddingTop: 48,
   },
   glassPanel: {
     borderRadius: 40,
