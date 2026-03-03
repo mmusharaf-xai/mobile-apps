@@ -697,12 +697,12 @@ export default function HistoryScreen() {
     }
 
     try {
-      // Use pageLoading for pagination (not first load, not refresh)
-      const isPagination = !isRefresh && page > 1;
+      // Use pageLoading for any pagination (not first initial load, not refresh)
+      const isInitialLoad = page === 1 && matches.length === 0 && !isRefresh;
       
       if (isRefresh) {
         setRefreshing(true);
-      } else if (isPagination) {
+      } else if (!isInitialLoad) {
         setPageLoading(true);
       } else {
         setLoading(true);
@@ -721,7 +721,7 @@ export default function HistoryScreen() {
       setRefreshing(false);
       setPageLoading(false);
     }
-  }, [user?.userId]);
+  }, [user?.userId, matches.length]);
 
   // Initial load
   useEffect(() => {
@@ -829,12 +829,12 @@ export default function HistoryScreen() {
       >
         <Text
           style={{
-            fontSize: 18,
+            fontSize: Platform.OS === 'ios' ? 18 : 16,
             fontWeight: '900',
             color: colors.textPrimary,
             textTransform: 'uppercase',
-            fontStyle: 'italic',
-            letterSpacing: 1,
+            fontStyle: Platform.OS === 'ios' ? 'italic' : 'normal',
+            letterSpacing: Platform.OS === 'ios' ? 1 : 0.5,
             textAlign: 'center',
             includeFontPadding: false,
           }}

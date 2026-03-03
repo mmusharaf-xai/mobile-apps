@@ -177,13 +177,6 @@ export default function HomeScreen() {
                   </View>
                 </View>
               )}
-              {savedGame && savedGame.overs !== selectedOvers && (
-                <View style={{ backgroundColor: colors.surfaceBorder, borderRadius: 12, padding: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Text style={{ fontSize: 12, color: colors.textSecondary, flex: 1 }}>
-                    Starting a new {selectedOvers} over game will discard your saved progress
-                  </Text>
-                </View>
-              )}
               <View style={{ gap: 12 }}>
                 <Text style={{ fontSize: 10, fontWeight: 'bold', color: colors.textMuted, textTransform: 'uppercase', letterSpacing: 1, textAlign: 'center' }}>Select Match Duration</Text>
                 <View style={{ flexDirection: 'row', gap: 8 }}>
@@ -222,7 +215,13 @@ export default function HomeScreen() {
                   shadowRadius: 8,
                   elevation: 4,
                 }}
-                onPress={() => navigation.navigate('TossArena', { overs: selectedOvers })}
+                onPress={async () => {
+                  // Clear saved game if starting a new game with different overs
+                  if (savedGame && savedGame.overs !== selectedOvers) {
+                    await AsyncStorage.removeItem(GAME_STATE_KEY);
+                  }
+                  navigation.navigate('TossArena', { overs: selectedOvers });
+                }}
               >
                 <Text style={{ fontSize: 18, fontWeight: '900', color: colors.textPrimary, textTransform: 'uppercase', letterSpacing: 1 }}>Play Now</Text>
               </TouchableOpacity>
