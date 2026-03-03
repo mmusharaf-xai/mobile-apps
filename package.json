@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "drizzle-orm": "^0.45.1",
+    "expo-sqlite": "~55.0.10"
+  },
+  "devDependencies": {
+    "babel-plugin-inline-import": "^3.0.0",
+    "drizzle-kit": "^0.31.9",
+    "expo-drizzle-studio-plugin": "^0.2.1"
+  }
+}
