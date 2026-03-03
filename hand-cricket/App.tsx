@@ -15,6 +15,7 @@ import TossArena from './TossArena';
 import UpdatePassword from './UpdatePassword';
 import GameRules from './GameRules';
 import GameArena from './GameArena';
+import GameCompletion from './GameCompletion';
 import { MaterialIcons } from '@expo/vector-icons';
 
 const Stack = createNativeStackNavigator();
@@ -93,6 +94,7 @@ export default function App() {
             <Stack.Screen name="Main" component={TabNavigator} />
             <Stack.Screen name="TossArena" component={TossArena} />
             <Stack.Screen name="GameArena" component={GameArena} />
+            <Stack.Screen name="GameCompletion" component={GameCompletion} />
             <Stack.Screen name="UpdatePassword" component={UpdatePassword} />
             <Stack.Screen name="GameRules" component={GameRules} />
           </Stack.Navigator>
