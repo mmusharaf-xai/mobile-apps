@@ -16,6 +16,130 @@ import { initDb, matchService, type Match, type PaginatedMatches } from './db';
 
 const PAGE_SIZE = 10;
 
+// Skeleton Loader Component
+function SkeletonCard({ colors, isDark }: { colors: any; isDark: boolean }) {
+  return (
+    <View
+      style={{
+        backgroundColor: isDark ? colors.surface : '#ffffff',
+        borderRadius: 24,
+        padding: 20,
+        marginBottom: 16,
+        borderWidth: 1,
+        borderColor: isDark ? colors.surfaceBorder : '#e0e0e0',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: isDark ? 0.3 : 0.08,
+        shadowRadius: 12,
+        elevation: 3,
+      }}
+    >
+      {/* Top Row Skeleton */}
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 16,
+        }}
+      >
+        {/* Avatar Skeletons */}
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: 24,
+              backgroundColor: colors.surfaceBorder,
+              marginRight: -12,
+            }}
+          />
+          <View
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: 24,
+              backgroundColor: colors.surfaceBorder,
+            }}
+          />
+        </View>
+
+        {/* Result Badge Skeleton */}
+        <View
+          style={{
+            width: 60,
+            height: 28,
+            borderRadius: 14,
+            backgroundColor: colors.surfaceBorder,
+          }}
+        />
+      </View>
+
+      {/* Bottom Row Skeleton */}
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'flex-end',
+        }}
+      >
+        {/* Score Skeleton */}
+        <View>
+          <View
+            style={{
+              width: 100,
+              height: 14,
+              borderRadius: 4,
+              backgroundColor: colors.surfaceBorder,
+              marginBottom: 8,
+            }}
+          />
+          <View
+            style={{
+              width: 140,
+              height: 28,
+              borderRadius: 4,
+              backgroundColor: colors.surfaceBorder,
+            }}
+          />
+        </View>
+
+        {/* Duration Skeleton */}
+        <View style={{ alignItems: 'flex-end' }}>
+          <View
+            style={{
+              width: 80,
+              height: 10,
+              borderRadius: 4,
+              backgroundColor: colors.surfaceBorder,
+              marginBottom: 6,
+            }}
+          />
+          <View
+            style={{
+              width: 100,
+              height: 24,
+              borderRadius: 8,
+              backgroundColor: colors.surfaceBorder,
+            }}
+          />
+        </View>
+      </View>
+    </View>
+  );
+}
+
+// Skeleton List Component
+function SkeletonList({ count, colors, isDark }: { count: number; colors: any; isDark: boolean }) {
+  return (
+    <>
+      {Array.from({ length: count }).map((_, index) => (
+        <SkeletonCard key={index} colors={colors} isDark={isDark} />
+      ))}
+    </>
+  );
+}
+
 // Avatar component with tooltip
 interface AvatarWithTooltipProps {
   avatarUrl?: string;
@@ -548,6 +672,7 @@ export default function HistoryScreen() {
   const [pagination, setPagination] = useState<PaginatedMatches | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(false); // For pagination loading
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -572,7 +697,14 @@ export default function HistoryScreen() {
     }
 
     try {
-      if (!isRefresh) {
+      // Use pageLoading for pagination (not first load, not refresh)
+      const isPagination = !isRefresh && page > 1;
+      
+      if (isRefresh) {
+        setRefreshing(true);
+      } else if (isPagination) {
+        setPageLoading(true);
+      } else {
         setLoading(true);
       }
       setError(null);
@@ -587,6 +719,7 @@ export default function HistoryScreen() {
     } finally {
       setLoading(false);
       setRefreshing(false);
+      setPageLoading(false);
     }
   }, [user?.userId]);
 
@@ -614,8 +747,8 @@ export default function HistoryScreen() {
     }
   }, [currentPage, pagination?.hasPrevPage, loadMatches]);
 
-  // Loading state
-  if (loading && !refreshing) {
+  // Loading state (only for initial load)
+  if (loading && !refreshing && !pageLoading) {
     return (
       <View
         style={{
@@ -724,7 +857,7 @@ export default function HistoryScreen() {
       )}
 
       {/* Match List */}
-      {matches.length === 0 ? (
+      {matches.length === 0 && !pageLoading ? (
         <EmptyState colors={colors} />
       ) : (
         <ScrollView
@@ -743,14 +876,18 @@ export default function HistoryScreen() {
           }
           showsVerticalScrollIndicator={false}
         >
-          {matches.map((match) => (
-            <MatchCard
-              key={match.id}
-              match={match}
-              colors={colors}
-              isDark={isDark}
-            />
-          ))}
+          {pageLoading ? (
+            <SkeletonList count={PAGE_SIZE} colors={colors} isDark={isDark} />
+          ) : (
+            matches.map((match) => (
+              <MatchCard
+                key={match.id}
+                match={match}
+                colors={colors}
+                isDark={isDark}
+              />
+            ))
+          )}
         </ScrollView>
       )}
     </View>

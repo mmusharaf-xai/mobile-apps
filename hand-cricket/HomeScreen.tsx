@@ -54,7 +54,7 @@ export default function HomeScreen() {
         const parsed = JSON.parse(savedGameData);
         if (!parsed.gameState?.gameOver) {
           setSavedGame(parsed);
-          setSelectedOvers(parsed.overs);
+          // Don't auto-select overs - let user choose
         } else {
           setSavedGame(null);
         }
@@ -175,6 +175,13 @@ export default function HomeScreen() {
                       <Text style={{ fontSize: 14, fontWeight: '900', color: colors.textPrimary, textTransform: 'uppercase', letterSpacing: 1 }}>Resume</Text>
                     </TouchableOpacity>
                   </View>
+                </View>
+              )}
+              {savedGame && savedGame.overs !== selectedOvers && (
+                <View style={{ backgroundColor: colors.surfaceBorder, borderRadius: 12, padding: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Text style={{ fontSize: 12, color: colors.textSecondary, flex: 1 }}>
+                    Starting a new {selectedOvers} over game will discard your saved progress
+                  </Text>
                 </View>
               )}
               <View style={{ gap: 12 }}>
