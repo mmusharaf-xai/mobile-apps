@@ -83,7 +83,17 @@ export default function TossArena() {
   }, [currentScreen, startCoinFlip]);
 
   const handleStartMatch = () => {
-    navigation.navigate('GameArena', { overs });
+    // Determine who bats first based on toss result
+    // If user won toss and chose to bat, or bot won toss and chose to ball, user bats first
+    // If user won toss and chose to ball, or bot won toss and chose to bat, bot bats first
+    let userBattingFirst: boolean;
+    if (userWonToss) {
+      userBattingFirst = chosenAction === 'bat';
+    } else {
+      // Bot won toss - if bot chose to bat, user bowls (userBattingFirst = false)
+      userBattingFirst = botAction === 'ball';
+    }
+    navigation.navigate('GameArena', { overs, userBattingFirst });
   };
 
   // Handle bat/ball choice (screen 2 when user wins toss)

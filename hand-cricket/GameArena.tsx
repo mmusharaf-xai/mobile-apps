@@ -6,9 +6,9 @@ import {
   StyleSheet,
   ScrollView,
   Dimensions,
-  SafeAreaView,
   Image,
   Platform,
+  BackHandler,
 } from 'react-native';
 import { useTheme } from './ThemeContext';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
@@ -17,6 +17,7 @@ import Svg, { Circle } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useUser } from './UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -52,6 +53,7 @@ export default function GameArena() {
   const route = useRoute();
   const overs = (route.params as any)?.overs || 5;
   const isResume = (route.params as any)?.resume || false;
+  const userBattingFirst = (route.params as any)?.userBattingFirst;
 
   // Load saved game state on mount
   const [gameState, setGameState] = useState<GameState>({
@@ -65,7 +67,7 @@ export default function GameArena() {
     botBalls: 0,
     target: null,
     isFirstInnings: true,
-    userBatting: true,
+    userBatting: userBattingFirst !== undefined ? userBattingFirst : true,
     gameOver: false,
     winner: null,
   });
@@ -393,6 +395,17 @@ export default function GameArena() {
     statsUpdatedRef.current = true;
   }, [gameState.gameOver, gameState.winner, updateUser, user]);
 
+  // Handle back button - navigate to Home instead of previous screen
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      // Navigate to Home screen when back is pressed
+      navigation.navigate('Home' as never);
+      return true; // Prevent default behavior
+    });
+
+    return () => backHandler.remove();
+  }, [navigation]);
+
   const handleMoveSelect = useCallback((number: number) => {
     if (userSelectedNumber !== null || isBotThinking || gameState.gameOver) return;
 
@@ -437,22 +450,23 @@ export default function GameArena() {
   };
 
   // Platform-specific glass effect colors
-  // Android needs different alpha values because it renders transparency differently
+  // Android needs solid white backgrounds for cards
   const isAndroid = Platform.OS === 'android';
   const glassBg = isDark 
-    ? (isAndroid ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.08)')
-    : (isAndroid ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.4)');
+    ? (isAndroid ? 'rgba(30,45,35,0.95)' : 'rgba(255,255,255,0.08)')
+    : (isAndroid ? '#ffffff' : 'rgba(255,255,255,0.4)');
   const glassBorder = isDark 
     ? (isAndroid ? 'rgba(100,150,120,0.3)' : 'rgba(255,255,255,0.15)')
-    : (isAndroid ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.6)');
+    : (isAndroid ? '#e5e5e5' : 'rgba(255,255,255,0.6)');
   const glassButtonBg = isDark 
     ? (isAndroid ? 'rgba(50,70,60,0.6)' : 'rgba(255,255,255,0.1)')
-    : (isAndroid ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.5)');
+    : (isAndroid ? '#ffffff' : 'rgba(255,255,255,0.5)');
 
   const renderHeader = () => (
     <View style={[styles.header, { 
       backgroundColor: isDark ? 'rgba(10,26,17,0.3)' : 'rgba(255,255,255,0.3)',
       borderBottomColor: glassBorder,
+      paddingTop: isAndroid ? 24 : 16,
     }]}>
       <View style={styles.headerContent}>
         <MaterialIcons name="sports-cricket" size={28} color={colors.primary} />
