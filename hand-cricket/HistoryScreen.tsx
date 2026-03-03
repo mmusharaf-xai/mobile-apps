@@ -62,7 +62,7 @@ function AvatarWithTooltip({ avatarUrl, avatarIcon, name, isUser = false, colors
           borderWidth: 2,
           borderColor: '#fff',
           overflow: 'hidden',
-          backgroundColor: isUser ? colors.primary + '20' : '#f1f5f9',
+          backgroundColor: '#ffffff',
           alignItems: 'center',
           justifyContent: 'center',
           shadowColor: '#000',
@@ -73,7 +73,15 @@ function AvatarWithTooltip({ avatarUrl, avatarIcon, name, isUser = false, colors
         }}
       >
         {isUser && hasValidIcon ? (
-          <MaterialIcons name={avatarIcons[avatarIcon!] as any} size={24} color={colors.primary} />
+          <View style={{ 
+            width: '100%', 
+            height: '100%', 
+            backgroundColor: colors.primary + '15',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <MaterialIcons name={avatarIcons[avatarIcon!] as any} size={24} color={colors.primary} />
+          </View>
         ) : (
           <MaterialIcons name="smart-toy" size={24} color={isUser ? colors.primary : '#64748b'} />
         )}
@@ -378,12 +386,13 @@ function Pagination({
           alignItems: 'center',
           justifyContent: 'center',
           height: 44,
-          paddingHorizontal: 16,
+          paddingHorizontal: 12,
           borderRadius: 16,
-          backgroundColor: hasPrevPage ? colors.surface : colors.surface,
+          backgroundColor: colors.surface,
           borderWidth: hasPrevPage ? 2 : 1,
           borderColor: hasPrevPage ? colors.primary : colors.surfaceBorder,
           opacity: hasPrevPage ? 1 : 0.5,
+          minWidth: 80,
         }}
       >
         <MaterialIcons
@@ -396,8 +405,9 @@ function Pagination({
             fontSize: 10,
             fontWeight: hasPrevPage ? '900' : '700',
             color: hasPrevPage ? colors.primary : colors.textSecondary,
-            marginLeft: 4,
             textTransform: 'uppercase',
+            textAlign: 'center',
+            includeFontPadding: false,
           }}
         >
           Prev
@@ -449,12 +459,13 @@ function Pagination({
           alignItems: 'center',
           justifyContent: 'center',
           height: 44,
-          paddingHorizontal: 16,
+          paddingHorizontal: 12,
           borderRadius: 16,
-          backgroundColor: hasNextPage ? colors.surface : colors.surface,
+          backgroundColor: colors.surface,
           borderWidth: hasNextPage ? 2 : 1,
           borderColor: hasNextPage ? colors.primary : colors.surfaceBorder,
           opacity: hasNextPage ? 1 : 0.5,
+          minWidth: 80,
         }}
       >
         <Text
@@ -462,8 +473,9 @@ function Pagination({
             fontSize: 10,
             fontWeight: hasNextPage ? '900' : '700',
             color: hasNextPage ? colors.primary : colors.textSecondary,
-            marginRight: 4,
             textTransform: 'uppercase',
+            textAlign: 'center',
+            includeFontPadding: false,
           }}
         >
           Next
@@ -671,13 +683,15 @@ export default function HistoryScreen() {
       {/* Header */}
       <View
         style={{
-          paddingTop: Platform.OS === 'ios' ? 60 : 40,
+          paddingTop: Platform.OS === 'ios' ? 60 : 20,
           paddingHorizontal: 16,
           paddingBottom: 16,
           backgroundColor: colors.background,
           alignItems: 'center',
+          justifyContent: 'center',
           borderBottomWidth: 1,
           borderBottomColor: colors.surfaceBorder,
+          minHeight: Platform.OS === 'ios' ? 100 : 80,
         }}
       >
         <Text
@@ -688,6 +702,8 @@ export default function HistoryScreen() {
             textTransform: 'uppercase',
             fontStyle: 'italic',
             letterSpacing: 1,
+            textAlign: 'center',
+            includeFontPadding: false,
           }}
         >
           Match History
