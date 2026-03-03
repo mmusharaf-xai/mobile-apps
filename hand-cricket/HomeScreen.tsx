@@ -1,16 +1,54 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, Image, ImageBackground, ScrollView, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from './ThemeContext';
 import { useUser } from './UserContext';
+import { initDb, matchService } from './db';
 
 export default function HomeScreen() {
   const { colors, isDark } = useTheme();
-  const { user, setUser } = useUser(); // Global user from context (auto-synced)
+  const { user, updateUser } = useUser(); // Global user from context (auto-synced)
   const [selectedOvers, setSelectedOvers] = useState(1);
   const navigation = useNavigation();
+
+  // Fetch and cache stats
+  const refreshStats = useCallback(async () => {
+    if (!user?.userId) return;
+
+    try {
+      await initDb();
+      const stats = await matchService.getMatchStats(user.userId);
+      
+      // Update global context and local storage
+      const updates = {
+        played: stats.totalMatches,
+        wins: stats.wins,
+      };
+      
+      await updateUser(updates);
+      
+      // Explicitly cache in local storage for redundancy/quick access if needed
+      await AsyncStorage.setItem(`stats_${user.userId}`, JSON.stringify(updates));
+    } catch (error) {
+      console.error('Failed to refresh stats:', error);
+      
+      // Try to load from cache if DB fails
+      const cachedStats = await AsyncStorage.getItem(`stats_${user.userId}`);
+      if (cachedStats) {
+        updateUser(JSON.parse(cachedStats));
+      }
+    }
+  }, [user?.userId, updateUser]);
+
+  // Refresh stats whenever screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      refreshStats();
+    }, [refreshStats])
+  );
 
   // Redirect if no user (in effect to avoid render update error)
   useEffect(() => {

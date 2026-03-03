@@ -159,17 +159,17 @@ function MatchCard({ match, colors, isDark }: MatchCardProps) {
   return (
     <View
       style={{
-        backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.7)',
+        backgroundColor: isDark ? colors.surface : '#ffffff',
         borderRadius: 24,
         padding: 20,
         marginBottom: 16,
         borderWidth: 1,
-        borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.5)',
+        borderColor: isDark ? colors.surfaceBorder : '#e0e0e0',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: isDark ? 0.2 : 0.05,
-        shadowRadius: 8,
-        elevation: 2,
+        shadowOpacity: isDark ? 0.3 : 0.08,
+        shadowRadius: 12,
+        elevation: 3,
       }}
     >
       {/* Top Row: Avatars and Result */}
