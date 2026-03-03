@@ -93,7 +93,7 @@ export default function TossArena() {
       // Bot won toss - if bot chose to bat, user bowls (userBattingFirst = false)
       userBattingFirst = botAction === 'ball';
     }
-    navigation.navigate('GameArena', { overs, userBattingFirst });
+    navigation.replace('GameArena', { overs, userBattingFirst });
   };
 
   // Handle bat/ball choice (screen 2 when user wins toss)

@@ -147,53 +147,57 @@ export default function GameArena() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const botTimerRef = useRef<NodeJS.Timeout | null>(null);
   const eventTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const navTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const resetTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const radius = 36;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference * (1 - timerProgress / 100);
 
-  // Clear timers on unmount
+  // Clear ALL timers on unmount
   useEffect(() => {
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      if (timerRef.current) clearTimeout(timerRef.current);
       if (botTimerRef.current) clearTimeout(botTimerRef.current);
       if (eventTimerRef.current) clearTimeout(eventTimerRef.current);
+      if (pulseTimerRef.current) clearTimeout(pulseTimerRef.current);
+      if (navTimerRef.current) clearTimeout(navTimerRef.current);
+      if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
     };
   }, []);
 
-  // Timer countdown effect
-  useEffect(() => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
-    
-    if (isBotThinking || userSelectedNumber !== null || gameState.gameOver) {
-      return;
-    }
+  // Timer countdown effect - only run when focused
+  useFocusEffect(
+    useCallback(() => {
+      if (isBotThinking || userSelectedNumber !== null || gameState.gameOver) {
+        if (timerRef.current) clearTimeout(timerRef.current);
+        return;
+      }
 
-    setTimeLeft(10);
-    setTimerProgress(100);
-    
-    let time = 10;
-    const tick = () => {
-      time -= 1;
-      setTimeLeft(time);
-      setTimerProgress((time / 10) * 100);
-      if (time > 0) {
-        timerRef.current = setTimeout(tick, 1000);
-      } else {
-        // Auto-select random number when timer runs out
-        handleMoveSelect(Math.floor(Math.random() * 6) + 1);
-      }
-    };
-    timerRef.current = setTimeout(tick, 1000);
-    
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-    };
-  }, [isBotThinking, userSelectedNumber, gameState.gameOver]);
+      setTimeLeft(10);
+      setTimerProgress(100);
+      
+      let time = 10;
+      const tick = () => {
+        time -= 1;
+        setTimeLeft(time);
+        setTimerProgress((time / 10) * 100);
+        if (time > 0) {
+          timerRef.current = setTimeout(tick, 1000);
+        } else {
+          // Auto-select random number when timer runs out
+          handleMoveSelect(Math.floor(Math.random() * 6) + 1);
+        }
+      };
+      timerRef.current = setTimeout(tick, 1000);
+      
+      return () => {
+        if (timerRef.current) {
+          clearTimeout(timerRef.current);
+        }
+      };
+    }, [isBotThinking, userSelectedNumber, gameState.gameOver, handleMoveSelect])
+  );
 
   // Process game logic after both players have selected
   const processGameLogic = useCallback((userNum: number, botNum: number) => {
@@ -284,7 +288,8 @@ export default function GameArena() {
       }
       
       if (newState.gameOver) {
-        setTimeout(() => {
+        if (navTimerRef.current) clearTimeout(navTimerRef.current);
+        navTimerRef.current = setTimeout(() => {
           navigation.navigate('GameCompletion' as never, {
             overs,
             userScore: newState.userScore,
@@ -364,7 +369,8 @@ export default function GameArena() {
       }
 
       if (newState.gameOver) {
-        setTimeout(() => {
+        if (navTimerRef.current) clearTimeout(navTimerRef.current);
+        navTimerRef.current = setTimeout(() => {
           navigation.navigate('GameCompletion' as never, {
             overs,
             userScore: newState.userScore,
@@ -402,11 +408,14 @@ export default function GameArena() {
     statsUpdatedRef.current = true;
   }, [gameState.gameOver, gameState.winner, updateUser, user]);
 
-  // Handle back button - navigate to Home instead of previous screen
+  // Handle back button - navigate to Home and clear stack
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-      // Navigate to Main screen (which contains the Home tab) when back is pressed
-      navigation.navigate('Main' as never);
+      // Navigate to Main screen and reset stack to prevent "stacking" games
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Main' as never }],
+      });
       return true; // Prevent default behavior
     });
 
@@ -433,7 +442,8 @@ export default function GameArena() {
       processGameLogic(number, botNumber);
       
       // Reset for next turn after showing result
-      setTimeout(() => {
+      if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+      resetTimerRef.current = setTimeout(() => {
         setUserSelectedNumber(null);
         setBotSelectedNumber(null);
         setSelectedMove(null);

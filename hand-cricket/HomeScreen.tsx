@@ -25,26 +25,31 @@ export default function HomeScreen() {
       await initDb();
       const stats = await matchService.getMatchStats(user.userId);
       
-      // Update global context and local storage
-      const updates = {
-        played: stats.totalMatches,
-        wins: stats.wins,
-      };
-      
-      await updateUser(updates);
-      
-      // Explicitly cache in local storage for redundancy/quick access if needed
-      await AsyncStorage.setItem(`stats_${user.userId}`, JSON.stringify(updates));
+      // Only update if stats have actually changed to avoid infinite loops
+      if (user.played !== stats.totalMatches || user.wins !== stats.wins) {
+        const updates = {
+          played: stats.totalMatches,
+          wins: stats.wins,
+        };
+        
+        await updateUser(updates);
+        
+        // Explicitly cache in local storage for redundancy/quick access if needed
+        await AsyncStorage.setItem(`stats_${user.userId}`, JSON.stringify(updates));
+      }
     } catch (error) {
       console.error('Failed to refresh stats:', error);
       
       // Try to load from cache if DB fails
       const cachedStats = await AsyncStorage.getItem(`stats_${user.userId}`);
       if (cachedStats) {
-        updateUser(JSON.parse(cachedStats));
+        const parsed = JSON.parse(cachedStats);
+        if (user.played !== parsed.played || user.wins !== parsed.wins) {
+          updateUser(parsed);
+        }
       }
     }
-  }, [user?.userId, updateUser]);
+  }, [user?.userId, user?.played, user?.wins, updateUser]);
 
   // Check for saved game
   const checkSavedGame = useCallback(async () => {
