@@ -398,8 +398,8 @@ export default function GameArena() {
   // Handle back button - navigate to Home instead of previous screen
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-      // Navigate to Home screen when back is pressed
-      navigation.navigate('Home' as never);
+      // Navigate to Main screen (which contains the Home tab) when back is pressed
+      navigation.navigate('Main' as never);
       return true; // Prevent default behavior
     });
 
