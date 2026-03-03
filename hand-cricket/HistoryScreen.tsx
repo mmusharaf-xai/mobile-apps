@@ -697,19 +697,22 @@ export default function HistoryScreen() {
     }
 
     try {
-      // Use pageLoading for any pagination (not first initial load, not refresh)
-      const isInitialLoad = page === 1 && matches.length === 0 && !isRefresh;
-      
+      // Determine loading state
       if (isRefresh) {
         setRefreshing(true);
-      } else if (!isInitialLoad) {
+      } else if (matches.length > 0) {
+        // If we already have matches, show page loader/skeleton
         setPageLoading(true);
       } else {
+        // First ever load
         setLoading(true);
       }
+      
       setError(null);
 
       const result = await matchService.getMatches(user.userId, page);
+      
+      // Update states in one go
       setMatches(result.matches);
       setPagination(result);
       setCurrentPage(page);
@@ -721,12 +724,13 @@ export default function HistoryScreen() {
       setRefreshing(false);
       setPageLoading(false);
     }
-  }, [user?.userId, matches.length]);
+  }, [user?.userId, matches.length]); // Removed loading dependency to prevent recreation while loading
 
   // Initial load
   useEffect(() => {
     loadMatches(1);
-  }, [loadMatches]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
   // Handle refresh
   const handleRefresh = useCallback(() => {
@@ -736,16 +740,16 @@ export default function HistoryScreen() {
 
   // Handle page navigation
   const handleNextPage = useCallback(() => {
-    if (pagination?.hasNextPage) {
+    if (pagination?.hasNextPage && !loading && !pageLoading && !refreshing) {
       loadMatches(currentPage + 1);
     }
-  }, [currentPage, pagination?.hasNextPage, loadMatches]);
+  }, [currentPage, pagination?.hasNextPage, loading, pageLoading, refreshing, loadMatches]);
 
   const handlePrevPage = useCallback(() => {
-    if (pagination?.hasPrevPage) {
+    if (pagination?.hasPrevPage && !loading && !pageLoading && !refreshing) {
       loadMatches(currentPage - 1);
     }
-  }, [currentPage, pagination?.hasPrevPage, loadMatches]);
+  }, [currentPage, pagination?.hasPrevPage, loading, pageLoading, refreshing, loadMatches]);
 
   // Loading state (only for initial load)
   if (loading && !refreshing && !pageLoading) {

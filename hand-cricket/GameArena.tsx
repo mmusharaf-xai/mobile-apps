@@ -72,12 +72,15 @@ export default function GameArena() {
     winner: null,
   });
 
+  const [isLoaded, setIsLoaded] = useState(false);
+
   // Load saved game state only if resuming
   useEffect(() => {
     const loadSavedGame = async () => {
       if (!isResume) {
-        // Start fresh - clear any saved game for this overs setting
+        // Start fresh - clear any saved game
         await AsyncStorage.removeItem(GAME_STATE_KEY);
+        setIsLoaded(true);
         return;
       }
 
@@ -95,13 +98,17 @@ export default function GameArena() {
         }
       } catch (err) {
         console.error('Failed to load saved game:', err);
+      } finally {
+        setIsLoaded(true);
       }
     };
     loadSavedGame();
   }, [overs, isResume]);
 
-  // Save game state whenever it changes
+  // Save game state whenever it changes, but only after loading is complete
   useEffect(() => {
+    if (!isLoaded) return;
+
     const saveGame = async () => {
       try {
         if (!gameState.gameOver) {
@@ -119,7 +126,7 @@ export default function GameArena() {
       }
     };
     saveGame();
-  }, [gameState, overs]);
+  }, [gameState, overs, isLoaded]);
 
   // Timer state
   const [timeLeft, setTimeLeft] = useState(10);

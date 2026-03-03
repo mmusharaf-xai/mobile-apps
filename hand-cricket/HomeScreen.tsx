@@ -216,8 +216,9 @@ export default function HomeScreen() {
                   elevation: 4,
                 }}
                 onPress={async () => {
-                  // Clear saved game if starting a new game with different overs
-                  if (savedGame && savedGame.overs !== selectedOvers) {
+                  // Always clear saved game when starting a new game via "Play Now"
+                  if (savedGame) {
+                    setSavedGame(null);
                     await AsyncStorage.removeItem(GAME_STATE_KEY);
                   }
                   navigation.navigate('TossArena', { overs: selectedOvers });
