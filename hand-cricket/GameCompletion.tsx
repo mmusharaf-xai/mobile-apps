@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   ScrollView,
   Platform,
   StatusBar,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -15,6 +16,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from './ThemeContext';
 import { useUser } from './UserContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { initDb, matchService } from './db';
 
 interface GameCompletionParams {
   overs: number;
@@ -46,6 +48,51 @@ export default function GameCompletion() {
     botBalls,
     winner,
   } = (route.params || {}) as GameCompletionParams;
+
+  const [savingMatch, setSavingMatch] = useState(true);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const matchSavedRef = useRef(false);
+
+  // Save match to database
+  useEffect(() => {
+    const saveMatch = async () => {
+      if (matchSavedRef.current || !user?.userId) {
+        setSavingMatch(false);
+        return;
+      }
+
+      try {
+        await initDb();
+        
+        await matchService.createMatch({
+          userId: user.userId,
+          userName: user.username || 'You',
+          userAvatar: user.avatar,
+          opponentName: 'Bot',
+          opponentAvatar: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=100&h=100&fit=crop',
+          userScore: userScore || 0,
+          userWickets: userWickets || 0,
+          opponentScore: botScore || 0,
+          opponentWickets: botWickets || 0,
+          userOvers: userOvers || 0,
+          userBalls: userBalls || 0,
+          opponentOvers: botOvers || 0,
+          opponentBalls: botBalls || 0,
+          totalOvers: overs || 1,
+          winner: winner === 'user' ? 'user' : 'opponent',
+        });
+        
+        matchSavedRef.current = true;
+        setSavingMatch(false);
+      } catch (err) {
+        console.error('Failed to save match:', err);
+        setSaveError('Failed to save match history');
+        setSavingMatch(false);
+      }
+    };
+
+    saveMatch();
+  }, [user?.userId, user?.username, user?.avatar, userScore, userWickets, botScore, botWickets, userOvers, userBalls, botOvers, botBalls, overs, winner]);
 
   const title = winner === 'user' ? 'Congratulations!' : 'Good Effort!';
   const resultLine = winner === 'user'
@@ -96,6 +143,32 @@ export default function GameCompletion() {
           <View style={styles.titleBlock}>
             <Text style={[styles.title, { color: colors.textPrimary }]}>{title}</Text>
             <Text style={[styles.resultLine, { color: colors.primary }]}>{resultLine}</Text>
+            
+            {/* Save Status Indicator */}
+            {savingMatch && (
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
+                <ActivityIndicator size="small" color={colors.primary} />
+                <Text style={{ fontSize: 12, color: colors.textSecondary, marginLeft: 8 }}>
+                  Saving to history...
+                </Text>
+              </View>
+            )}
+            {saveError && (
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
+                <MaterialIcons name="error-outline" size={14} color="#ef4444" />
+                <Text style={{ fontSize: 12, color: '#ef4444', marginLeft: 4 }}>
+                  {saveError}
+                </Text>
+              </View>
+            )}
+            {!savingMatch && !saveError && matchSavedRef.current && (
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
+                <MaterialIcons name="check-circle" size={14} color={colors.primary} />
+                <Text style={{ fontSize: 12, color: colors.primary, marginLeft: 4 }}>
+                  Saved to history
+                </Text>
+              </View>
+            )}
           </View>
 
           <View style={[styles.scoreCard, { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : (isAndroid ? 'rgba(255,255,255,0.98)' : 'rgba(255,255,255,0.2)'), borderColor: isDark ? 'rgba(255,255,255,0.12)' : (isAndroid ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.4)') }]}
