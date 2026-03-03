@@ -11,11 +11,12 @@ import {
   Platform,
 } from 'react-native';
 import { useTheme } from './ThemeContext';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Svg, { Circle } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useUser } from './UserContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -39,8 +40,10 @@ interface GameState {
   isFirstInnings: boolean;
   userBatting: boolean;
   gameOver: boolean;
-  winner: 'user' | 'bot' | null;
+  winner: 'user' | 'bot' | 'tie' | null;
 }
+
+const GAME_STATE_KEY = 'handcricket_saved_game';
 
 export default function GameArena() {
   const { colors, isDark } = useTheme();
@@ -48,8 +51,9 @@ export default function GameArena() {
   const navigation = useNavigation();
   const route = useRoute();
   const overs = (route.params as any)?.overs || 5;
+  const isResume = (route.params as any)?.resume || false;
 
-  // Game state - start fresh with first innings
+  // Load saved game state on mount
   const [gameState, setGameState] = useState<GameState>({
     userScore: 0,
     userWickets: 0,
@@ -61,10 +65,59 @@ export default function GameArena() {
     botBalls: 0,
     target: null,
     isFirstInnings: true,
-    userBatting: true, // User bats first
+    userBatting: true,
     gameOver: false,
     winner: null,
   });
+
+  // Load saved game state only if resuming
+  useEffect(() => {
+    const loadSavedGame = async () => {
+      if (!isResume) {
+        // Start fresh - clear any saved game for this overs setting
+        await AsyncStorage.removeItem(GAME_STATE_KEY);
+        return;
+      }
+
+      try {
+        const savedGame = await AsyncStorage.getItem(GAME_STATE_KEY);
+        if (savedGame) {
+          const parsed = JSON.parse(savedGame);
+          // Only restore if game is not over and overs match
+          if (!parsed.gameState.gameOver && parsed.overs === overs) {
+            setGameState(parsed.gameState);
+          } else {
+            // Clear saved game if it's over or overs don't match
+            await AsyncStorage.removeItem(GAME_STATE_KEY);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load saved game:', err);
+      }
+    };
+    loadSavedGame();
+  }, [overs, isResume]);
+
+  // Save game state whenever it changes
+  useEffect(() => {
+    const saveGame = async () => {
+      try {
+        if (!gameState.gameOver) {
+          await AsyncStorage.setItem(GAME_STATE_KEY, JSON.stringify({
+            gameState,
+            overs,
+            timestamp: Date.now(),
+          }));
+        } else {
+          // Clear saved game when it's over
+          await AsyncStorage.removeItem(GAME_STATE_KEY);
+        }
+      } catch (err) {
+        console.error('Failed to save game:', err);
+      }
+    };
+    saveGame();
+  }, [gameState, overs]);
 
   // Timer state
   const [timeLeft, setTimeLeft] = useState(10);
@@ -259,9 +312,13 @@ export default function GameArena() {
               }
               pulseTimerRef.current = setTimeout(() => setInningsPulse(false), 700);
             } else {
-              // Second innings complete without chasing target - bowler wins
+              // Second innings complete - check for tie
               newState.gameOver = true;
-              newState.winner = 'bot';
+              if (newState.userScore === newState.botScore) {
+                newState.winner = 'tie';
+              } else {
+                newState.winner = newState.userScore > newState.botScore ? 'user' : 'bot';
+              }
             }
           }
         }
@@ -285,9 +342,13 @@ export default function GameArena() {
               }
               pulseTimerRef.current = setTimeout(() => setInningsPulse(false), 700);
             } else {
-              // Second innings complete without chasing target - bowler wins
+              // Second innings complete - check for tie
               newState.gameOver = true;
-              newState.winner = 'user';
+              if (newState.userScore === newState.botScore) {
+                newState.winner = 'tie';
+              } else {
+                newState.winner = newState.userScore > newState.botScore ? 'user' : 'bot';
+              }
             }
           }
         }

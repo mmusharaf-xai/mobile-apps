@@ -28,7 +28,7 @@ interface GameCompletionParams {
   userBalls: number;
   botOvers: number;
   botBalls: number;
-  winner: 'user' | 'bot' | null;
+  winner: 'user' | 'bot' | 'tie' | null;
 }
 
 export default function GameCompletion() {
@@ -79,7 +79,7 @@ export default function GameCompletion() {
           opponentOvers: botOvers || 0,
           opponentBalls: botBalls || 0,
           totalOvers: overs || 1,
-          winner: winner === 'user' ? 'user' : 'opponent',
+          winner: winner === 'user' ? 'user' : winner === 'tie' ? 'draw' : 'opponent',
         });
         
         matchSavedRef.current = true;
@@ -94,9 +94,11 @@ export default function GameCompletion() {
     saveMatch();
   }, [user?.userId, user?.username, user?.avatar, userScore, userWickets, botScore, botWickets, userOvers, userBalls, botOvers, botBalls, overs, winner]);
 
-  const title = winner === 'user' ? 'Congratulations!' : 'Good Effort!';
+  const title = winner === 'user' ? 'Congratulations!' : winner === 'tie' ? 'Match Tied!' : 'Good Effort!';
   const resultLine = winner === 'user'
     ? `You Won By ${Math.max(userScore - botScore, 1)} Runs`
+    : winner === 'tie'
+    ? `Both teams scored ${userScore} runs`
     : `Bot Won By ${Math.max(botScore - userScore, 1)} Runs`;
 
   const oversPlayed = useMemo(() => {

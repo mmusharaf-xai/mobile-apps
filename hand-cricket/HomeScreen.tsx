@@ -8,10 +8,13 @@ import { useTheme } from './ThemeContext';
 import { useUser } from './UserContext';
 import { initDb, matchService } from './db';
 
+const GAME_STATE_KEY = 'handcricket_saved_game';
+
 export default function HomeScreen() {
   const { colors, isDark } = useTheme();
   const { user, updateUser } = useUser(); // Global user from context (auto-synced)
   const [selectedOvers, setSelectedOvers] = useState(1);
+  const [savedGame, setSavedGame] = useState<{ gameState: any; overs: number } | null>(null);
   const navigation = useNavigation();
 
   // Fetch and cache stats
@@ -43,11 +46,33 @@ export default function HomeScreen() {
     }
   }, [user?.userId, updateUser]);
 
-  // Refresh stats whenever screen comes into focus
+  // Check for saved game
+  const checkSavedGame = useCallback(async () => {
+    try {
+      const savedGameData = await AsyncStorage.getItem(GAME_STATE_KEY);
+      if (savedGameData) {
+        const parsed = JSON.parse(savedGameData);
+        if (!parsed.gameState?.gameOver) {
+          setSavedGame(parsed);
+          setSelectedOvers(parsed.overs);
+        } else {
+          setSavedGame(null);
+        }
+      } else {
+        setSavedGame(null);
+      }
+    } catch (err) {
+      console.error('Failed to check saved game:', err);
+      setSavedGame(null);
+    }
+  }, []);
+
+  // Refresh stats and check saved game whenever screen comes into focus
   useFocusEffect(
     useCallback(() => {
       refreshStats();
-    }, [refreshStats])
+      checkSavedGame();
+    }, [refreshStats, checkSavedGame])
   );
 
   // Redirect if no user (in effect to avoid render update error)
@@ -125,6 +150,33 @@ export default function HomeScreen() {
               <Text style={{ fontSize: 24, fontWeight: '900', fontStyle: 'italic', color: colors.textPrimary, textTransform: 'uppercase', letterSpacing: 1 }}>Bot Match</Text>
             </ImageBackground>
             <View style={{ padding: 20, gap: 20 }}>
+              {savedGame && (
+                <View style={{ backgroundColor: colors.primary + '15', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: colors.primary + '30' }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <View>
+                      <Text style={{ fontSize: 12, fontWeight: 'bold', color: colors.primary, textTransform: 'uppercase', letterSpacing: 1 }}>Match In Progress</Text>
+                      <Text style={{ fontSize: 14, color: colors.textSecondary, marginTop: 4 }}>
+                        {savedGame.gameState.userScore} - {savedGame.gameState.botScore} • {savedGame.overs} Overs
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: colors.primary,
+                        paddingHorizontal: 20,
+                        paddingVertical: 10,
+                        borderRadius: 20,
+                        shadowColor: colors.primary,
+                        shadowOpacity: 0.3,
+                        shadowRadius: 4,
+                        elevation: 2,
+                      }}
+                      onPress={() => navigation.navigate('GameArena', { overs: savedGame.overs, resume: true })}
+                    >
+                      <Text style={{ fontSize: 14, fontWeight: '900', color: colors.textPrimary, textTransform: 'uppercase', letterSpacing: 1 }}>Resume</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
               <View style={{ gap: 12 }}>
                 <Text style={{ fontSize: 10, fontWeight: 'bold', color: colors.textMuted, textTransform: 'uppercase', letterSpacing: 1, textAlign: 'center' }}>Select Match Duration</Text>
                 <View style={{ flexDirection: 'row', gap: 8 }}>
